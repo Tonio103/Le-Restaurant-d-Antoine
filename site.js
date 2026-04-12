@@ -27,7 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
      ========================================================================== */
   const STORAGE_KEYS = {
     theme: "antoine-theme",
-    reviews: "antoine-reviews"
+    reviews: "antoine-reviews",
+    recipeLikes: "antoine-recipe-likes",
+    userLikedRecipes: "antoine-user-liked-recipes"
   };
 
   /* ==========================================================================
@@ -150,6 +152,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const timers = {};
   let toastTimeout = null;
   let currentRating = 0;
+
+  const RECIPE_KEYS = ["cailles", "crepes", "burgers", "fondants", "marbre", "pokebowl"];
+
+  const recipesMeta = {
+    cailles: { name: "Cailles", url: "cailles.html", emoji: "🍗" },
+    crepes: { name: "Crêpes", url: "crepes.html", emoji: "🥞" },
+    burgers: { name: "Burger maison", url: "burger.html", emoji: "🍔" },
+    fondants: { name: "Fondant au chocolat", url: "fondant.html", emoji: "🍫" },
+    marbre: { name: "Gâteau marbré", url: "gateau-marbre.html", emoji: "🍰" },
+    pokebowl: { name: "Poké Bowl", url: "poke-bowl.html", emoji: "🥗" }
+  };
 
   /* ==========================================================================
      STORAGE HELPERS
@@ -327,42 +340,43 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ==========================================================================
      PLANE ANIMATION
      ========================================================================== */
-function initPlaneAnimation() {
-  const plane = document.getElementById("plane");
-  if (!plane) return;
+  function initPlaneAnimation() {
+    const plane = document.getElementById("plane");
+    if (!plane) return;
 
-  let startTime = null;
-  const duration = 10000;
+    let startTime = null;
+    const duration = 10000;
 
-  function animatePlane(timestamp) {
-    if (!startTime) startTime = timestamp;
+    function animatePlane(timestamp) {
+      if (!startTime) startTime = timestamp;
 
-    const elapsed = timestamp - startTime;
-    const progress = elapsed / duration;
+      const elapsed = timestamp - startTime;
+      const progress = elapsed / duration;
 
-    if (progress >= 1) {
-      plane.style.opacity = "0";
-      return;
+      if (progress >= 1) {
+        plane.style.opacity = "0";
+        return;
+      }
+
+      const x = progress * (window.innerWidth + 120) - 60;
+      const y = window.innerHeight * 0.38 + Math.sin(progress * Math.PI * 1.4) * 70;
+
+      const nextX = (progress + 0.001) * (window.innerWidth + 120) - 60;
+      const nextY = window.innerHeight * 0.38 + Math.sin((progress + 0.001) * Math.PI * 1.4) * 70;
+
+      const angleRad = Math.atan2(nextY - y, nextX - x);
+
+      plane.style.opacity = "1";
+      plane.style.left = `${x}px`;
+      plane.style.top = `${y}px`;
+      plane.style.transform = `translate(-50%, -50%) rotate(${angleRad}rad)`;
+
+      requestAnimationFrame(animatePlane);
     }
-
-    const x = progress * (window.innerWidth + 120) - 60;
-    const y = window.innerHeight * 0.38 + Math.sin(progress * Math.PI * 1.4) * 70;
-
-    const nextX = (progress + 0.001) * (window.innerWidth + 120) - 60;
-    const nextY = window.innerHeight * 0.38 + Math.sin((progress + 0.001) * Math.PI * 1.4) * 70;
-
-    const angleRad = Math.atan2(nextY - y, nextX - x);
-
-    plane.style.opacity = "1";
-    plane.style.left = `${x}px`;
-    plane.style.top = `${y}px`;
-    plane.style.transform = `translate(-50%, -50%) rotate(${angleRad}rad)`;
 
     requestAnimationFrame(animatePlane);
   }
 
-  requestAnimationFrame(animatePlane);
-}
   /* ==========================================================================
      INGREDIENTS / PORTIONS
      ========================================================================== */
@@ -596,6 +610,125 @@ function initPlaneAnimation() {
 
       showToast("✅ Votre avis a été publié avec succès !");
     });
+  }
+
+  /* ==========================================================================
+     LIKES
+     ========================================================================== */
+  function getLikes() {
+    try {
+      const raw = safeGetStorage(STORAGE_KEYS.recipeLikes, "{}");
+      const parsed = JSON.parse(raw);
+      return typeof parsed === "object" && parsed !== null ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function saveLikes(likes) {
+    safeSetStorage(STORAGE_KEYS.recipeLikes, JSON.stringify(likes));
+  }
+
+  function getUserLikedRecipes() {
+    try {
+      const raw = safeGetStorage(STORAGE_KEYS.userLikedRecipes, "[]");
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveUserLikedRecipes(likedRecipes) {
+    safeSetStorage(STORAGE_KEYS.userLikedRecipes, JSON.stringify(likedRecipes));
+  }
+
+  function hasUserLiked(recipe) {
+    return getUserLikedRecipes().includes(recipe);
+  }
+
+  function updateLikeDisplay(recipe) {
+    const likes = getLikes();
+    const button = document.querySelector(`[onclick="toggleLike('${recipe}')"]`);
+    const countEl = document.getElementById(`likes-${recipe}`);
+    const isLiked = hasUserLiked(recipe);
+
+    if (countEl) {
+      countEl.textContent = likes[recipe] || 0;
+    }
+
+    if (button) {
+      button.classList.toggle("liked", isLiked);
+      button.setAttribute("aria-pressed", isLiked ? "true" : "false");
+      button.title = isLiked ? "Retirer mon like" : "Liker cette recette";
+    }
+  }
+
+  function toggleLike(recipe) {
+    const likes = getLikes();
+    const userLikedRecipes = getUserLikedRecipes();
+    const alreadyLiked = userLikedRecipes.includes(recipe);
+
+    if (!likes[recipe]) {
+      likes[recipe] = 0;
+    }
+
+    if (alreadyLiked) {
+      likes[recipe] = Math.max(0, likes[recipe] - 1);
+      const nextLikedRecipes = userLikedRecipes.filter((item) => item !== recipe);
+      saveUserLikedRecipes(nextLikedRecipes);
+      showToast("Like retiré.");
+    } else {
+      likes[recipe] += 1;
+      userLikedRecipes.push(recipe);
+      saveUserLikedRecipes(userLikedRecipes);
+      showToast("Recette likée ❤️");
+    }
+
+    saveLikes(likes);
+    updateLikeDisplay(recipe);
+    renderTopRecipe();
+  }
+
+  function getTopRecipe() {
+    const likes = getLikes();
+
+    let top = null;
+    let max = 0;
+
+    RECIPE_KEYS.forEach((recipe) => {
+      const score = likes[recipe] || 0;
+      if (score > max) {
+        max = score;
+        top = recipe;
+      }
+    });
+
+    return top;
+  }
+
+  function renderTopRecipe() {
+    const container = document.getElementById("topRecipe");
+    if (!container) return;
+
+    const top = getTopRecipe();
+
+    if (!top || !recipesMeta[top]) {
+      container.innerHTML = `<p>Aucune recette n’a encore été likée.</p>`;
+      return;
+    }
+
+    const recipe = recipesMeta[top];
+    const likes = getLikes();
+    const count = likes[top] || 0;
+
+    container.innerHTML = `
+      <a href="${recipe.url}" class="feature-box" style="display:block;">
+        <span>${recipe.emoji}</span>
+        <h4>${recipe.name}</h4>
+        <p>${count} like${count > 1 ? "s" : ""}</p>
+      </a>
+    `;
   }
 
   /* ==========================================================================
@@ -946,86 +1079,7 @@ function initPlaneAnimation() {
   window.addEventListener("error", () => {
     hideLoader();
   });
-function getLikes() {
-  try {
-    return JSON.parse(localStorage.getItem("recipeLikes") || "{}");
-  } catch {
-    return {};
-  }
-}
 
-function saveLikes(likes) {
-  localStorage.setItem("recipeLikes", JSON.stringify(likes));
-}
-
-function updateLikeDisplay(recipe) {
-  const likes = getLikes();
-  const el = document.getElementById(`likes-${recipe}`);
-  if (el) {
-    el.textContent = likes[recipe] || 0;
-  }
-}
-
-function toggleLike(recipe) {
-  const likes = getLikes();
-
-  if (!likes[recipe]) {
-    likes[recipe] = 0;
-  }
-
-  likes[recipe] += 1;
-  saveLikes(likes);
-  updateLikeDisplay(recipe);
-  renderTopRecipe();
-}
-
-function getTopRecipe() {
-  const likes = getLikes();
-
-  let top = null;
-  let max = -1;
-
-  for (const recipe in likes) {
-    if (likes[recipe] > max) {
-      max = likes[recipe];
-      top = recipe;
-    }
-  }
-
-  return top;
-}
-
-function renderTopRecipe() {
-  const container = document.getElementById("topRecipe");
-  if (!container) return;
-
-  const top = getTopRecipe();
-
-  const recipesData = {
-    crepes: { name: "Crêpes", url: "crepes.html", emoji: "🥞" },
-    burger: { name: "Burger maison", url: "burger.html", emoji: "🍔" },
-    fondant: { name: "Fondant au chocolat", url: "fondant.html", emoji: "🍫" },
-    marbre: { name: "Gâteau marbré", url: "gateau-marbre.html", emoji: "🍰" },
-    pokebowl: { name: "Poké Bowl", url: "poke-bowl.html", emoji: "🥗" },
-    cailles: { name: "Cailles", url: "cailles.html", emoji: "🍗" }
-  };
-
-  if (!top || !recipesData[top]) {
-    container.innerHTML = `<p>Aucune recette n’a encore été likée.</p>`;
-    return;
-  }
-
-  const r = recipesData[top];
-  const likes = getLikes();
-
-  container.innerHTML = `
-    <a href="${r.url}" class="feature-box" style="display:block;">
-      <span>${r.emoji}</span>
-      <h4>${r.name}</h4>
-      <p>${likes[top]} like${likes[top] > 1 ? "s" : ""}</p>
-    </a>
-  `;
-}
   /* ==========================================================================
      INIT
      ========================================================================== */
@@ -1041,9 +1095,10 @@ function renderTopRecipe() {
   initHeroParallax();
   initLiquidGlass();
   initScrollTopButton();
-  renderTopRecipe();
 
   Object.keys(recipeData).forEach(renderIngredients);
+  RECIPE_KEYS.forEach(updateLikeDisplay);
+  renderTopRecipe();
   revealOnScroll();
 
   window.setTimeout(hideLoader, 900);
