@@ -182,21 +182,20 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: var(--z-negative);
+  z-index: -1;
   pointer-events: none;
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
-  filter: saturate(1.08) blur(2px);
+  background-repeat: no-repeat;
   transform: scale(1.02);
   opacity: 0.72;
   transition: opacity 0.6s ease, filter 0.6s ease, transform 0.6s ease;
 }
 
-/* seulement le sombre */
+/* mode sombre */
 body.dark-mode::before {
-  opacity: 0.1;
-  filter: brightness(0.45) saturate(0.9) blur(1px);
+  opacity: 0.14;
+  filter: brightness(0.38) saturate(0.9);
 }
 /* Dynamic Backgrounds */
 body[data-theme-page="accueil"]::before {
