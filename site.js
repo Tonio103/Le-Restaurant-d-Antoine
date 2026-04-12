@@ -708,29 +708,45 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderTopRecipe() {
-    const container = document.getElementById("topRecipe");
-    if (!container) return;
+  const container = document.getElementById("topRecipe");
+  if (!container) return;
 
-    const top = getTopRecipe();
+  const top = getTopRecipe();
 
-    if (!top || !recipesMeta[top]) {
-      container.innerHTML = `<p>Aucune recette n’a encore été likée.</p>`;
-      return;
-    }
-
-    const recipe = recipesMeta[top];
-    const likes = getLikes();
-    const count = likes[top] || 0;
-
+  if (!top || !recipesMeta[top]) {
     container.innerHTML = `
-      <a href="${recipe.url}" class="feature-box" style="display:block;">
-        <span>${recipe.emoji}</span>
-        <h4>${recipe.name}</h4>
-        <p>${count} like${count > 1 ? "s" : ""}</p>
-      </a>
+      <div class="top-recipe-card">
+        <div class="top-recipe-left">
+          <div class="top-recipe-emoji">🏆</div>
+          <div class="top-recipe-text">
+            <span class="top-recipe-kicker">Recette mise en avant</span>
+            <h4>Aucune recette favorite pour le moment</h4>
+            <p>Les likes des visiteurs feront apparaître la recette star ici.</p>
+          </div>
+        </div>
+      </div>
     `;
+    return;
   }
 
+  const recipe = recipesMeta[top];
+  const likes = getLikes();
+  const count = likes[top] || 0;
+
+  container.innerHTML = `
+    <a href="${recipe.url}" class="top-recipe-card">
+      <div class="top-recipe-left">
+        <div class="top-recipe-emoji">${recipe.emoji}</div>
+        <div class="top-recipe-text">
+          <span class="top-recipe-kicker">Recette la plus aimée</span>
+          <h4>${recipe.name}</h4>
+          <p>La favorite actuelle des visiteurs.</p>
+        </div>
+      </div>
+      <div class="top-recipe-badge">❤️ ${count} like${count > 1 ? "s" : ""}</div>
+    </a>
+  `;
+}
   /* ==========================================================================
      COUNTERS
      ========================================================================== */
