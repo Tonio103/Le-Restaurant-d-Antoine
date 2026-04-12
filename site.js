@@ -937,6 +937,7 @@ function initPlaneAnimation() {
 
   window.setRating = setRating;
   window.showToast = showToast;
+  window.toggleLike = toggleLike;
 
   /* ==========================================================================
      GLOBAL EVENTS
@@ -945,7 +946,86 @@ function initPlaneAnimation() {
   window.addEventListener("error", () => {
     hideLoader();
   });
+function getLikes() {
+  try {
+    return JSON.parse(localStorage.getItem("recipeLikes") || "{}");
+  } catch {
+    return {};
+  }
+}
 
+function saveLikes(likes) {
+  localStorage.setItem("recipeLikes", JSON.stringify(likes));
+}
+
+function updateLikeDisplay(recipe) {
+  const likes = getLikes();
+  const el = document.getElementById(`likes-${recipe}`);
+  if (el) {
+    el.textContent = likes[recipe] || 0;
+  }
+}
+
+function toggleLike(recipe) {
+  const likes = getLikes();
+
+  if (!likes[recipe]) {
+    likes[recipe] = 0;
+  }
+
+  likes[recipe] += 1;
+  saveLikes(likes);
+  updateLikeDisplay(recipe);
+  renderTopRecipe();
+}
+
+function getTopRecipe() {
+  const likes = getLikes();
+
+  let top = null;
+  let max = -1;
+
+  for (const recipe in likes) {
+    if (likes[recipe] > max) {
+      max = likes[recipe];
+      top = recipe;
+    }
+  }
+
+  return top;
+}
+
+function renderTopRecipe() {
+  const container = document.getElementById("topRecipe");
+  if (!container) return;
+
+  const top = getTopRecipe();
+
+  const recipesData = {
+    crepes: { name: "Crêpes", url: "crepes.html", emoji: "🥞" },
+    burger: { name: "Burger maison", url: "burger.html", emoji: "🍔" },
+    fondant: { name: "Fondant au chocolat", url: "fondant.html", emoji: "🍫" },
+    marbre: { name: "Gâteau marbré", url: "gateau-marbre.html", emoji: "🍰" },
+    pokebowl: { name: "Poké Bowl", url: "poke-bowl.html", emoji: "🥗" },
+    cailles: { name: "Cailles", url: "cailles.html", emoji: "🍗" }
+  };
+
+  if (!top || !recipesData[top]) {
+    container.innerHTML = `<p>Aucune recette n’a encore été likée.</p>`;
+    return;
+  }
+
+  const r = recipesData[top];
+  const likes = getLikes();
+
+  container.innerHTML = `
+    <a href="${r.url}" class="feature-box" style="display:block;">
+      <span>${r.emoji}</span>
+      <h4>${r.name}</h4>
+      <p>${likes[top]} like${likes[top] > 1 ? "s" : ""}</p>
+    </a>
+  `;
+}
   /* ==========================================================================
      INIT
      ========================================================================== */
@@ -961,6 +1041,7 @@ function initPlaneAnimation() {
   initHeroParallax();
   initLiquidGlass();
   initScrollTopButton();
+  renderTopRecipe();
 
   Object.keys(recipeData).forEach(renderIngredients);
   revealOnScroll();
