@@ -27,9 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
      ========================================================================== */
   const STORAGE_KEYS = {
     theme: "antoine-theme",
-    reviews: "antoine-reviews",
-    recipeLikes: "antoine-recipe-likes",
-    userLikedRecipes: "antoine-user-liked-recipes"
+    reviews: "antoine-reviews"
   };
 
   /* ==========================================================================
@@ -152,17 +150,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const timers = {};
   let toastTimeout = null;
   let currentRating = 0;
-
-  const RECIPE_KEYS = ["cailles", "crepes", "burgers", "fondants", "marbre", "pokebowl"];
-
-  const recipesMeta = {
-    cailles: { name: "Cailles", url: "cailles.html", emoji: "🍗" },
-    crepes: { name: "Crêpes", url: "crepes.html", emoji: "🥞" },
-    burgers: { name: "Burger maison", url: "burger.html", emoji: "🍔" },
-    fondants: { name: "Fondant au chocolat", url: "fondant.html", emoji: "🍫" },
-    marbre: { name: "Gâteau marbré", url: "gateau-marbre.html", emoji: "🍰" },
-    pokebowl: { name: "Poké Bowl", url: "poke-bowl.html", emoji: "🥗" }
-  };
 
   /* ==========================================================================
      STORAGE HELPERS
@@ -613,141 +600,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ==========================================================================
-     LIKES
-     ========================================================================== */
-  function getLikes() {
-    try {
-      const raw = safeGetStorage(STORAGE_KEYS.recipeLikes, "{}");
-      const parsed = JSON.parse(raw);
-      return typeof parsed === "object" && parsed !== null ? parsed : {};
-    } catch {
-      return {};
-    }
-  }
-
-  function saveLikes(likes) {
-    safeSetStorage(STORAGE_KEYS.recipeLikes, JSON.stringify(likes));
-  }
-
-  function getUserLikedRecipes() {
-    try {
-      const raw = safeGetStorage(STORAGE_KEYS.userLikedRecipes, "[]");
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-
-  function saveUserLikedRecipes(likedRecipes) {
-    safeSetStorage(STORAGE_KEYS.userLikedRecipes, JSON.stringify(likedRecipes));
-  }
-
-  function hasUserLiked(recipe) {
-    return getUserLikedRecipes().includes(recipe);
-  }
-
-  function updateLikeDisplay(recipe) {
-    const likes = getLikes();
-    const button = document.querySelector(`[onclick="toggleLike('${recipe}')"]`);
-    const countEl = document.getElementById(`likes-${recipe}`);
-    const isLiked = hasUserLiked(recipe);
-
-    if (countEl) {
-      countEl.textContent = likes[recipe] || 0;
-    }
-
-    if (button) {
-      button.classList.toggle("liked", isLiked);
-      button.setAttribute("aria-pressed", isLiked ? "true" : "false");
-      button.title = isLiked ? "Retirer mon like" : "Liker cette recette";
-    }
-  }
-
-  function toggleLike(recipe) {
-    const likes = getLikes();
-    const userLikedRecipes = getUserLikedRecipes();
-    const alreadyLiked = userLikedRecipes.includes(recipe);
-
-    if (!likes[recipe]) {
-      likes[recipe] = 0;
-    }
-
-    if (alreadyLiked) {
-      likes[recipe] = Math.max(0, likes[recipe] - 1);
-      const nextLikedRecipes = userLikedRecipes.filter((item) => item !== recipe);
-      saveUserLikedRecipes(nextLikedRecipes);
-      showToast("Like retiré.");
-    } else {
-      likes[recipe] += 1;
-      userLikedRecipes.push(recipe);
-      saveUserLikedRecipes(userLikedRecipes);
-      showToast("Recette likée ❤️");
-    }
-
-    saveLikes(likes);
-    updateLikeDisplay(recipe);
-    renderTopRecipe();
-  }
-
-  function getTopRecipe() {
-    const likes = getLikes();
-
-    let top = null;
-    let max = 0;
-
-    RECIPE_KEYS.forEach((recipe) => {
-      const score = likes[recipe] || 0;
-      if (score > max) {
-        max = score;
-        top = recipe;
-      }
-    });
-
-    return top;
-  }
-
-  function renderTopRecipe() {
-  const container = document.getElementById("topRecipe");
-  if (!container) return;
-
-  const top = getTopRecipe();
-
-  if (!top || !recipesMeta[top]) {
-    container.innerHTML = `
-      <div class="top-recipe-card">
-        <div class="top-recipe-left">
-          <div class="top-recipe-emoji">🏆</div>
-          <div class="top-recipe-text">
-            <span class="top-recipe-kicker">Recette mise en avant</span>
-            <h4>Aucune recette favorite pour le moment</h4>
-            <p>Les likes des visiteurs feront apparaître la recette star ici.</p>
-          </div>
-        </div>
-      </div>
-    `;
-    return;
-  }
-
-  const recipe = recipesMeta[top];
-  const likes = getLikes();
-  const count = likes[top] || 0;
-
-  container.innerHTML = `
-    <a href="${recipe.url}" class="top-recipe-card">
-      <div class="top-recipe-left">
-        <div class="top-recipe-emoji">${recipe.emoji}</div>
-        <div class="top-recipe-text">
-          <span class="top-recipe-kicker">Recette la plus aimée</span>
-          <h4>${recipe.name}</h4>
-          <p>La favorite actuelle des visiteurs.</p>
-        </div>
-      </div>
-      <div class="top-recipe-badge">❤️ ${count} like${count > 1 ? "s" : ""}</div>
-    </a>
-  `;
-}
-  /* ==========================================================================
      COUNTERS
      ========================================================================== */
   function initCounters() {
@@ -1086,7 +938,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.setRating = setRating;
   window.showToast = showToast;
-  window.toggleLike = toggleLike;
 
   /* ==========================================================================
      GLOBAL EVENTS
@@ -1113,8 +964,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initScrollTopButton();
 
   Object.keys(recipeData).forEach(renderIngredients);
-  RECIPE_KEYS.forEach(updateLikeDisplay);
-  renderTopRecipe();
   revealOnScroll();
 
   window.setTimeout(hideLoader, 900);
