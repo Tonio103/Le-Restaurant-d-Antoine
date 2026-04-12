@@ -3062,13 +3062,23 @@ body[data-theme-page="accueil"]:not(.dark-mode)::before {
 body.dark-mode {
   background: #161210 !important;
 }
+#searchInput {
+  color: #2c211c;
+}
+
+#searchInput::placeholder {
+  color: rgba(44, 33, 28, 0.6);
+}
+
+body.dark-mode #searchInput {
+  color: white;
+}
+
+body.dark-mode #searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
 @media (max-width: 768px) {
-  .bento-container,
-  .bento-card,
-  .bento-badge,
-  .floating-item,
-  .floating-badge,
-  .hero-glow {
+  .hero-visual {
     display: none !important;
   }
 }
