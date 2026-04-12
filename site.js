@@ -329,43 +329,10 @@ document.addEventListener("DOMContentLoaded", () => {
      ========================================================================== */
 function initPlaneAnimation() {
   const plane = document.getElementById("plane");
-  const canvas = document.getElementById("trail");
+  if (!plane) return;
 
-  if (!plane || !canvas) return;
-
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  let path = [];
   let startTime = null;
-  const duration = 10000; // 10 secondes
-
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-
-  resizeCanvas();
-  window.addEventListener("resize", resizeCanvas);
-
-  function drawTrail() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (path.length < 2) return;
-
-    ctx.beginPath();
-    for (let i = 0; i < path.length; i++) {
-      const p = path[i];
-      if (i === 0) ctx.moveTo(p.x, p.y);
-      else ctx.lineTo(p.x, p.y);
-    }
-
-    ctx.strokeStyle = "rgba(255,255,255,0.35)";
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.stroke();
-  }
+  const duration = 10000;
 
   function animatePlane(timestamp) {
     if (!startTime) startTime = timestamp;
@@ -375,7 +342,6 @@ function initPlaneAnimation() {
 
     if (progress >= 1) {
       plane.style.opacity = "0";
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
       return;
     }
 
@@ -392,17 +358,6 @@ function initPlaneAnimation() {
     plane.style.top = `${y}px`;
     plane.style.transform = `translate(-50%, -50%) rotate(${angleRad}rad)`;
 
-    const offsetBack = 10;
-    const trailX = x - Math.cos(angleRad) * offsetBack;
-    const trailY = y - Math.sin(angleRad) * offsetBack;
-
-    path.push({ x: trailX, y: trailY });
-
-    if (path.length > 70) {
-      path.shift();
-    }
-
-    drawTrail();
     requestAnimationFrame(animatePlane);
   }
 
