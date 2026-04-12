@@ -106,11 +106,11 @@ document.addEventListener("DOMContentLoaded", () => {
       targetId: "marbreIngredients",
       labelId: "marbreCountLabel",
       items: [
-        { emoji: "", name: "Farine blanche", amount: 220, unit: "g" },
-        { emoji: "", name: "Œufs frais", amount: 4, unit: "pièces" },
-        { emoji: "", name: "Beurre mou (pommade)", amount: 140, unit: "g" },
-        { emoji: "", name: "Sucre cristal", amount: 140, unit: "g" },
-        { emoji: "", name: "Cacao amer en poudre", amount: 25, unit: "g" },
+        { emoji: "", name: "Farine blanche", amount: 250, unit: "g" },
+        { emoji: "", name: "Œufs frais", amount: 3, unit: "pièces" },
+        { emoji: "", name: "Beurre mou (pommade)", amount: 125, unit: "g" },
+        { emoji: "", name: "Sucre blanc", amount: 125, unit: "g" },
+        { emoji: "", name: "Chocolat", amount: 100, unit: "g" },
         { emoji: "", name: "Lait entier", amount: 80, unit: "ml" },
         { emoji: "", name: "Levure chimique", amount: 1, unit: "sachet" },
         { emoji: "", name: "Extrait de vanille", amount: 1, unit: "c. à café" }
