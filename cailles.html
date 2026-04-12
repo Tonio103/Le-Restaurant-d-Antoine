@@ -1,0 +1,233 @@
+<header class="site-header">
+  <nav class="navbar">
+
+    <div class="logo-wrap">
+      <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+      <div class="logo-text">
+        <strong>Le restaurant d’Antoine</strong>
+        <span>Maison gourmande & recettes favorites</span>
+      </div>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+    <!-- 🔍 BARRE DE RECHERCHE -->
+    <div class="nav-center" id="navCenter">
+      <div style="position:relative; width:100%;">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Rechercher une recette..."
+          autocomplete="off"
+          style="padding:10px; border-radius:10px; border:none; width:100%;"
+        />
+        <div id="searchSuggestions" class="search-suggestions"></div>
+      </div>
+    </div>
+
+    <!-- 🔥 LES 3 LIENS -->
+    <div class="nav-links">
+      <a href="questions.html">Questions</a>
+      <a href="avis.html">Avis</a>
+      <a href="infos.html">Infos</a>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+
+  </nav>
+</header>
+
+  <main class="main-layout">
+
+    <section class="page-section active" id="cailles">
+
+      <div class="recipe-banner glass-card tilt-card">
+        <div>
+          <p class="section-kicker">Plat Signature Tradition</p>
+          <h3>Cuisses de caille aux petits pois</h3>
+          <p>
+            Un plat de tradition française, à la fois élégant et réconfortant.
+            Les petits pois mijotent doucement avec les lardons, les herbes et le bouillon,
+            pendant que les cailles dorent pour rester tendres et savoureuses. Merci Mamoune !
+          </p>
+        </div>
+        <div class="recipe-big-emoji">🥘</div>
+      </div>
+
+      <div class="recipe-gallery-grid burger-gallery">
+        <img src="cailles.png" alt="Plat de cailles aux petits pois" class="gallery-main lightboxable" />
+        <img src="petits-pois.png" alt="Petits pois frais" class="lightboxable" />
+        <img src="cailesss.png" alt="Détail cuisson caille" class="lightboxable" />
+      </div>
+
+      <div class="glass-card">
+        <div class="recipe-header">
+          <h3>Ingrédients de la recette</h3>
+          <div class="portion-box">
+            <span id="caillesCountLabel">4 PERSONNES</span>
+            <div class="portion-controls">
+              <button type="button" onclick="changePortions('cailles', -1)">−</button>
+              <button type="button" onclick="resetPortions('cailles')">↻</button>
+              <button type="button" onclick="changePortions('cailles', 1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="ingredient-grid" id="caillesIngredients"></div>
+      </div>
+
+      <div class="two-col">
+
+        <div class="glass-card">
+          <div class="prep-header">
+            <h3>Préparation détaillée</h3>
+            <span class="prep-time">⏱ 30 min</span>
+          </div>
+
+          <div class="step-grid top-gap">
+            <div class="step">
+              <span>1</span>
+              <p>
+                Commencez par préparer tous les ingrédients : émincez l’oignon,
+                épluchez si besoin les petits oignons, sortez les lardons,
+                préparez les petits pois et gardez le bouillon chaud à portée de main.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>2</span>
+              <p>
+                Faites chauffer une grande sauteuse ou une cocotte à feu moyen,
+                puis ajoutez les lardons fumés. Laissez-les revenir quelques minutes
+                jusqu’à ce qu’ils soient bien dorés et qu’ils rendent leur gras parfumé.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>3</span>
+              <p>
+                Ajoutez l’oignon émincé dans la cocotte avec les lardons.
+                Faites-le suer doucement pendant 2 à 3 minutes,
+                jusqu’à ce qu’il devienne translucide et légèrement fondant.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>4</span>
+              <p>
+                Incorporez les petits pois, les petits oignons grelots et,
+                si tu le souhaites, quelques rondelles de carottes.
+                Mélangez bien pour enrober les légumes du jus de cuisson.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>5</span>
+              <p>
+                Versez le bouillon chaud, ajoutez le bouquet garni,
+                puis assaisonnez légèrement avec du sel et du poivre.
+                Goûtez toujours avant de resaler, car les lardons apportent déjà du goût.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>6</span>
+              <p>
+                Couvrez et laissez mijoter à feu doux pendant environ 15 minutes.
+                Les petits pois doivent devenir tendres sans perdre toute leur tenue,
+                et le jus doit doucement se concentrer.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>7</span>
+              <p>
+                Pendant ce temps, faites dorer les cuisses de caille dans une poêle
+                avec un peu de beurre ou un filet d’huile.
+                L’objectif est d’obtenir une belle coloration extérieure
+                tout en gardant une chair moelleuse.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>8</span>
+              <p>
+                Déposez les cailles sur les petits pois juste avant de servir,
+                ou laissez-les finir quelques minutes dans la cocotte pour que les saveurs se mélangent.
+                Servez bien chaud avec le jus de cuisson par-dessus.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <h3>Accompagnements & Herbes</h3>
+
+          <div class="chip-group">
+            <button type="button" onclick="toggleChoice(this, 'caillesChoice')">Thym frais</button>
+            <button type="button" onclick="toggleChoice(this, 'caillesChoice')">Laurier</button>
+            <button type="button" onclick="toggleChoice(this, 'caillesChoice')">Pommes de terre grenailles</button>
+            <button type="button" onclick="toggleChoice(this, 'caillesChoice')">Vin blanc sec</button>
+            <button type="button" onclick="toggleChoice(this, 'caillesChoice')">Champignons</button>
+            <button type="button" onclick="toggleChoice(this, 'caillesChoice')">Persil plat</button>
+          </div>
+
+          <p class="selected-line">Sélection : <span id="caillesChoice">Aucune</span></p>
+
+          <div class="pairing-box top-gap">
+            <h4>Idées pour accompagner le plat</h4>
+            <ul>
+              <li><strong>Version classique :</strong> quelques pommes de terre grenailles rôties au four.</li>
+              <li><strong>Version plus raffinée :</strong> un filet de vin blanc pour déglacer la cocotte.</li>
+              <li><strong>Version encore plus gourmande :</strong> quelques champignons poêlés ajoutés en fin de cuisson.</li>
+              <li><strong>Finition fraîche :</strong> un peu de persil ciselé juste avant de servir.</li>
+            </ul>
+          </div>
+
+          <h3 class="top-gap">Checklist</h3>
+          <div class="checklist" data-fill="caillesFill" data-text="caillesText">
+            <label><input type="checkbox" /> Préparer et sortir tous les ingrédients</label>
+            <label><input type="checkbox" /> Faire revenir les lardons et l’oignon</label>
+            <label><input type="checkbox" /> Ajouter les petits pois et le bouillon</label>
+            <label><input type="checkbox" /> Laisser mijoter doucement</label>
+            <label><input type="checkbox" /> Faire dorer les cuisses de caille à part</label>
+            <label><input type="checkbox" /> Assembler et servir bien chaud</label>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill" id="caillesFill"></div>
+            </div>
+            <p id="caillesText">0 / 6</p>
+          </div>
+
+          <div class="timer-box top-gap">
+            <p class="timer-title">Gestion de la cuisson</p>
+            <p style="font-size:14px; opacity:0.75; margin-bottom:10px;">
+              Choisis le temps selon l’étape que tu es en train de faire :
+            </p>
+            <div id="timerDisplayCailles">00:00</div>
+            <div class="timer-actions">
+              <button type="button" onclick="startTimer(900, 'timerDisplayCailles')">15 min (cuisson des cailles)</button>
+              <button type="button" onclick="startTimer(900, 'timerDisplayCailles')">15 min (mijotage des petits pois)</button>
+              <button type="button" onclick="startTimer(1800, 'timerDisplayCailles')">30 min (préparation totale)</button>
+              <button type="button" onclick="resetTimer('timerDisplayCailles')" class="reset-btn">Remettre à zéro</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    </div>
+  </footer>
+
+  <script src="site.js"></script>
+</body>
+</html>

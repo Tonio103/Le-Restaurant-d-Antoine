@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gâteau marbré | Le restaurant d’Antoine</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body data-theme-page="marbre">
+
+  <header class="site-header">
+  <nav class="navbar">
+
+    <div class="logo-wrap">
+      <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+      <div class="logo-text">
+        <strong>Le restaurant d’Antoine</strong>
+        <span>Maison gourmande & recettes favorites</span>
+      </div>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+    <div class="nav-center" id="navCenter">
+      <div style="position:relative; width:100%;">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Rechercher une recette..."
+          autocomplete="off"
+          style="padding:10px; border-radius:10px; border:none; width:100%;"
+        />
+        <div id="searchSuggestions" class="search-suggestions"></div>
+      </div>
+    </div>
+
+    <!-- 🔥 AJOUT -->
+    <div class="nav-links">
+      <a href="questions.html">Questions</a>
+      <a href="avis.html">Avis</a>
+      <a href="infos.html">Infos</a>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+
+  </nav>
+</header>
+
+  <main class="main-layout">
+    <section class="page-section active" id="marbre">
+      <div class="recipe-banner glass-card tilt-card">
+        <div>
+          <p class="section-kicker">Univers 4</p>
+          <h3>Gâteau marbré d'enfance</h3>
+          <p>
+            Un grand classique du goûter, moelleux et généreux, avec ses jolies
+            marbrures vanille-chocolat. C’est le type de gâteau simple, rassurant
+            et gourmand qu’on adore retrouver au petit-déjeuner comme au goûter.
+          </p>
+        </div>
+        <div class="recipe-big-emoji">🍰</div>
+      </div>
+
+      <div class="recipe-gallery-grid fondant-gallery">
+        <img src="Gâteau marbré au chocolat et vanille.png" alt="Gâteau marbré" class="gallery-main lightboxable" />
+        <img src="Pain marbré au soleil d'extérieur.png" alt="Tranche de marbré" class="lightboxable" />
+        <img src="Part de gâteau marbré et détails.png" alt="Détail du gâteau marbré" class="lightboxable" />
+      </div>
+
+      <div class="glass-card">
+        <div class="recipe-header">
+          <h3>Ingrédients du gâteau marbré</h3>
+          <div class="portion-box">
+            <span id="marbreCountLabel">4 PERSONNES</span>
+            <div class="portion-controls">
+              <button type="button" onclick="changePortions('marbre', -1)">−</button>
+              <button type="button" onclick="resetPortions('marbre')">↻</button>
+              <button type="button" onclick="changePortions('marbre', 1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="ingredient-grid" id="marbreIngredients"></div>
+      </div>
+
+      <div class="two-col">
+
+        <div class="glass-card">
+          <div class="prep-header">
+            <h3>Préparation détaillée</h3>
+            <span class="prep-time">⏱ 1 h 10</span>
+          </div>
+
+          <div class="step-grid top-gap">
+            <div class="step">
+              <span>1</span>
+              <p>
+                Préchauffe le four à 160°C. Beurre soigneusement un moule à cake,
+                puis farine-le légèrement pour éviter que le gâteau n’accroche au démoulage.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>2</span>
+              <p>
+                Dans un grand saladier, travaille le beurre pommade avec le sucre
+                jusqu’à obtenir une texture claire, lisse et crémeuse. Cette étape
+                est importante pour donner du moelleux au gâteau.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>3</span>
+              <p>
+                Ajoute les œufs un par un en mélangeant bien entre chaque ajout.
+                Cela permet d’obtenir une pâte homogène sans grumeaux ni séparation.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>4</span>
+              <p>
+                Verse le lait pour assouplir la pâte. Tu peux aussi ajouter un peu de crème
+                ou un yaourt nature si tu veux un marbré encore plus fondant.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>5</span>
+              <p>
+                Incorpore ensuite la farine tamisée avec la levure.
+                Mélange juste assez pour obtenir une pâte lisse,
+                sans trop la travailler pour garder un gâteau léger.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>6</span>
+              <p>
+                Sépare la pâte en deux parts égales. Dans l’une, ajoute la vanille.
+                Dans l’autre, incorpore le cacao en poudre jusqu’à obtenir
+                une belle pâte chocolatée homogène.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>7</span>
+              <p>
+                Verse les deux pâtes en alternant les couches dans le moule :
+                un peu de vanille, puis un peu de chocolat, et ainsi de suite.
+                Passe ensuite la lame d’un couteau en zigzag dans la pâte
+                pour créer l’effet marbré.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>8</span>
+              <p>
+                Enfourne pour environ 50 à 55 minutes. Vérifie la cuisson avec la lame d’un couteau :
+                elle doit ressortir sèche. Laisse tiédir avant de démouler,
+                puis laisse complètement refroidir avant d’ajouter un glaçage ou un voile de sucre glace.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <h3>Finitions et glaçages</h3>
+
+          <div class="chip-group">
+            <button type="button" onclick="toggleChoice(this, 'marbreChoice')">Voile de sucre glace</button>
+            <button type="button" onclick="toggleChoice(this, 'marbreChoice')">Glaçage rocher</button>
+            <button type="button" onclick="toggleChoice(this, 'marbreChoice')">Sirop d'imbibage</button>
+            <button type="button" onclick="toggleChoice(this, 'marbreChoice')">Pépites de chocolat</button>
+            <button type="button" onclick="toggleChoice(this, 'marbreChoice')">Nappage ganache</button>
+            <button type="button" onclick="toggleChoice(this, 'marbreChoice')">Crème anglaise</button>
+          </div>
+
+          <p class="selected-line">Votre finition idéale : <span id="marbreChoice">Aucune</span></p>
+
+          <div class="pairing-box top-gap">
+            <h4>Les astuces pour un marbré d'exception</h4>
+            <ul>
+              <li><strong>Le moelleux :</strong> badigeonne le gâteau chaud avec un léger sirop de sucre pour conserver toute sa tendreté.</li>
+              <li><strong>Le visuel :</strong> ne mélange pas trop les pâtes dans le moule, sinon tu perds le bel effet marbré.</li>
+              <li><strong>Le glaçage :</strong> une ganache ou un glaçage rocher transforme le cake en dessert encore plus gourmand.</li>
+              <li><strong>Le lendemain :</strong> ce gâteau est souvent encore meilleur après une nuit bien emballé.</li>
+            </ul>
+          </div>
+
+          <h3 class="top-gap">Checklist de réussite</h3>
+          <div class="checklist" data-fill="marbreFill" data-text="marbreText">
+            <label><input type="checkbox" /> Sortir les ingrédients à température ambiante</label>
+            <label><input type="checkbox" /> Bien crémer le beurre et le sucre</label>
+            <label><input type="checkbox" /> Séparer correctement les deux pâtes</label>
+            <label><input type="checkbox" /> Faire un beau marbrage au couteau</label>
+            <label><input type="checkbox" /> Vérifier la cuisson sans ouvrir le four trop tôt</label>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill" id="marbreFill"></div>
+            </div>
+            <p id="marbreText">0 / 5</p>
+          </div>
+
+          <div class="timer-box top-gap">
+            <p class="timer-title">Cuisson lente du gâteau</p>
+            <p style="font-size:14px; opacity:0.75; margin-bottom:10px;">
+              Choisis le temps selon l’étape de cuisson souhaitée :
+            </p>
+            <div id="timerDisplayMarbre">00:00</div>
+            <div class="timer-actions">
+              <button type="button" onclick="startTimer(2700, 'timerDisplayMarbre')">45 min (vérification)</button>
+              <button type="button" onclick="startTimer(3300, 'timerDisplayMarbre')">55 min (cuisson totale)</button>
+              <button type="button" onclick="startTimer(4200, 'timerDisplayMarbre')">1 h 10 (préparation complète)</button>
+              <button type="button" onclick="resetTimer('timerDisplayMarbre')" class="reset-btn">Reset</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    </div>
+  </footer>
+
+  <script src="site.js"></script>
+</body>
+</html>

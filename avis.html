@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Avis | Le restaurant d’Antoine</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body data-theme-page="avis">
+
+<header class="site-header">
+  <nav class="navbar">
+
+    <div class="logo-wrap">
+      <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+      <div class="logo-text">
+        <strong>Le restaurant d’Antoine</strong>
+        <span>Maison gourmande & recettes favorites</span>
+      </div>
+    </div>
+
+    <div class="nav-center" id="navCenter">
+      <div style="position:relative; width:100%;">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Rechercher une recette..."
+          autocomplete="off"
+          style="padding:10px; border-radius:10px; border:none; width:100%;"
+        />
+        <div id="searchSuggestions" class="search-suggestions"></div>
+      </div>
+    </div>
+
+    <!-- 🔥 NAV DROITE -->
+    <div class="nav-links">
+      <a href="questions.html">Questions</a>
+      <a href="avis.html" class="active-link">Avis</a>
+      <a href="infos.html">Infos</a>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+
+  </nav>
+</header>
+
+  <main class="main-layout">
+    <section class="page-section active" id="avis">
+      <div class="glass-card">
+        <h3>Livre d'or du restaurant</h3>
+        <p class="muted">Avez-vous testé une de nos recettes ? Partagez votre expérience et donnez une note au site d'Antoine.</p>
+
+        <div class="review-box-container">
+          <div class="review-input-area">
+            <h4>Laisser une évaluation</h4>
+
+            <div class="stars" id="stars">
+              <span onclick="setRating(1)">★</span>
+              <span onclick="setRating(2)">★</span>
+              <span onclick="setRating(3)">★</span>
+              <span onclick="setRating(4)">★</span>
+              <span onclick="setRating(5)">★</span>
+            </div>
+
+            <p class="rating-text">Ta note globale : <strong id="ratingValue">0</strong>/5</p>
+
+            <div class="review-form">
+              <input type="text" id="reviewName" placeholder="Ton prénom (ex: Julien, Marie...)" />
+              <textarea id="reviewMessage" placeholder="Raconte-nous ce que tu as cuisiné, ce que tu as aimé sur le site..."></textarea>
+              <button type="button" id="submitReview" class="primary-btn">Publier mon avis publiquement</button>
+            </div>
+          </div>
+
+          <div class="reviews-display-area">
+            <h4>Avis récents des gourmands</h4>
+            <div id="reviewsList" class="reviews-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    </div>
+  </footer>
+
+  <div id="secretToast"></div>
+  <button id="scrollTopBtn" title="Retourner en haut de la page">↑</button>
+
+  <script src="site.js"></script>
+</body>
+</html>

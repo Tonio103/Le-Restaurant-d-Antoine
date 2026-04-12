@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Questions | Le restaurant d’Antoine</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body data-theme-page="questions">
+
+  <header class="site-header">
+  <nav class="navbar">
+
+    <div class="logo-wrap">
+      <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+      <div class="logo-text">
+        <strong>Le restaurant d’Antoine</strong>
+        <span>Maison gourmande & recettes favorites</span>
+      </div>
+    </div>
+
+    <div class="nav-center" id="navCenter">
+      <div style="position:relative; width:100%;">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Rechercher une recette..."
+          autocomplete="off"
+          style="padding:10px; border-radius:10px; border:none; width:100%;"
+        />
+        <div id="searchSuggestions" class="search-suggestions"></div>
+      </div>
+    </div>
+
+    <!-- 🔥 NAV DROITE -->
+    <div class="nav-links">
+      <a href="questions.html" class="active-link">Questions</a>
+      <a href="avis.html">Avis</a>
+      <a href="infos.html">Infos</a>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+
+  </nav>
+</header>
+  <main class="main-layout">
+    <section class="page-section active" id="questions">
+      <div class="glass-card">
+        <h3>Poser une question au Chef</h3>
+        <p class="muted">
+          Tu as une interrogation sur une étape de cuisson, tu ne trouves pas un ingrédient,
+          ou tu as une suggestion d'amélioration pour le design du site ? Écris-nous !
+        </p>
+
+        <form class="question-form" action="https://formspree.io/f/xeepdkvr" method="POST">
+          <div class="form-row">
+            <input type="text" name="nom" placeholder="Ton prénom ou pseudo" required />
+            <input type="email" name="email" placeholder="Ton adresse email" required />
+          </div>
+
+          <input type="text" name="sujet" placeholder="Sujet global de ta demande" required />
+
+          <select name="categorie" required>
+            <option value="" disabled selected>Choisis la catégorie concernée...</option>
+            <option value="cailles">Recette : Cailles aux petits pois</option>
+            <option value="crepes">Recette : Crêpes faciles</option>
+            <option value="burgers">Recette : Burgers maison</option>
+            <option value="fondants">Recette : Fondants au chocolat</option>
+            <option value="marbre">Recette : Gâteau marbré</option>
+            <option value="pokebowl">Recette : Poké bowl frais</option>
+            <option value="technique">Question technique de cuisine</option>
+            <option value="site">Avis ou question sur le design du site web</option>
+            <option value="idee">Suggestion de nouvelle recette</option>
+            <option value="bug">Signaler un bug technique sur le site</option>
+          </select>
+
+          <textarea
+            name="message"
+            placeholder="Écris ta question détaillée ici. Plus tu donnes de détails, plus la réponse sera précise !"
+            required
+          ></textarea>
+
+          <button type="submit" class="primary-btn submit-full">Envoyer le message au restaurant</button>
+        </form>
+
+        <div class="info-note"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    </div>
+  </footer>
+
+  <div id="secretToast"></div>
+  <button id="scrollTopBtn" title="Retourner en haut de la page">↑</button>
+
+  <script src="site.js"></script>
+</body>
+</html>

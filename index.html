@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Le restaurant d’Antoine</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body data-theme-page="accueil">
+
+  <div class="page-background"></div>
+  <div class="page-background-overlay"></div>
+  <div class="page-noise"></div>
+
+  <svg width="0" height="0" style="position: absolute; display: none;" aria-hidden="true">
+    <filter id="glass-distortion">
+      <feTurbulence
+        type="turbulence"
+        baseFrequency="0.008"
+        numOctaves="2"
+        result="noise"
+      />
+      <feDisplacementMap
+        id="glassDisplacement"
+        in="SourceGraphic"
+        in2="noise"
+        scale="8"
+      />
+    </filter>
+  </svg>
+
+  <div id="loader">
+    <div class="loader-inner">
+      <div class="glass-card loader-bubble">
+        <div class="glass-filter"></div>
+        <div class="glass-distortion-overlay"></div>
+        <div class="glass-overlay"></div>
+        <div class="glass-specular"></div>
+
+        <div class="glass-content">
+          <div class="loader-icons">
+            <span>🥞</span>
+            <span>🍔</span>
+            <span>🥘</span>
+            <span>🍰</span>
+            <span>🥗</span>
+          </div>
+        </div>
+      </div>
+      <h1>Préparation en cours...</h1>
+    </div>
+  </div>
+
+  <header class="site-header" id="siteHeader">
+  <nav class="navbar">
+    <div class="logo-wrap">
+      <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+      <div class="logo-text">
+        <strong>Le restaurant d’Antoine</strong>
+        <span>Maison gourmande & recettes favorites</span>
+      </div>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+    <div class="nav-center" id="navCenter">
+      <div class="search-wrap">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Rechercher une recette..."
+          autocomplete="off"
+        />
+        <div id="searchSuggestions" class="search-suggestions"></div>
+      </div>
+    </div>
+
+    <div class="nav-links">
+  <a href="questions.html">Questions</a>
+  <a href="avis.html">Avis</a>
+  <a href="infos.html" class="active-link">Infos</a>
+</div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+  </nav>
+</header>
+
+  <main class="main-layout">
+
+    <section class="page-section active" id="accueil">
+      <section class="hero" id="homeHero">
+        <div class="hero-copy">
+          <p class="badge">6 recettes • design premium • outils interactifs • ambiance maison</p>
+          <h1>Bienvenue au restaurant d’Antoine</h1>
+          <h2>Des recettes séparées, gourmandes et mieux organisées</h2>
+          <p class="hero-text">
+            Chaque recette a son univers : ingrédients ajustables, étapes détaillées,
+            idées d’associations, checklist, minuteurs multiples, galerie haute définition,
+            questions globales et avis.
+            Le tout dans un style plus élégant, plus lisible et plus agréable à utiliser.
+            Découvrez notre nouvelle spécialité : les cuisses de caille aux petits pois.
+          </p>
+
+          <div class="hero-actions">
+            <a class="primary-btn" href="cailles.html">Découvrir les Cailles</a>
+            <a class="secondary-btn" href="crepes.html">Voir les crêpes</a>
+            <a class="secondary-btn" href="burger.html">Voir les burgers</a>
+            <a class="secondary-btn" href="fondant.html">Voir les fondants</a>
+            <a class="secondary-btn" href="gateau-marbre.html">Voir le marbré</a>
+            <a class="secondary-btn" href="poke-bowl.html">Voir le poké bowl</a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat-card tilt-card">
+              <span class="stat-number counter" data-target="6">0</span>
+              <span class="stat-label">recettes</span>
+            </div>
+            <div class="stat-card tilt-card">
+              <span class="stat-number counter" data-target="24">0</span>
+              <span class="stat-label">outils pratiques</span>
+            </div>
+            <div class="stat-card tilt-card">
+              <span class="stat-number counter" data-target="100">0</span>
+              <span class="stat-label">% gourmandise</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-glow"></div>
+          <div class="bento-container" id="bento-box">
+            <div class="bento-card card-main" data-speed="2">
+              <span class="bento-icon">🍔</span>
+              <div class="bento-info">
+                <span>Burgers</span>
+                <small>Maison</small>
+              </div>
+            </div>
+
+            <div class="bento-card card-medium" data-speed="4">
+              <span class="bento-icon">🥞</span>
+              <div class="bento-info">
+                <span>Crêpes</span>
+                <small>Gourmandes</small>
+              </div>
+            </div>
+
+            <div class="bento-card card-small" data-speed="-3">
+              <span class="bento-icon">🥗</span>
+            </div>
+
+            <div class="bento-badge" data-speed="6">Fait Maison ✨</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="glass-card intro-card tilt-card top-gap liquid-glass-card">
+        <div class="glass-filter"></div>
+        <div class="glass-distortion-overlay"></div>
+        <div class="glass-overlay"></div>
+        <div class="glass-specular"></div>
+
+        <div class="glass-content intro-content">
+          <div>
+            <h3>Le Menu Signature d'Antoine</h3>
+            <p>
+              Le restaurant d’Antoine rassemble des recettes gourmandes dans un site travaillé avec
+              une interface plus claire, plus élégante et interactive. Tout est séparé proprement pour rendre le site agréable
+              à utiliser et joli à regarder.
+            </p>
+          </div>
+          <div class="intro-emoji">👨‍🍳</div>
+        </div>
+      </div>
+
+      <div class="universe-grid">
+        <article class="glass-card universe-card tilt-card">
+          <img src="cailesss.png" alt="Cailles aux petits pois" class="universe-image" />
+          <div class="universe-content">
+            <div class="universe-icon"></div>
+            <h3>Cailles & Petits pois</h3>
+            <p>Un classique de la gastronomie française, délicat et savoureux, parfait pour les repas de fête ou du dimanche.</p>
+            <a class="primary-btn" href="cailles.html">Explorer la recette</a>
+          </div>
+        </article>
+
+        <article class="glass-card universe-card tilt-card">
+          <img src="Crêpes dorées sur plateaux rustique.png" alt="Crêpes classiques" class="universe-image" />
+          <div class="universe-content">
+            <div class="universe-icon"></div>
+            <h3>Crêpes gourmandes</h3>
+            <p>Douces, moelleuses, avec un léger parfum de vanille ou de rhum, faciles à personnaliser à l'infini.</p>
+            <a class="primary-btn" href="crepes.html">Explorer la recette</a>
+          </div>
+        </article>
+
+        <article class="glass-card universe-card tilt-card">
+          <img src="Burger appétissant sur surface en bois.png" alt="Hamburger maison" class="universe-image" />
+          <div class="universe-content">
+            <div class="universe-icon"></div>
+            <h3>Burgers garnis</h3>
+            <p>Chauds, généreux et ultra gourmands, avec un pain brioché moelleux et une viande fondante.</p>
+            <a class="primary-btn" href="burger.html">Explorer la recette</a>
+          </div>
+        </article>
+
+        <article class="glass-card universe-card tilt-card">
+          <img src="Fondant au chocolat fondants.png" alt="Fondant au chocolat" class="universe-image" />
+          <div class="universe-content">
+            <div class="universe-icon"></div>
+            <h3>Fondants intenses</h3>
+            <p>Au cœur coulant et intense, ce dessert fera chavirer tous les amateurs de chocolat.</p>
+            <a class="primary-btn" href="fondant.html">Explorer la recette</a>
+          </div>
+        </article>
+
+        <article class="glass-card universe-card tilt-card">
+          <img src="Gâteau marbré au chocolat et vanille.png" alt="Gâteau marbré" class="universe-image" />
+          <div class="universe-content">
+            <div class="universe-icon"></div>
+            <h3>Gâteau marbré</h3>
+            <p>Moelleux à souhait, ce classique est aussi superbe à la découpe qu'en bouche.</p>
+            <a class="primary-btn" href="gateau-marbre.html">Explorer la recette</a>
+          </div>
+        </article>
+
+        <article class="glass-card universe-card tilt-card">
+          <img src="Bol poke coloré et frais.png" alt="Poké bowl" class="universe-image" />
+          <div class="universe-content">
+            <div class="universe-icon"></div>
+            <h3>Poké bowl hawaïen</h3>
+            <p>Frais, coloré, sain et équilibré. Une explosion de saveurs pour un repas léger et nutritif.</p>
+            <a class="primary-btn" href="poke-bowl.html">Explorer la recette</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="carousel-wrap glass-card top-gap">
+        <h3>Les incontournables du restaurant</h3>
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-item">🥘 Cailles fondantes et petits pois croquants</div>
+          <div class="carousel-item">🥞 Crêpes au sucre et citron</div>
+          <div class="carousel-item">🍔 Burger gourmand sauce secrète</div>
+          <div class="carousel-item">🍫 Fondant chocolat noir 70%</div>
+          <div class="carousel-item">🍰 Marbré moelleux vanille-cacao</div>
+          <div class="carousel-item">🥗 Poké bowl saumon mariné</div>
+          <div class="carousel-item">✨ Ambiance maison premium 100% garantie</div>
+        </div>
+      </div>
+
+      <div class="home-gallery top-gap">
+        <div class="glass-card feature-box tilt-card">
+          <span>🧮</span>
+          <h4>Portions dynamiques</h4>
+          <p>Les quantités d'ingrédients se recalculent automatiquement selon vos invités.</p>
+        </div>
+        <div class="glass-card feature-box tilt-card">
+          <span>⏱️</span>
+          <h4>Minuteurs intégrés</h4>
+          <p>Ne ratez plus jamais une cuisson grâce aux minuteurs précis pour chaque plat.</p>
+        </div>
+        <div class="glass-card feature-box tilt-card">
+          <span>💡</span>
+          <h4>Associations parfaites</h4>
+          <p>Des idées de garnitures et combinaisons pour sublimer chaque assiette.</p>
+        </div>
+        <div class="glass-card feature-box tilt-card">
+          <span>📝</span>
+          <h4>Checklists de chef</h4>
+          <p>Suivez votre progression étape par étape sans perdre le fil de la recette.</p>
+        </div>
+      </div>
+    </section>
+
+
+
+    
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    </div>
+  </footer>
+
+  <div id="secretToast"></div>
+  <button id="scrollTopBtn" title="Retourner en haut de la page">↑</button>
+
+  <div id="lightbox">
+    <div class="lightbox-backdrop"></div>
+    <img src="" alt="" class="lightbox-image" id="lightboxImage" />
+    <button class="lightbox-close" id="lightboxClose">×</button>
+  </div>
+
+  <script src="site.js"></script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crêpes gourmandes | Le restaurant d’Antoine</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body data-theme-page="crepes">
+
+  <header class="site-header">
+  <nav class="navbar">
+
+    <div class="logo-wrap">
+      <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+      <div class="logo-text">
+        <strong>Le restaurant d’Antoine</strong>
+        <span>Maison gourmande & recettes favorites</span>
+      </div>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+    <div class="nav-center" id="navCenter">
+      <div style="position:relative; width:100%;">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Rechercher une recette..."
+          autocomplete="off"
+          style="padding:10px; border-radius:10px; border:none; width:100%;"
+        />
+        <div id="searchSuggestions" class="search-suggestions"></div>
+      </div>
+    </div>
+
+    <!-- 🔥 AJOUT -->
+    <div class="nav-links">
+      <a href="questions.html">Questions</a>
+      <a href="avis.html">Avis</a>
+      <a href="infos.html">Infos</a>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+
+  </nav>
+</header>
+
+  <main class="main-layout">
+    <section class="page-section active" id="crepes">
+      <div class="recipe-banner glass-card tilt-card">
+        <div>
+          <p class="section-kicker">Univers 1</p>
+          <h3>Crêpes gourmandes</h3>
+          <p>
+            Une recette simple, conviviale et parfaite pour les moments chaleureux,
+            de la Chandeleur aux goûters d’hiver. Les crêpes sont fines, souples
+            et faciles à garnir selon les envies de chacun.
+          </p>
+        </div>
+        <div class="recipe-big-emoji">🥞</div>
+      </div>
+
+      <div class="recipe-gallery-grid">
+        <img src="Crêpes dorées sur plateaux rustique.png" alt="Crêpes classiques" class="gallery-main lightboxable" />
+        <img src="Crêpes dorées et sucre glace.png" alt="Crêpes au sucre" class="lightboxable" />
+        <img src="Crêpes garnies de chocolat fondant.png" alt="Crêpes au chocolat" class="lightboxable" />
+        <img src="Crêpes aux fruits et sucre glace.png" alt="Crêpes à la confiture" class="lightboxable" />
+      </div>
+
+      <div class="glass-card">
+        <div class="recipe-header">
+          <h3>Ingrédients des crêpes</h3>
+          <div class="portion-box">
+            <span id="crepesCountLabel">4 PERSONNES</span>
+            <div class="portion-controls">
+              <button type="button" onclick="changePortions('crepes', -1)">−</button>
+              <button type="button" onclick="resetPortions('crepes')">↻</button>
+              <button type="button" onclick="changePortions('crepes', 1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="ingredient-grid" id="crepesIngredients"></div>
+      </div>
+
+      <div class="two-col">
+        <div class="glass-card">
+          <div class="prep-header">
+            <h3>Préparation détaillée</h3>
+            <span class="prep-time">⏱ 1 h 20</span>
+          </div>
+
+          <div class="step-grid top-gap">
+            <div class="step">
+              <span>1</span>
+              <p>
+                Verse la farine tamisée dans un grand saladier et forme un puits au centre.
+                Cette étape aide à incorporer les liquides plus facilement et à éviter les grumeaux.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>2</span>
+              <p>
+                Casse les œufs un à un dans le puits. Ajoute ensuite le sucre,
+                une pincée de sel, l’huile et le beurre fondu.
+                Mélange doucement au centre avec un fouet.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>3</span>
+              <p>
+                Commence à incorporer progressivement la farine autour du puits
+                en fouettant petit à petit. Ne va pas trop vite :
+                c’est le meilleur moyen d’obtenir une pâte lisse.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>4</span>
+              <p>
+                Verse le lait en filet fin tout en continuant à fouetter.
+                La pâte doit devenir souple, fluide et homogène,
+                sans paquets de farine au fond du saladier.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>5</span>
+              <p>
+                Parfume la pâte avec un peu de rhum, de fleur d’oranger
+                ou d’extrait de vanille selon tes goûts.
+                Cette petite touche change vraiment le résultat final.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>6</span>
+              <p>
+                Couvre le saladier avec un torchon propre ou un film alimentaire,
+                puis laisse reposer la pâte à température ambiante.
+                Ce temps de repos permet d’obtenir des crêpes plus souples et plus régulières.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>7</span>
+              <p>
+                Fais chauffer une crêpière ou une grande poêle antiadhésive.
+                Graisse-la légèrement avec un essuie-tout huilé ou une noisette de beurre.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>8</span>
+              <p>
+                Verse une louche de pâte, répartis-la rapidement sur toute la surface,
+                puis laisse cuire environ 1 à 2 minutes par face.
+                Retourne la crêpe dès que les bords se décollent et qu’elle prend une belle couleur dorée.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <h3>Garnitures au choix</h3>
+
+          <div class="chip-group">
+            <button type="button" onclick="toggleChoice(this, 'crepesChoice')">Sucre roux & citron</button>
+            <button type="button" onclick="toggleChoice(this, 'crepesChoice')">Pâte à tartiner</button>
+            <button type="button" onclick="toggleChoice(this, 'crepesChoice')">Miel de fleurs</button>
+            <button type="button" onclick="toggleChoice(this, 'crepesChoice')">Rondelles de banane</button>
+            <button type="button" onclick="toggleChoice(this, 'crepesChoice')">Fraises fraîches</button>
+            <button type="button" onclick="toggleChoice(this, 'crepesChoice')">Confiture maison</button>
+            <button type="button" onclick="toggleChoice(this, 'crepesChoice')">Caramel beurre salé</button>
+            <button type="button" onclick="toggleChoice(this, 'crepesChoice')">Crème de marrons</button>
+          </div>
+
+          <p class="selected-line">Votre garniture phare : <span id="crepesChoice">Aucune</span></p>
+
+          <div class="pairing-box top-gap">
+            <h4>Meilleures associations gourmandes</h4>
+            <ul>
+              <li><strong>La classique :</strong> sucre en poudre + une noix de beurre demi-sel fondu.</li>
+              <li><strong>La gourmande :</strong> chocolat fondu + rondelles de banane + amandes grillées.</li>
+              <li><strong>La fruitée :</strong> confiture de fruits rouges + fraises fraîches découpées.</li>
+              <li><strong>La bretonne :</strong> caramel au beurre salé + boule de glace vanille.</li>
+            </ul>
+          </div>
+
+          <h3 class="top-gap">Checklist du chef</h3>
+          <div class="checklist" data-fill="crepesFill" data-text="crepesText">
+            <label><input type="checkbox" /> Peser et préparer tous les ingrédients</label>
+            <label><input type="checkbox" /> Réaliser une pâte lisse sans grumeaux</label>
+            <label><input type="checkbox" /> Laisser reposer la pâte</label>
+            <label><input type="checkbox" /> Chauffer et graisser la poêle à la bonne température</label>
+            <label><input type="checkbox" /> Cuire et empiler les crêpes pour les garder chaudes</label>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill" id="crepesFill"></div>
+            </div>
+            <p id="crepesText">0 / 5</p>
+          </div>
+
+          <div class="timer-box top-gap">
+            <p class="timer-title">Temps de repos et préparation</p>
+            <p style="font-size:14px; opacity:0.75; margin-bottom:10px;">
+              Choisis le temps selon l’étape où tu en es :
+            </p>
+            <div id="timerDisplayCrepes">00:00</div>
+            <div class="timer-actions">
+              <button type="button" onclick="startTimer(1800, 'timerDisplayCrepes')">30 min (repos idéal)</button>
+              <button type="button" onclick="startTimer(3600, 'timerDisplayCrepes')">1 heure (repos parfait)</button>
+              <button type="button" onclick="startTimer(4800, 'timerDisplayCrepes')">1 h 20 (préparation complète)</button>
+              <button type="button" onclick="resetTimer('timerDisplayCrepes')" class="reset-btn">Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    </div>
+  </footer>
+
+  <script src="site.js"></script>
+</body>
+</html>

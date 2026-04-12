@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Infos & Culture | Le restaurant d’Antoine</title>
+  <link rel="stylesheet" href="site.css"/>
+</head>
+
+<body data-theme-page="infos">
+
+<header class="site-header">
+  <nav class="navbar">
+
+    <div class="logo-wrap">
+      <a href="index.html" class="logo-icon">🍽️</a>
+      <div class="logo-text">
+        <strong>Le restaurant d’Antoine</strong>
+        <span>Maison gourmande & recettes favorites</span>
+      </div>
+    </div>
+
+    <div class="nav-center" id="navCenter">
+      <div style="position:relative; width:100%;">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Rechercher une recette..."
+          autocomplete="off"
+          style="padding:10px; border-radius:10px; border:none; width:100%;"
+        />
+        <div id="searchSuggestions" class="search-suggestions"></div>
+      </div>
+    </div>
+
+    <!-- 🔥 NAV DROITE -->
+    <div class="nav-links">
+      <a href="questions.html">Questions</a>
+      <a href="avis.html">Avis</a>
+      <a href="infos.html" class="active-link">Infos</a>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+
+  </nav>
+</header>
+
+<main class="main-layout">
+<div id="planeContainer">
+  <canvas id="trail"></canvas>
+  <div id="plane">✈️</div>
+</div>
+  <!-- BANNIÈRE -->
+  <section class="page-section active">
+    <div class="recipe-banner glass-card">
+      <div>
+        <p class="section-kicker">Voyage culinaire</p>
+        <h3>Origine des plats</h3>
+        <p>Découvre l’histoire, les origines et les secrets des recettes du site.</p>
+      </div>
+      <div class="recipe-big-emoji">🌍</div>
+    </div>
+  </section>
+
+  <!-- GRID -->
+  <section class="info-grid">
+
+    <!-- POKÉ -->
+    <div class="info-card glass-card">
+      <img src="Bol poke coloré et frais.png" class="info-img"/>
+      <div class="info-content">
+        <h3>Poké Bowl</h3>
+        <p class="info-origin">📍 Hawaï</p>
+
+        <p>Plat traditionnel hawaïen à base de poisson cru coupé en dés et assaisonné.</p>
+
+        <h4>Histoire</h4>
+        <p>À l’origine, les pêcheurs hawaïens assaisonnaient les restes de poisson frais avec du sel et des algues.</p>
+
+        <h4>Ingrédients typiques</h4>
+        <ul>
+          <li>Poisson cru</li>
+          <li>Riz</li>
+          <li>Sauce soja</li>
+          <li>Avocat</li>
+        </ul>
+
+        <p class="info-fact">💡 “Poké” signifie “couper en morceaux”.</p>
+      </div>
+    </div>
+
+    <!-- FONDANT -->
+    <div class="info-card glass-card">
+      <img src="Gâteau fondant au chocolat coulant.png" class="info-img"/>
+      <div class="info-content">
+        <h3>Fondant au chocolat</h3>
+        <p class="info-origin">📍 France</p>
+
+        <p>Dessert au chocolat avec une texture moelleuse et parfois un cœur coulant.</p>
+
+        <h4>Histoire</h4>
+        <p>Issu de la pâtisserie française moderne, il est devenu célèbre pour son contraste intérieur/extérieur.</p>
+
+        <h4>Ingrédients typiques</h4>
+        <ul>
+          <li>Chocolat</li>
+          <li>Beurre</li>
+          <li>Œufs</li>
+          <li>Sucre</li>
+        </ul>
+
+        <p class="info-fact">💡 Quelques minutes de cuisson changent tout.</p>
+      </div>
+    </div>
+
+    <!-- BURGER -->
+    <div class="info-card glass-card">
+      <img src="Burger appétissant sur surface en bois.png" class="info-img"/>
+      <div class="info-content">
+        <h3>Burger</h3>
+        <p class="info-origin">📍 États-Unis (origine allemande)</p>
+
+        <p>Sandwich composé d’un steak haché dans un pain rond avec garniture.</p>
+
+        <h4>Histoire</h4>
+        <p>Inspiré du steak de Hambourg en Allemagne, popularisé aux États-Unis au XXe siècle.</p>
+
+        <h4>Ingrédients typiques</h4>
+        <ul>
+          <li>Pain</li>
+          <li>Steak haché</li>
+          <li>Fromage</li>
+          <li>Sauce</li>
+        </ul>
+
+        <p class="info-fact">💡 C’est aujourd’hui l’un des plats les plus consommés au monde.</p>
+      </div>
+    </div>
+
+    <!-- CRÊPES -->
+    <div class="info-card glass-card">
+      <img src="Crêpes dorées sur plateaux rustique.png" class="info-img"/>
+      <div class="info-content">
+        <h3>Crêpes</h3>
+        <p class="info-origin">📍 France (Bretagne)</p>
+
+        <p>Fine pâte cuite à la poêle, sucrée ou salée.</p>
+
+        <h4>Histoire</h4>
+        <p>Tradition bretonne liée à la Chandeleur, symbole de prospérité.</p>
+
+        <h4>Ingrédients typiques</h4>
+        <ul>
+          <li>Farine</li>
+          <li>Lait</li>
+          <li>Œufs</li>
+        </ul>
+
+        <p class="info-fact">💡 La forme ronde représente le soleil.</p>
+      </div>
+    </div>
+
+    <!-- CAILLE -->
+    <div class="info-card glass-card">
+      <img src="cailles.png" class="info-img"/>
+      <div class="info-content">
+        <h3>Caille aux petits pois</h3>
+        <p class="info-origin">📍 France</p>
+
+        <p>Plat traditionnel raffiné à base de caille mijotée avec légumes.</p>
+
+        <h4>Histoire</h4>
+        <p>Plat classique de la cuisine française, souvent servi lors de repas élégants.</p>
+
+        <h4>Ingrédients typiques</h4>
+        <ul>
+          <li>Caille</li>
+          <li>Petits pois</li>
+          <li>Carottes</li>
+        </ul>
+
+        <p class="info-fact">💡 La caille est une viande fine et délicate.</p>
+      </div>
+    </div>
+
+    <!-- MARBRÉ -->
+    <div class="info-card glass-card">
+      <img src="Pain marbré au soleil d'extérieur.png" class="info-img"/>
+      <div class="info-content">
+        <h3>Gâteau marbré</h3>
+        <p class="info-origin">📍 Europe centrale</p>
+
+        <p>Gâteau mélangeant pâte nature et chocolat pour créer un effet visuel marbré.</p>
+
+        <h4>Histoire</h4>
+        <p>Inspiré des gâteaux allemands du XIXe siècle, popularisé ensuite en France.</p>
+
+        <h4>Ingrédients typiques</h4>
+        <ul>
+          <li>Farine</li>
+          <li>Œufs</li>
+          <li>Chocolat</li>
+          <li>Beurre</li>
+        </ul>
+
+        <p class="info-fact">💡 Chaque marbré est unique.</p>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>© 2026 Le restaurant d’Antoine</p>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

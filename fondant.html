@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fondants au chocolat | Le restaurant d’Antoine</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body data-theme-page="fondants">
+
+  <header class="site-header">
+  <nav class="navbar">
+
+    <div class="logo-wrap">
+      <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+      <div class="logo-text">
+        <strong>Le restaurant d’Antoine</strong>
+        <span>Maison gourmande & recettes favorites</span>
+      </div>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+    <div class="nav-center" id="navCenter">
+      <div style="position:relative; width:100%;">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Rechercher une recette..."
+          autocomplete="off"
+          style="padding:10px; border-radius:10px; border:none; width:100%;"
+        />
+        <div id="searchSuggestions" class="search-suggestions"></div>
+      </div>
+    </div>
+
+    <!-- 🔥 AJOUT -->
+    <div class="nav-links">
+      <a href="questions.html">Questions</a>
+      <a href="avis.html">Avis</a>
+      <a href="infos.html">Infos</a>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+
+  </nav>
+</header>
+
+  <main class="main-layout">
+    <section class="page-section active" id="fondants">
+
+      <div class="recipe-banner glass-card tilt-card">
+        <div>
+          <p class="section-kicker">Univers 3</p>
+          <h3>Fondants au chocolat</h3>
+          <p>
+            Le dessert ultime pour les amateurs de chocolat :
+            une fine croûte à l’extérieur et un centre plus ou moins coulant
+            selon le temps de cuisson choisi.
+          </p>
+        </div>
+        <div class="recipe-big-emoji">🍫</div>
+      </div>
+
+      <div class="recipe-gallery-grid fondant-gallery">
+        <img src="Gâteau fondant au chocolat coulant.png" alt="Fondant au chocolat" class="gallery-main lightboxable" />
+        <img src="Fondant au chocolat fondants.png" alt="Fondant coupé" class="lightboxable" />
+        <img src="Ramequin de chocolat sur nappe à carreaux.png" alt="Fondant coulant" class="lightboxable" />
+      </div>
+
+      <div class="glass-card">
+        <div class="recipe-header">
+          <h3>Ingrédients</h3>
+          <div class="portion-box">
+            <span id="fondantsCountLabel">4 PERSONNES</span>
+            <div class="portion-controls">
+              <button type="button" onclick="changePortions('fondants', -1)">−</button>
+              <button type="button" onclick="resetPortions('fondants')">↻</button>
+              <button type="button" onclick="changePortions('fondants', 1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="ingredient-grid" id="fondantsIngredients"></div>
+      </div>
+
+      <div class="two-col">
+
+        <div class="glass-card">
+<div class="prep-header">
+  <h3>Préparation détaillée</h3>
+  <span class="prep-time">⏱ 25 min</span>
+</div>
+
+          <div class="step-grid top-gap">
+            <div class="step">
+              <span>1</span>
+              <p>
+                Préchauffe le four à 200°C. Beurre soigneusement les moules
+                puis farine-les légèrement pour faciliter le démoulage.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>2</span>
+              <p>
+                Fais fondre doucement le chocolat avec le beurre,
+                soit au bain-marie, soit au micro-ondes par petites séquences.
+                Mélange jusqu’à obtenir une texture bien lisse et brillante.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>3</span>
+              <p>
+                Dans un autre saladier, fouette les œufs avec le sucre
+                jusqu’à ce que le mélange soit homogène et légèrement mousseux.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>4</span>
+              <p>
+                Verse le chocolat fondu tiédi sur les œufs battus,
+                puis mélange délicatement pour obtenir une préparation bien uniforme.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>5</span>
+              <p>
+                Ajoute la farine tamisée et incorpore-la sans trop travailler la pâte,
+                juste assez pour qu’elle reste lisse.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>6</span>
+              <p>
+                Répartis la pâte dans les moules en les remplissant aux trois quarts.
+                Laisse un peu de place pour que les fondants gonflent légèrement à la cuisson.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>7</span>
+              <p>
+                Enfourne et surveille bien : quelques minutes de plus ou de moins
+                changent totalement la texture du cœur.
+              </p>
+            </div>
+
+            <div class="step">
+              <span>8</span>
+              <p>
+                Sers immédiatement, encore chaud, pour profiter du centre fondant.
+                Tu peux les accompagner d’une glace, de fruits rouges ou d’un filet de caramel.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <h3>Accompagnements</h3>
+
+          <div class="chip-group">
+            <button type="button" onclick="toggleChoice(this, 'fondantsChoice')">Glace vanille</button>
+            <button type="button" onclick="toggleChoice(this, 'fondantsChoice')">Fruits rouges</button>
+            <button type="button" onclick="toggleChoice(this, 'fondantsChoice')">Crème fouettée</button>
+            <button type="button" onclick="toggleChoice(this, 'fondantsChoice')">Caramel</button>
+            <button type="button" onclick="toggleChoice(this, 'fondantsChoice')">Noisettes grillées</button>
+            <button type="button" onclick="toggleChoice(this, 'fondantsChoice')">Coulis de framboise</button>
+          </div>
+
+          <p class="selected-line">Choix : <span id="fondantsChoice">Aucun</span></p>
+
+          <div class="pairing-box top-gap">
+            <h4>Associations gourmandes</h4>
+            <ul>
+              <li><strong>Le classique :</strong> fondant chaud + glace vanille.</li>
+              <li><strong>Le fruité :</strong> fondant + fruits rouges + coulis.</li>
+              <li><strong>Le croquant :</strong> fondant + noisettes grillées + caramel.</li>
+              <li><strong>Le plus léger :</strong> fondant + crème fouettée peu sucrée.</li>
+            </ul>
+          </div>
+
+          <h3 class="top-gap">Checklist</h3>
+          <div class="checklist" data-fill="fondantsFill" data-text="fondantsText">
+            <label><input type="checkbox" /> Préparer et beurrer les moules</label>
+            <label><input type="checkbox" /> Faire fondre le chocolat sans le brûler</label>
+            <label><input type="checkbox" /> Mélanger œufs et sucre correctement</label>
+            <label><input type="checkbox" /> Répartir la pâte dans les moules</label>
+            <label><input type="checkbox" /> Surveiller la cuisson de près</label>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill" id="fondantsFill"></div>
+            </div>
+            <p id="fondantsText">0 / 5</p>
+          </div>
+
+          <div class="timer-box top-gap">
+            <p class="timer-title">Temps de cuisson</p>
+            <p style="font-size:14px; opacity:0.75; margin-bottom:10px;">
+              Choisis la texture que tu veux obtenir :
+            </p>
+            <div id="timerDisplayFondants">00:00</div>
+            <div class="timer-actions">
+              <button type="button" onclick="startTimer(540, 'timerDisplayFondants')">9 min (très coulant)</button>
+              <button type="button" onclick="startTimer(660, 'timerDisplayFondants')">11 min (moelleux)</button>
+              <button type="button" onclick="startTimer(780, 'timerDisplayFondants')">13 min (cuit à cœur)</button>
+              <button type="button" onclick="startTimer(1500, 'timerDisplayFondants')">25 min (préparation totale)</button>
+              <button type="button" onclick="resetTimer('timerDisplayFondants')" class="reset-btn">Reset</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    </div>
+  </footer>
+
+  <script src="site.js"></script>
+</body>
+</html>

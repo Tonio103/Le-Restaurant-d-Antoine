@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poké Bowl Hawaïen | Le restaurant d’Antoine</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body data-theme-page="pokebowl">
+
+<header class="site-header">
+  <nav class="navbar">
+
+    <div class="logo-wrap">
+      <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+      <div class="logo-text">
+        <strong>Le restaurant d’Antoine</strong>
+        <span>Maison gourmande & recettes favorites</span>
+      </div>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+    <div class="nav-center" id="navCenter">
+      <div style="position:relative; width:100%;">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Rechercher une recette..."
+          autocomplete="off"
+          style="padding:10px; border-radius:10px; border:none; width:100%;"
+        />
+        <div id="searchSuggestions" class="search-suggestions"></div>
+      </div>
+    </div>
+
+    <!-- 🔥 AJOUT -->
+    <div class="nav-links">
+      <a href="questions.html">Questions</a>
+      <a href="avis.html">Avis</a>
+      <a href="infos.html">Infos</a>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+
+  </nav>
+</header>
+
+  <main class="main-layout">
+
+    <section class="page-section active" id="pokebowl">
+
+      <div class="recipe-banner glass-card tilt-card">
+        <div>
+          <p class="section-kicker">Univers 5</p>
+          <h3>Poké bowl frais, coloré et sain</h3>
+          <p>Une recette venue de Hawaï, légère, saine et pleine de fraîcheur.</p>
+        </div>
+        <div class="recipe-big-emoji">🥗</div>
+      </div>
+
+      <div class="recipe-gallery-grid burger-gallery">
+        <img src="Bol poke coloré et frais.png" alt="Poké bowl coloré" class="gallery-main lightboxable" />
+        <img src="Tranches de saumon frais sur bois.png" alt="Saumon frais" class="lightboxable" />
+        <img src="Cuisson de riz dans une casserole.png" alt="Cuisson du riz" class="lightboxable" />
+      </div>
+
+      <div class="glass-card">
+        <div class="recipe-header">
+          <div class="prep-header">
+            <h3>Ingrédients</h3>
+           
+          </div>
+
+          <div class="portion-box">
+            <span id="pokebowlCountLabel">2 BOLS</span>
+            <div class="portion-controls">
+              <button type="button" onclick="changePortions('pokebowl', -1)">−</button>
+              <button type="button" onclick="resetPortions('pokebowl')">↻</button>
+              <button type="button" onclick="changePortions('pokebowl', 1)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ingredient-grid" id="pokeIngredients"></div>
+      </div>
+
+      <div class="two-col">
+
+        <!-- COLONNE GAUCHE -->
+        <div class="glass-card">
+          <div class="prep-header">
+            <h3>Préparation détaillée</h3>
+            <span class="prep-time">⏱ 1 h 10</span>
+          </div>
+
+          <div class="step-grid top-gap">
+            <div class="step">
+              <span>1</span>
+              <p>Cuire le riz, le rincer avant cuisson si besoin, puis le laisser refroidir complètement.</p>
+            </div>
+
+            <div class="step">
+              <span>2</span>
+              <p>Couper le saumon cru en dés réguliers, retirer la peau si nécessaire, puis réserver au frais.</p>
+            </div>
+
+            <div class="step">
+              <span>3</span>
+              <p>Préparer la marinade en mélangeant sauce soja, huile de sésame, citron et miel, puis y ajouter le saumon et laisser mariner 10 à 15 minutes.</p>
+            </div>
+
+            <div class="step">
+              <span>4</span>
+              <p>Couper les légumes et les fruits : râper la carotte, trancher le concombre et couper la mangue en cubes.</p>
+            </div>
+
+            <div class="step">
+              <span>5</span>
+              <p>Couper l’avocat en lamelles ou en dés, puis ajouter un peu de citron pour éviter qu’il noircisse.</p>
+            </div>
+
+            <div class="step">
+              <span>6</span>
+              <p>Cuire les edamame dans de l’eau bouillante salée pendant 3 à 5 minutes, puis les égoutter et les laisser refroidir.</p>
+            </div>
+
+            <div class="step">
+              <span>7</span>
+              <p>Assembler le bol : déposer le riz froid au fond, puis ajouter le saumon mariné et disposer les légumes et les fruits autour.</p>
+            </div>
+
+            <div class="step">
+              <span>8</span>
+              <p>Ajouter les toppings, comme les graines de sésame, les oignons frits ou un peu de sauce, puis servir bien frais.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLONNE DROITE -->
+        <div class="glass-card">
+          <h3>Accompagnements</h3>
+
+          <div class="chip-group">
+            <button type="button" onclick="toggleChoice(this,'pokebowlChoice')">Soupe miso</button>
+            <button type="button" onclick="toggleChoice(this,'pokebowlChoice')">Salade wakamé</button>
+            <button type="button" onclick="toggleChoice(this,'pokebowlChoice')">Gyozas</button>
+            <button type="button" onclick="toggleChoice(this,'pokebowlChoice')">Thé glacé maison</button>
+            <button type="button" onclick="toggleChoice(this,'pokebowlChoice')">Citronnade</button>
+            <button type="button" onclick="toggleChoice(this,'pokebowlChoice')">Chips de crevette</button>
+          </div>
+
+          <p class="selected-line">Choix : <span id="pokebowlChoice">Aucun</span></p>
+
+          <div class="pairing-box top-gap">
+            <h4>Associations conseillées</h4>
+            <ul>
+              <li><strong>Le plus frais :</strong> poké bowl + citronnade.</li>
+              <li><strong>Le plus léger :</strong> poké bowl + salade wakamé.</li>
+              <li><strong>Le plus complet :</strong> poké bowl + soupe miso.</li>
+              <li><strong>Le plus gourmand :</strong> poké bowl + gyozas.</li>
+            </ul>
+          </div>
+
+          <h3 class="top-gap">Checklist</h3>
+          <div class="checklist" data-fill="pokebowlFill" data-text="pokebowlText">
+            <label><input type="checkbox" /> Cuire et refroidir le riz</label>
+            <label><input type="checkbox" /> Préparer et mariner le saumon</label>
+            <label><input type="checkbox" /> Couper les légumes et les fruits</label>
+            <label><input type="checkbox" /> Cuire les edamame</label>
+            <label><input type="checkbox" /> Assembler le bol</label>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill" id="pokebowlFill"></div>
+            </div>
+            <p id="pokebowlText">0 / 5</p>
+          </div>
+
+          <div class="timer-box top-gap">
+            <p class="timer-title">Temps utiles</p>
+            <p style="font-size:14px; opacity:0.75; margin-bottom:10px;">
+              Lance un minuteur selon l’étape en cours :
+            </p>
+            <div id="timerDisplayPokebowl">00:00</div>
+            <div class="timer-actions">
+              <button type="button" onclick="startTimer(900,'timerDisplayPokebowl')">15 min (marinade)</button>
+              <button type="button" onclick="startTimer(300,'timerDisplayPokebowl')">5 min (edamame)</button>
+              <button type="button" onclick="startTimer(1200,'timerDisplayPokebowl')">20 min (cuisson du riz)</button>
+              <button type="button" onclick="startTimer(4200,'timerDisplayPokebowl')">1 h 10 (total)</button>
+              <button type="button" onclick="resetTimer('timerDisplayPokebowl')" class="reset-btn">Reset</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    </div>
+  </footer>
+
+  <script src="site.js"></script>
+</body>
+</html>
