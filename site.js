@@ -337,11 +337,8 @@ function initPlaneAnimation() {
   if (!ctx) return;
 
   let path = [];
-  let t = 0;
-  const speed = 0.0025;
-
-  let prevX = null;
-  let prevY = null;
+  let startTime = null;
+  const duration = 10000; // 10 secondes
 
   function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -363,60 +360,54 @@ function initPlaneAnimation() {
       else ctx.lineTo(p.x, p.y);
     }
 
-    ctx.strokeStyle = "rgba(255,255,255,0.45)";
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.stroke();
   }
 
-  function animatePlane() {
-    t += speed;
+  function animatePlane(timestamp) {
+    if (!startTime) startTime = timestamp;
 
-    const x =
-      (Math.sin(t) * 0.5 + Math.sin(t * 0.47) * 0.8 + Math.cos(t * 0.21) * 0.35) *
-        (window.innerWidth / 3.2) +
-      window.innerWidth / 2;
+    const elapsed = timestamp - startTime;
+    const progress = elapsed / duration;
 
-    const y =
-      (Math.cos(t * 0.83) * 0.45 + Math.sin(t * 1.18) * 0.55 + Math.cos(t * 0.31) * 0.2) *
-        (window.innerHeight / 3.4) +
-      window.innerHeight / 2;
-
-    let angleRad = 0;
-    if (prevX !== null && prevY !== null) {
-      angleRad = Math.atan2(y - prevY, x - prevX);
+    if (progress >= 1) {
+      plane.style.opacity = "0";
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
     }
 
+    const x = progress * (window.innerWidth + 120) - 60;
+    const y = window.innerHeight * 0.38 + Math.sin(progress * Math.PI * 1.4) * 70;
+
+    const nextX = (progress + 0.001) * (window.innerWidth + 120) - 60;
+    const nextY = window.innerHeight * 0.38 + Math.sin((progress + 0.001) * Math.PI * 1.4) * 70;
+
+    const angleRad = Math.atan2(nextY - y, nextX - x);
+
+    plane.style.opacity = "1";
     plane.style.left = `${x}px`;
     plane.style.top = `${y}px`;
     plane.style.transform = `translate(-50%, -50%) rotate(${angleRad}rad)`;
 
-    const offsetBack = 7;
-    const offsetSide = -10;
-
-    const trailX =
-      x - Math.cos(angleRad) * offsetBack + Math.sin(angleRad) * offsetSide;
-
-    const trailY =
-      y - Math.sin(angleRad) * offsetBack - Math.cos(angleRad) * offsetSide;
+    const offsetBack = 10;
+    const trailX = x - Math.cos(angleRad) * offsetBack;
+    const trailY = y - Math.sin(angleRad) * offsetBack;
 
     path.push({ x: trailX, y: trailY });
 
-    if (path.length > 90) {
+    if (path.length > 70) {
       path.shift();
     }
-
-    prevX = x;
-    prevY = y;
 
     drawTrail();
     requestAnimationFrame(animatePlane);
   }
 
-  animatePlane();
+  requestAnimationFrame(animatePlane);
 }
-
   /* ==========================================================================
      INGREDIENTS / PORTIONS
      ========================================================================== */
