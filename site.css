@@ -3147,3 +3147,7 @@ body.dark-mode #searchInput::placeholder {
   transform: scale(1.1);
   background: rgba(255, 0, 0, 0.2);
 }
+.like-btn.liked {
+  background: #ff4d6d;
+  color: white;
+}
