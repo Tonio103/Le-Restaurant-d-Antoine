@@ -3095,3 +3095,41 @@ body.dark-mode #searchInput::placeholder {
     transform: rotate(360deg);
   }
 }
+@media (max-width: 768px) {
+
+  /* 🔻 Réduit la taille globale des cartes */
+  .recipe-card,
+  .universe-card {
+    padding: 14px !important;
+    border-radius: 16px;
+  }
+
+  /* 🔻 Images moins hautes */
+  .recipe-card img,
+  .universe-card img {
+    height: 140px !important;
+    object-fit: cover;
+  }
+
+  /* 🔻 Titre plus petit */
+  .recipe-card h3,
+  .universe-card h3 {
+    font-size: 18px !important;
+  }
+
+  /* 🔻 Texte description */
+  .recipe-card p,
+  .universe-card p {
+    font-size: 13px !important;
+    line-height: 1.4;
+  }
+
+  /* 🔻 Bouton plus compact */
+  .recipe-card button,
+  .universe-card button {
+    padding: 10px 14px !important;
+    font-size: 14px !important;
+    border-radius: 10px;
+  }
+
+}
