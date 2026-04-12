@@ -3068,3 +3068,11 @@ body.dark-mode {
     display: none !important;
   }
 }
+@media (max-width: 768px) {
+  .bento-card,
+  .floating-item,
+  .floating-badge,
+  .hero-glow {
+    display: none !important;
+  }
+}
