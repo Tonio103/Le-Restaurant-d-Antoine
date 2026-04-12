@@ -3063,13 +3063,9 @@ body.dark-mode {
   background: #161210 !important;
 }
 @media (max-width: 768px) {
-  .floating-item,
-  .floating-badge {
-    display: none !important;
-  }
-}
-@media (max-width: 768px) {
+  .bento-container,
   .bento-card,
+  .bento-badge,
   .floating-item,
   .floating-badge,
   .hero-glow {
