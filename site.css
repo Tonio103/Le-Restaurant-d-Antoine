@@ -3441,3 +3441,23 @@ body.dark-mode #searchInput::placeholder {
     padding: 8px 12px;
   }
 }
+.hero {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Overlay sombre */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5); /* ← tu ajustes ici */
+  z-index: 1;
+}
+
+/* Pour que le texte passe au-dessus */
+.hero-copy,
+.hero-visual {
+  position: relative;
+  z-index: 2;
+}
