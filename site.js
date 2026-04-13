@@ -16,18 +16,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeToggle = document.getElementById("themeToggle");
   const scrollTopBtn = document.getElementById("scrollTopBtn");
   const toast = document.getElementById("secretToast");
-  const reviewsList = document.getElementById("reviewsList");
-  const submitReviewBtn = document.getElementById("submitReview");
-  const ratingValueDisplay = document.getElementById("ratingValue");
-  const stars = document.querySelectorAll("#stars span");
   const searchInput = document.getElementById("searchInput");
 
   /* ==========================================================================
      STORAGE KEYS
      ========================================================================== */
   const STORAGE_KEYS = {
-    theme: "antoine-theme",
-    reviews: "antoine-reviews"
+    theme: "antoine-theme"
   };
 
   /* ==========================================================================
@@ -149,7 +144,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const timers = {};
   let toastTimeout = null;
-  let currentRating = 0;
 
   /* ==========================================================================
      STORAGE HELPERS
@@ -460,142 +454,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       updateChecklist();
-    });
-  }
-
-  /* ==========================================================================
-     REVIEWS
-     ========================================================================== */
-  function getReviews() {
-    try {
-      const raw = safeGetStorage(STORAGE_KEYS.reviews, "[]");
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-
-  function saveReviews(reviews) {
-    safeSetStorage(STORAGE_KEYS.reviews, JSON.stringify(reviews));
-  }
-
-  function renderReviews() {
-    if (!reviewsList) return;
-
-    reviewsList.innerHTML = "";
-    const reviews = getReviews();
-
-    if (!reviews.length) {
-      const empty = document.createElement("div");
-      empty.className = "review-item empty-review";
-
-      const title = document.createElement("strong");
-      title.textContent = "Aucun avis pour le moment";
-
-      const text = document.createElement("p");
-      text.textContent = "Sois le premier à tester les recettes et à donner ton avis au chef Antoine !";
-
-      empty.appendChild(title);
-      empty.appendChild(text);
-      reviewsList.appendChild(empty);
-      return;
-    }
-
-    reviews
-      .slice()
-      .reverse()
-      .forEach((review) => {
-        const item = document.createElement("div");
-        item.className = "review-item";
-
-        const header = document.createElement("div");
-        header.className = "review-header-flex";
-
-        const name = document.createElement("strong");
-        name.textContent = review.name || "Anonyme";
-
-        const date = document.createElement("span");
-        date.className = "review-date";
-        date.textContent = review.date
-          ? new Date(review.date).toLocaleDateString("fr-FR", {
-              day: "numeric",
-              month: "short",
-              year: "numeric"
-            })
-          : "Récemment";
-
-        const starsLine = document.createElement("div");
-        starsLine.className = "review-stars";
-        const rating = Math.max(0, Math.min(5, Number(review.rating) || 0));
-        starsLine.textContent = `${"★".repeat(rating)}${"☆".repeat(5 - rating)}`;
-
-        const message = document.createElement("p");
-        message.className = "review-text-content";
-        message.textContent = review.message || "";
-
-        header.appendChild(name);
-        header.appendChild(date);
-        item.appendChild(header);
-        item.appendChild(starsLine);
-        item.appendChild(message);
-        reviewsList.appendChild(item);
-      });
-  }
-
-  function setRating(value) {
-    currentRating = value;
-
-    if (ratingValueDisplay) {
-      ratingValueDisplay.textContent = String(value);
-    }
-
-    stars.forEach((star, index) => {
-      star.classList.toggle("active", index < value);
-    });
-  }
-
-  function initReviews() {
-    renderReviews();
-
-    stars.forEach((star, index) => {
-      star.addEventListener("click", () => {
-        setRating(index + 1);
-      });
-    });
-
-    submitReviewBtn?.addEventListener("click", () => {
-      const nameInput = document.getElementById("reviewName");
-      const messageInput = document.getElementById("reviewMessage");
-
-      if (!(nameInput instanceof HTMLInputElement) || !(messageInput instanceof HTMLTextAreaElement)) {
-        return;
-      }
-
-      const name = nameInput.value.trim();
-      const message = messageInput.value.trim();
-
-      if (!name || !message || currentRating === 0) {
-        showToast("⚠️ Merci de compléter le prénom, le message et la note.");
-        return;
-      }
-
-      const reviews = getReviews();
-      reviews.push({
-        name,
-        message,
-        rating: currentRating,
-        date: new Date().toISOString()
-      });
-
-      saveReviews(reviews);
-      renderReviews();
-
-      nameInput.value = "";
-      messageInput.value = "";
-      setRating(0);
-
-      showToast("✅ Votre avis a été publié avec succès !");
     });
   }
 
@@ -936,7 +794,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTimerDisplay(displayId);
   };
 
-  window.setRating = setRating;
   window.showToast = showToast;
 
   /* ==========================================================================
@@ -955,7 +812,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initSearch();
   initPlaneAnimation();
   initChecklists();
-  initReviews();
   initCounters();
   initTilt();
   initLightbox();
