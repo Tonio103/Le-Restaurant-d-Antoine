@@ -3441,3 +3441,11 @@ body.dark-mode #searchInput::placeholder {
     padding: 8px 12px;
   }
 }
+.site-footer {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
