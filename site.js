@@ -803,7 +803,21 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("error", () => {
     hideLoader();
   });
+const flame = document.querySelector(".fire-emoji");
 
+function animateFlame() {
+  const scale = 1 + Math.random() * 0.25; // taille variable
+  const glow = 4 + Math.random() * 10; // intensité lumière
+
+  flame.style.transform = `scale(${scale})`;
+  flame.style.filter = `drop-shadow(0 0 ${glow}px orange)`;
+
+  requestAnimationFrame(() => {
+    setTimeout(animateFlame, 80 + Math.random() * 120);
+  });
+}
+
+animateFlame();
   /* ==========================================================================
      INIT
      ========================================================================== */
