@@ -1039,17 +1039,17 @@ document.addEventListener("DOMContentLoaded", () => {
       result.innerHTML = html;
     }
 
-    button.addEventListener("click", () => {
-      const value = input.value.trim();
+  button.addEventListener("click", () => {
+  const value = input.value.trim();
 
-      if (!value) {
-        result.innerHTML = `<strong>Décris un peu ce que tu veux manger.</strong><br>Par exemple : léger, rapide, sans chocolat.`;
-        return;
-      }
+  if (!value) {
+    result.innerHTML = `<strong>Bonjour 👋</strong><br>Dis-moi ce que tu cherches, et je te proposerai la recette la plus adaptée.`;
+    return;
+  }
 
-      result.innerHTML = `<strong>Analyse en cours...</strong>`;
-      window.setTimeout(() => renderRecommendation(value), 500);
-    });
+  result.innerHTML = `<strong>Recherche en cours...</strong>`;
+  window.setTimeout(() => renderRecommendation(value), 500);
+});
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
@@ -1059,13 +1059,37 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function initAiWidget() {
   const aiFab = document.getElementById("aiFab");
+  const aiFabIcon = document.getElementById("aiFabIcon");
   const aiWidget = document.getElementById("aiWidget");
+  const aiWidgetClose = document.getElementById("aiWidgetClose");
+  const aiWidgetExpand = document.getElementById("aiWidgetExpand");
 
-  if (!aiFab || !aiWidget) return;
+  if (!aiFab || !aiFabIcon || !aiWidget) return;
+
+  function openWidget() {
+    aiWidget.classList.remove("hidden");
+    aiFabIcon.style.opacity = "0";
+  }
+
+  function closeWidget() {
+    aiWidget.classList.add("hidden");
+    aiWidget.classList.remove("expanded");
+    aiFabIcon.style.opacity = "1";
+  }
+
+  function toggleExpand() {
+    aiWidget.classList.toggle("expanded");
+    aiWidgetExpand.textContent = aiWidget.classList.contains("expanded") ? "⤡" : "⤢";
+  }
 
   aiFab.addEventListener("click", () => {
-    aiWidget.classList.toggle("hidden");
+    if (aiWidget.classList.contains("hidden")) {
+      openWidget();
+    }
   });
+
+  aiWidgetClose?.addEventListener("click", closeWidget);
+  aiWidgetExpand?.addEventListener("click", toggleExpand);
 }
   /* ==========================================================================
      GLOBAL EVENTS
