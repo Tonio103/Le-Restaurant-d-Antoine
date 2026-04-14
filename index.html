@@ -271,24 +271,37 @@
     <button class="lightbox-close" id="lightboxClose">×</button>
   </div>
 
-  <button class="ai-fab" id="aiFab" type="button" aria-label="Ouvrir l'assistant cuisine">💬</button>
+  <button class="ai-fab" id="aiFab" type="button" aria-label="Ouvrir l'assistant cuisine">
+  <span class="ai-fab-icon" id="aiFabIcon">💬</span>
+</button>
 
-  <div class="ai-widget hidden" id="aiWidget">
-    <div class="ai-widget-header">
-      <strong>Assistant cuisine</strong>
+<div class="ai-widget hidden" id="aiWidget">
+  <div class="ai-widget-header">
+    <strong>Assistant cuisine</strong>
+
+    <div class="ai-widget-header-actions">
+      <button class="ai-widget-expand" id="aiWidgetExpand" type="button" aria-label="Agrandir l'assistant">⤢</button>
+      <button class="ai-widget-close" id="aiWidgetClose" type="button" aria-label="Fermer l'assistant">×</button>
+    </div>
+  </div>
+
+  <div class="ai-widget-body">
+    <div id="aiChefResult" class="ai-chef-result">
+      <strong>Bonjour 👋</strong><br>
+      Je peux t’aider à trouver la recette idéale.
     </div>
 
-    <div class="ai-widget-body">
+    <div class="ai-widget-input-row">
       <input
         type="text"
         id="aiChefInput"
-        placeholder="Ex : léger, rapide, sans chocolat"
+        placeholder="Que cherchez vous ?"
         autocomplete="off"
       />
-      <button id="aiChefBtn" class="primary-btn" type="button">Analyser</button>
-      <div id="aiChefResult" class="ai-chef-result"></div>
+      <button id="aiChefBtn" class="ai-send-btn" type="button" aria-label="Envoyer">➤</button>
     </div>
   </div>
+</div>
 
   <script src="site.js"></script>
   <script type="module" src="likes-firebase.js"></script>
