@@ -1050,7 +1050,12 @@ document.addEventListener("DOMContentLoaded", () => {
       result.innerHTML = `<strong>Analyse en cours...</strong>`;
       window.setTimeout(() => renderRecommendation(value), 500);
     });
+const aiFab = document.getElementById("aiFab");
+const aiWidget = document.getElementById("aiWidget");
 
+aiFab?.addEventListener("click", () => {
+  aiWidget?.classList.toggle("hidden");
+});
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
