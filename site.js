@@ -1084,16 +1084,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  aiFab.addEventListener("click", () => {
-    if (aiWidget.classList.contains("hidden")) {
-      openWidget();
-    }
-  });
-
+  aiFab.addEventListener("click", openWidget);
   aiWidgetClose?.addEventListener("click", closeWidget);
   aiWidgetExpand?.addEventListener("click", toggleExpand);
-}
-  /* ==========================================================================
+}  /* ==========================================================================
      GLOBAL EVENTS
      ========================================================================== */
   window.addEventListener("scroll", revealOnScroll);
