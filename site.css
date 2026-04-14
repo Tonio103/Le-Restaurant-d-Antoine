@@ -3450,21 +3450,5 @@ body.dark-mode #searchInput::placeholder {
   border-top: 1px solid rgba(255,255,255,0.1);
 }
 .fire-emoji {
-  display: inline-block;
-  animation: flameGlow 1.5s infinite ease-in-out;
-}
-
-@keyframes flameGlow {
-  0% {
-    filter: drop-shadow(0 0 2px rgba(255,120,0,0.4));
-    transform: scale(1);
-  }
-  50% {
-    filter: drop-shadow(0 0 8px rgba(255,140,0,0.9));
-    transform: scale(1.08);
-  }
-  100% {
-    filter: drop-shadow(0 0 2px rgba(255,120,0,0.4));
-    transform: scale(1);
-  }
+  font-size: 50px;
 }
