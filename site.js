@@ -830,7 +830,7 @@ document.addEventListener("DOMContentLoaded", () => {
         url: "burger.html",
         tags: [
           "viande", "copieux", "gourmand", "rapide", "sale",
-          "plat", "plaisir", "genereux", "consistant"
+          "plat", "plaisir", "genereux", "consistant","familial"
         ]
       },
       {
@@ -876,7 +876,8 @@ document.addEventListener("DOMContentLoaded", () => {
       facile: ["facile", "simple", "sans prise de tete", "sans prise de tête"],
       raffine: ["raffine", "raffiné", "chic", "élégant", "elegant"],
       familial: ["familial", "famille", "convivial"],
-      ete: ["ete", "été", "soleil", "estival"]
+      ete: ["ete", "été", "soleil", "estival"],
+      familial: ["famille", "familial", "convivial", "repas famille", "a plusieurs"]
     };
 
     function normalize(text) {
@@ -940,7 +941,11 @@ document.addEventListener("DOMContentLoaded", () => {
           score += 2;
           reasons.push("rapide");
         }
-
+if (normalized.includes("famille")) {
+  if (recipe.tags.includes("familial")) score += 5;
+  if (recipe.tags.includes("plat")) score += 3;
+  if (recipe.tags.includes("dessert")) score -= 2;
+}
         if (normalized.includes("repas") && recipe.tags.includes("plat")) {
           score += 2;
           reasons.push("plat");
