@@ -3449,4 +3449,40 @@ body.dark-mode #searchInput::placeholder {
   padding: 20px;
   border-top: 1px solid rgba(255,255,255,0.1);
 }
+.ai-chef-card {
+  padding: 24px;
+}
 
+.ai-subtitle {
+  margin-top: 6px;
+  opacity: 0.8;
+}
+
+.ai-chef-box {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+#aiChefInput {
+  flex: 1;
+  min-width: 260px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  outline: none;
+}
+
+.ai-chef-result {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  line-height: 1.6;
+}
+
+.ai-chef-result strong {
+  display: inline-block;
+  margin-bottom: 6px;
+}
