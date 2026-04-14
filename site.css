@@ -3558,3 +3558,37 @@ body.dark-mode #searchInput::placeholder {
 .hidden {
   display: none;
 }
+.ai-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 90px; /* plus haut pour ne pas gêner le bouton scroll */
+  z-index: 9998;
+  width: 62px;
+  height: 62px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  animation: aiPulse 2s ease-in-out infinite;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ai-fab:hover {
+  transform: scale(1.08);
+}
+
+@keyframes aiPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  }
+}
