@@ -3486,3 +3486,60 @@ body.dark-mode #searchInput::placeholder {
   display: inline-block;
   margin-bottom: 6px;
 }
+.ai-widget {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  z-index: 9999;
+  border-radius: 20px;
+  padding: 16px;
+  background: rgba(20, 20, 20, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  color: white;
+}
+
+.ai-widget-header {
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.ai-widget-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-widget input {
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  outline: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+
+.ai-widget .primary-btn {
+  width: 100%;
+}
+
+.ai-chef-result {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .ai-widget {
+    right: 12px;
+    left: 12px;
+    bottom: 12px;
+    width: auto;
+  }
+}
