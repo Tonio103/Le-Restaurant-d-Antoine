@@ -1067,15 +1067,15 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!aiFab || !aiFabIcon || !aiWidget) return;
 
   function openWidget() {
-    aiWidget.classList.remove("hidden");
-    aiFabIcon.style.opacity = "0";
-  }
+  aiWidget.classList.remove("hidden");
+  aiFab.classList.add("hidden");
+}
 
-  function closeWidget() {
-    aiWidget.classList.add("hidden");
-    aiWidget.classList.remove("expanded");
-    aiFabIcon.style.opacity = "1";
-  }
+function closeWidget() {
+  aiWidget.classList.add("hidden");
+  aiWidget.classList.remove("expanded");
+  aiFab.classList.remove("hidden");
+}
 
   function toggleExpand() {
     aiWidget.classList.toggle("expanded");
