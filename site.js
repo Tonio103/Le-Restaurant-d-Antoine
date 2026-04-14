@@ -830,7 +830,7 @@ document.addEventListener("DOMContentLoaded", () => {
         url: "burger.html",
         tags: [
           "viande", "copieux", "gourmand", "rapide", "sale",
-          "plat", "plaisir", "genereux", "consistant","familial"
+          "plat", "plaisir", "genereux", "consistant","familial","lourd"
         ]
       },
       {
@@ -839,7 +839,7 @@ document.addEventListener("DOMContentLoaded", () => {
         url: "fondant.html",
         tags: [
           "dessert", "sucre", "chocolat", "gourmand",
-          "intense", "plaisir", "reconfortant"
+          "intense", "plaisir", "reconfortant","lourd"
         ]
       },
       {
@@ -857,7 +857,7 @@ document.addEventListener("DOMContentLoaded", () => {
         url: "poke-bowl.html",
         tags: [
           "leger", "frais", "healthy", "equilibre", "rapide",
-          "poisson", "sale", "plat", "ete", "sain"
+          "poisson", "sale", "plat", "ete", "sain","leger"
         ]
       }
     ];
@@ -877,7 +877,9 @@ document.addEventListener("DOMContentLoaded", () => {
       raffine: ["raffine", "raffiné", "chic", "élégant", "elegant"],
       familial: ["familial", "famille", "convivial"],
       ete: ["ete", "été", "soleil", "estival"],
-      familial: ["famille", "familial", "convivial", "repas famille", "a plusieurs"]
+      familial: ["famille", "familial", "convivial", "repas famille", "a plusieurs"],
+      leger: ["leger", "léger", "light", "pas lourd", "digeste"],
+      lourd: ["lourd", "copieux", "gras", "qui cale", "consistant"]
     };
 
     function normalize(text) {
@@ -936,7 +938,16 @@ document.addEventListener("DOMContentLoaded", () => {
             reasons.push(concept);
           }
         });
+// gestion léger / lourd
+if (concepts.includes("leger")) {
+  if (recipe.tags.includes("leger")) score += 4;
+  if (recipe.tags.includes("lourd")) score -= 4;
+}
 
+if (concepts.includes("lourd")) {
+  if (recipe.tags.includes("lourd")) score += 4;
+  if (recipe.tags.includes("leger")) score -= 4;
+}
         if (normalized.includes("soir") && recipe.tags.includes("rapide")) {
           score += 2;
           reasons.push("rapide");
