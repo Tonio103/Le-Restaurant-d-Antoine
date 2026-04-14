@@ -1063,22 +1063,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const aiWidgetClose = document.getElementById("aiWidgetClose");
   const aiWidgetExpand = document.getElementById("aiWidgetExpand");
 
-  if (!aiFab || !aiFabIcon || !aiWidget) return;
+  if (!aiFab || !aiWidget) return;
 
   function openWidget() {
-  aiWidget.classList.remove("hidden");
-  aiFab.classList.add("hidden");
-}
+    aiWidget.classList.remove("hidden");
+    aiFab.classList.add("hidden");
+  }
 
-function closeWidget() {
-  aiWidget.classList.add("hidden");
-  aiWidget.classList.remove("expanded");
-  aiFab.classList.remove("hidden");
-}
+  function closeWidget() {
+    aiWidget.classList.add("hidden");
+    aiWidget.classList.remove("expanded");
+    aiFab.classList.remove("hidden");
+  }
 
   function toggleExpand() {
     aiWidget.classList.toggle("expanded");
-    aiWidgetExpand.textContent = aiWidget.classList.contains("expanded") ? "⤡" : "⤢";
+
+    if (aiWidgetExpand) {
+      aiWidgetExpand.textContent = aiWidget.classList.contains("expanded") ? "⤡" : "⤢";
+    }
   }
 
   aiFab.addEventListener("click", () => {
