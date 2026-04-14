@@ -795,7 +795,269 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   window.showToast = showToast;
+  /* ==========================================================================
+     AI CHEF RECOMMENDER
+     ========================================================================== */
+  function initAiChef() {
+    const input = document.getElementById("aiChefInput");
+    const button = document.getElementById("aiChefBtn");
+    const result = document.getElementById("aiChefResult");
 
+    if (!input || !button || !result) return;
+
+    const recipeBrain = [
+      {
+        key: "cailles",
+        name: "Cailles & Petits pois",
+        url: "cailles.html",
+        tags: [
+          "viande", "raffine", "traditionnel", "francais", "sale",
+          "plat", "fete", "dimanche", "familial", "plus long"
+        ]
+      },
+      {
+        key: "crepes",
+        name: "Crêpes gourmandes",
+        url: "crepes.html",
+        tags: [
+          "sucre", "dessert", "gouter", "rapide", "facile",
+          "leger", "reconfortant", "simple", "douceur"
+        ]
+      },
+      {
+        key: "burgers",
+        name: "Burgers garnis",
+        url: "burger.html",
+        tags: [
+          "viande", "copieux", "gourmand", "rapide", "sale",
+          "plat", "plaisir", "genereux", "consistant"
+        ]
+      },
+      {
+        key: "fondants",
+        name: "Fondants intenses",
+        url: "fondant.html",
+        tags: [
+          "dessert", "sucre", "chocolat", "gourmand",
+          "intense", "plaisir", "reconfortant"
+        ]
+      },
+      {
+        key: "marbre",
+        name: "Gâteau marbré",
+        url: "gateau-marbre.html",
+        tags: [
+          "dessert", "sucre", "gouter", "moelleux",
+          "familial", "simple", "classique"
+        ]
+      },
+      {
+        key: "pokebowl",
+        name: "Poké bowl hawaïen",
+        url: "poke-bowl.html",
+        tags: [
+          "leger", "frais", "healthy", "equilibre", "rapide",
+          "poisson", "sale", "plat", "ete", "sain"
+        ]
+      }
+    ];
+
+    const lexicon = {
+      leger: ["leger", "léger", "light", "sain", "healthy", "pas lourd"],
+      frais: ["frais", "frais", "froid", "rafraichissant", "rafraîchissant"],
+      rapide: ["rapide", "vite", "express", "pas trop long", "simple", "ce soir"],
+      gourmand: ["gourmand", "gourmande", "plaisir", "ultra bon", "reconfortant", "réconfortant"],
+      chocolat: ["chocolat", "choco", "cacao"],
+      viande: ["viande", "boeuf", "bœuf", "carné", "burger"],
+      poisson: ["poisson", "saumon", "poisson cru"],
+      dessert: ["dessert", "sucre", "sucré", "gouter", "goûter", "gateau", "gâteau"],
+      sale: ["sale", "salé", "repas", "plat"],
+      copieux: ["copieux", "consistant", "qui cale", "gros repas"],
+      facile: ["facile", "simple", "sans prise de tete", "sans prise de tête"],
+      raffine: ["raffine", "raffiné", "chic", "élégant", "elegant"],
+      familial: ["familial", "famille", "convivial"],
+      ete: ["ete", "été", "soleil", "estival"]
+    };
+
+    function normalize(text) {
+      return String(text || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\s-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function detectNegations(text) {
+      const negatives = [];
+      const patterns = [
+        /sans ([a-zA-Zàâçéèêëîïôûùüÿñæœ -]+)/g,
+        /pas de ([a-zA-Zàâçéèêëîïôûùüÿñæœ -]+)/g,
+        /je ne veux pas de ([a-zA-Zàâçéèêëîïôûùüÿñæœ -]+)/g
+      ];
+
+      for (const pattern of patterns) {
+        let match;
+        while ((match = pattern.exec(text)) !== null) {
+          negatives.push(normalize(match[1]));
+        }
+      }
+
+      return negatives;
+    }
+
+    function extractConcepts(text) {
+      const normalized = normalize(text);
+      const found = new Set();
+
+      Object.entries(lexicon).forEach(([concept, words]) => {
+        const matched = words.some((word) => normalized.includes(normalize(word)));
+        if (matched) found.add(concept);
+      });
+
+      return [...found];
+    }
+
+    function scoreRecipes(query) {
+      const normalized = normalize(query);
+      const concepts = extractConcepts(normalized);
+      const negatives = detectNegations(normalized);
+
+      const scored = recipeBrain.map((recipe) => {
+        let score = 0;
+        const reasons = [];
+        const penalties = [];
+
+        concepts.forEach((concept) => {
+          if (recipe.tags.includes(concept)) {
+            score += 3;
+            reasons.push(concept);
+          }
+        });
+
+        if (normalized.includes("soir") && recipe.tags.includes("rapide")) {
+          score += 2;
+          reasons.push("rapide");
+        }
+
+        if (normalized.includes("repas") && recipe.tags.includes("plat")) {
+          score += 2;
+          reasons.push("plat");
+        }
+
+        if ((normalized.includes("envie") || normalized.includes("plaisir")) && recipe.tags.includes("gourmand")) {
+          score += 2;
+          reasons.push("gourmand");
+        }
+
+        negatives.forEach((negative) => {
+          const negConcepts = extractConcepts(negative);
+
+          negConcepts.forEach((negConcept) => {
+            if (recipe.tags.includes(negConcept)) {
+              score -= 5;
+              penalties.push(negConcept);
+            }
+          });
+
+          if (recipe.tags.some((tag) => negative.includes(tag))) {
+            score -= 4;
+            penalties.push(negative);
+          }
+        });
+
+        if (!concepts.length) {
+          score += recipe.key === "pokebowl" ? 1 : 0;
+        }
+
+        return {
+          ...recipe,
+          score,
+          reasons: [...new Set(reasons)],
+          penalties: [...new Set(penalties)]
+        };
+      });
+
+      scored.sort((a, b) => b.score - a.score);
+      return { concepts, negatives, scored };
+    }
+
+    function labelConcept(concept) {
+      const labels = {
+        leger: "léger",
+        frais: "frais",
+        rapide: "rapide",
+        gourmand: "gourmand",
+        chocolat: "chocolat",
+        viande: "viande",
+        poisson: "poisson",
+        dessert: "dessert",
+        sale: "salé",
+        copieux: "copieux",
+        facile: "facile",
+        raffine: "raffiné",
+        familial: "familial",
+        ete: "esprit d’été"
+      };
+      return labels[concept] || concept;
+    }
+
+    function renderRecommendation(query) {
+      const { concepts, negatives, scored } = scoreRecipes(query);
+      const best = scored[0];
+      const second = scored[1];
+
+      if (!best) {
+        result.innerHTML = `<strong>Aucune recommandation disponible.</strong>`;
+        return;
+      }
+
+      const readableReasons = best.reasons.map(labelConcept);
+      const readableNegatives = negatives.map((item) => item.trim()).filter(Boolean);
+
+      let html = `
+        <strong>Je te conseille : ${best.name}</strong><br>
+      `;
+
+      if (readableReasons.length) {
+        html += `Ça correspond bien à : ${readableReasons.join(", ")}.<br>`;
+      } else {
+        html += `Je l’ai choisie comme recommandation polyvalente.<br>`;
+      }
+
+      if (readableNegatives.length) {
+        html += `J’ai aussi pris en compte : ${readableNegatives.join(", ")}.<br>`;
+      }
+
+      if (second) {
+        html += `Deuxième option : ${second.name}.<br>`;
+      }
+
+      html += `<br><a class="primary-btn" href="${best.url}">Voir cette recette</a>`;
+
+      result.innerHTML = html;
+    }
+
+    button.addEventListener("click", () => {
+      const value = input.value.trim();
+
+      if (!value) {
+        result.innerHTML = `<strong>Décris un peu ce que tu veux manger.</strong><br>Par exemple : léger, rapide, sans chocolat.`;
+        return;
+      }
+
+      result.innerHTML = `<strong>Analyse en cours...</strong>`;
+      window.setTimeout(() => renderRecommendation(value), 500);
+    });
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        button.click();
+      }
+    });
+  }
   /* ==========================================================================
      GLOBAL EVENTS
      ========================================================================== */
@@ -818,7 +1080,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initHeroParallax();
   initLiquidGlass();
   initScrollTopButton();
-
+  initAiChef();
   Object.keys(recipeData).forEach(renderIngredients);
   revealOnScroll();
 
