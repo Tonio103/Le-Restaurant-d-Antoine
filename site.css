@@ -3704,3 +3704,6 @@ body.dark-mode #searchInput::placeholder {
     transform: none;
   }
 }
+.hidden {
+  display: none;
+}
