@@ -3555,7 +3555,6 @@ body.dark-mode #searchInput::placeholder {
   font-size: 1.4rem;
   cursor: pointer;
 }
-
 .hidden {
   display: none;
 }
