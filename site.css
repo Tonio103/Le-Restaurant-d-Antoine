@@ -3451,25 +3451,20 @@ body.dark-mode #searchInput::placeholder {
 }
 .fire-emoji {
   display: inline-block;
-  transform-origin: center bottom;
-  animation: flameBurn 0.9s infinite ease-in-out;
-  filter: drop-shadow(0 0 6px rgba(255, 120, 0, 0.7));
+  animation: flameGlow 1.5s infinite ease-in-out;
 }
 
-@keyframes flameBurn {
+@keyframes flameGlow {
   0% {
-    transform: rotate(-4deg) scale(1);
-  }
-  25% {
-    transform: rotate(3deg) scale(1.08, 0.95);
+    filter: drop-shadow(0 0 2px rgba(255,120,0,0.4));
+    transform: scale(1);
   }
   50% {
-    transform: rotate(-2deg) scale(0.96, 1.08);
-  }
-  75% {
-    transform: rotate(2deg) scale(1.05, 0.97);
+    filter: drop-shadow(0 0 8px rgba(255,140,0,0.9));
+    transform: scale(1.08);
   }
   100% {
-    transform: rotate(-4deg) scale(1);
+    filter: drop-shadow(0 0 2px rgba(255,120,0,0.4));
+    transform: scale(1);
   }
 }
