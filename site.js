@@ -812,7 +812,7 @@ document.addEventListener("DOMContentLoaded", () => {
         url: "cailles.html",
         tags: [
           "viande", "raffine", "traditionnel", "francais", "sale",
-          "plat", "fete", "dimanche", "familial", "plus long"
+          "plat", "fete", "dimanche", "familial", "plus long","familial"
         ]
       },
       {
@@ -821,7 +821,7 @@ document.addEventListener("DOMContentLoaded", () => {
         url: "crepes.html",
         tags: [
           "sucre", "dessert", "gouter", "rapide", "facile",
-          "leger", "reconfortant", "simple", "douceur"
+          "leger", "reconfortant", "simple", "douceur","familial"
         ]
       },
       {
