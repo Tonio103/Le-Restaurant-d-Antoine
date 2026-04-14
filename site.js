@@ -1059,7 +1059,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function initAiWidget() {
   const aiFab = document.getElementById("aiFab");
-  const aiFabIcon = document.getElementById("aiFabIcon");
   const aiWidget = document.getElementById("aiWidget");
   const aiWidgetClose = document.getElementById("aiWidgetClose");
   const aiWidgetExpand = document.getElementById("aiWidgetExpand");
