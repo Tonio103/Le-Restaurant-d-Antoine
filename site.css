@@ -3488,14 +3488,15 @@ body.dark-mode #searchInput::placeholder {
   justify-content: center;
   width: 72px;
   height: 72px;
+  font-size: 1.9rem;
+  color: white;
+  background: linear-gradient(135deg, var(--btn-primary-start), var(--btn-primary-end));
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  color: white;
-  background: linear-gradient(135deg, var(--btn-primary-start), var(--btn-primary-end));
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
   animation: aiPulse 2.2s ease-in-out infinite;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .ai-fab:hover {
