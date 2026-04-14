@@ -86,7 +86,6 @@
   </header>
 
   <main class="main-layout">
-
     <section class="page-section active" id="accueil">
       <section class="hero" id="homeHero">
         <div class="hero-copy">
@@ -255,7 +254,6 @@
         </div>
       </div>
     </section>
-
   </main>
 
   <footer class="site-footer">
@@ -271,6 +269,25 @@
     <div class="lightbox-backdrop"></div>
     <img src="" alt="" class="lightbox-image" id="lightboxImage" />
     <button class="lightbox-close" id="lightboxClose">×</button>
+  </div>
+
+  <button class="ai-fab" id="aiFab" type="button" aria-label="Ouvrir l'assistant cuisine">🍽️</button>
+
+  <div class="ai-widget hidden" id="aiWidget">
+    <div class="ai-widget-header">
+      <strong>Assistant cuisine</strong>
+    </div>
+
+    <div class="ai-widget-body">
+      <input
+        type="text"
+        id="aiChefInput"
+        placeholder="Ex : léger, rapide, sans chocolat"
+        autocomplete="off"
+      />
+      <button id="aiChefBtn" class="primary-btn" type="button">Analyser</button>
+      <div id="aiChefResult" class="ai-chef-result"></div>
+    </div>
   </div>
 
   <script src="site.js"></script>
