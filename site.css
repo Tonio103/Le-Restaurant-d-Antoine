@@ -3543,3 +3543,19 @@ body.dark-mode #searchInput::placeholder {
     width: auto;
   }
 }
+.ai-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 10000;
+  width: 58px;
+  height: 58px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
