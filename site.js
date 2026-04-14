@@ -803,21 +803,28 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("error", () => {
     hideLoader();
   });
-const flame = document.querySelector(".fire-emoji");
+document.addEventListener("DOMContentLoaded", () => {
+  const flame = document.getElementById("fireEmoji");
 
-function animateFlame() {
-  const scale = 1 + Math.random() * 0.25; // taille variable
-  const glow = 4 + Math.random() * 10; // intensité lumière
+  if (!flame) {
+    console.log("Flamme introuvable");
+    return;
+  }
 
-  flame.style.transform = `scale(${scale})`;
-  flame.style.filter = `drop-shadow(0 0 ${glow}px orange)`;
+  function animateFlame() {
+    const scale = 1 + Math.random() * 0.2;
+    const glow = 4 + Math.random() * 8;
+    const rotate = -3 + Math.random() * 6;
 
-  requestAnimationFrame(() => {
-    setTimeout(animateFlame, 80 + Math.random() * 120);
-  });
-}
+    flame.style.display = "inline-block";
+    flame.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
+    flame.style.filter = `drop-shadow(0 0 ${glow}px orange)`;
 
-animateFlame();
+    setTimeout(animateFlame, 120);
+  }
+
+  animateFlame();
+});
   /* ==========================================================================
      INIT
      ========================================================================== */
