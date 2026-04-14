@@ -1050,12 +1050,6 @@ document.addEventListener("DOMContentLoaded", () => {
       result.innerHTML = `<strong>Analyse en cours...</strong>`;
       window.setTimeout(() => renderRecommendation(value), 500);
     });
-const aiFab = document.getElementById("aiFab");
-const aiWidget = document.getElementById("aiWidget");
-
-aiFab?.addEventListener("click", () => {
-  aiWidget?.classList.toggle("hidden");
-});
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
@@ -1063,6 +1057,16 @@ aiFab?.addEventListener("click", () => {
       }
     });
   }
+  function initAiWidget() {
+  const aiFab = document.getElementById("aiFab");
+  const aiWidget = document.getElementById("aiWidget");
+
+  if (!aiFab || !aiWidget) return;
+
+  aiFab.addEventListener("click", () => {
+    aiWidget.classList.toggle("hidden");
+  });
+}
   /* ==========================================================================
      GLOBAL EVENTS
      ========================================================================== */
@@ -1086,6 +1090,7 @@ aiFab?.addEventListener("click", () => {
   initLiquidGlass();
   initScrollTopButton();
   initAiChef();
+  initAiWidget();
   Object.keys(recipeData).forEach(renderIngredients);
   revealOnScroll();
 
