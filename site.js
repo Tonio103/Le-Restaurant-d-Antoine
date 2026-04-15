@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let toastTimeout = null;
 
   /* ==========================================================================
-     STORAGE HELPERS
+     HELPERS
      ========================================================================== */
   function safeGetStorage(key, fallback) {
     try {
@@ -165,9 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* ==========================================================================
-     UI HELPERS
-     ========================================================================== */
   function showToast(message) {
     if (!toast) return;
 
@@ -201,6 +198,16 @@ document.addEventListener("DOMContentLoaded", () => {
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+  }
+
+  function normalizeAi(text) {
+    return String(text || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w\s-]/g, " ")
+      .replace(/\s+/g, " ")
       .trim();
   }
 
@@ -244,535 +251,79 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ==========================================================================
      SEARCH
      ========================================================================== */
-function initAiChef() {
-  const input = document.getElementById("aiChefInput");
-  const button = document.getElementById("aiChefBtn");
-  const result = document.getElementById("aiChefResult");
+  function initSearch() {
+    if (!searchInput) return;
 
-  if (!input || !button || !result) return;
+    const suggestionsBox = document.getElementById("searchSuggestions");
+    if (!suggestionsBox) return;
 
-  const recipeBrain = [
-    {
-      key: "cailles",
-      name: "Cailles & Petits pois",
-      url: "cailles.html",
-      tags: ["viande", "raffine", "traditionnel", "francais", "sale", "plat", "familial", "moyen", "dimanche", "chaud"],
-      aliases: ["caille", "cailles", "petits pois", "cailles petits pois", "cailles et petits pois"]
-    },
-    {
-      key: "crepes",
-      name: "Crêpes gourmandes",
-      url: "crepes.html",
-      tags: ["dessert", "gouter", "rapide", "facile", "leger", "familial", "simple", "convivial", "sucre", "plaisir", "reconfort"],
-      aliases: ["crepe", "crepes", "crêpe", "crêpes", "pancake", "pancakes"]
-    },
-    {
-      key: "burgers",
-      name: "Burgers garnis",
-      url: "burger.html",
-      tags: ["viande", "copieux", "gourmand", "rapide", "sale", "plat", "familial", "lourd", "convivial", "plaisir", "chaud", "enfant"],
-      aliases: ["burger", "burgers", "hamburger", "hamburgers", "cheeseburger"]
-    },
-    {
-      key: "fondants",
-      name: "Fondants intenses",
-      url: "fondant.html",
-      tags: ["dessert", "chocolat", "gourmand", "lourd", "plaisir", "sucre", "reconfort"],
-      aliases: ["fondant", "fondants", "fondant chocolat", "fondants chocolat", "coulant", "coulant chocolat"]
-    },
-    {
-      key: "marbre",
-      name: "Gâteau marbré",
-      url: "gateau-marbre.html",
-      tags: ["dessert", "gouter", "familial", "simple", "leger", "sucre", "plaisir", "enfant"],
-      aliases: ["marbre", "gateau marbre", "gâteau marbré", "cake marbre", "cake marbré"]
-    },
-    {
-      key: "pokebowl",
-      name: "Poké bowl hawaïen",
-      url: "poke-bowl.html",
-      tags: ["leger", "frais", "healthy", "equilibre", "rapide", "poisson", "sale", "plat", "sain", "familial", "froid", "ete"],
-      aliases: ["poke", "pokebowl", "poke bowl", "poké", "poké bowl", "bowl saumon"]
-    }
-  ];
-
-  const lexicon = {
-    leger: ["leger", "léger", "light", "digeste"],
-    pas_trop_lourd: ["pas trop lourd", "pas lourd", "pas trop copieux", "assez leger", "assez léger"],
-    lourd: ["lourd", "copieux", "gras", "qui cale", "consistant"],
-
-    familial: ["famille", "familial", "convivial", "a plusieurs", "à plusieurs", "partager"],
-    frais: ["frais", "froid", "rafraichissant", "rafraîchissant"],
-    rapide: ["rapide", "vite", "express", "simple", "ce soir"],
-    gourmand: ["gourmand", "gourmande", "plaisir", "reconfortant", "réconfortant"],
-    chocolat: ["chocolat", "choco", "cacao"],
-    viande: ["viande", "boeuf", "bœuf", "carne"],
-    poisson: ["poisson", "saumon"],
-    dessert: ["dessert", "sucre", "sucré", "gouter", "goûter", "gateau", "gâteau"],
-    sale: ["sale", "salé", "repas", "plat"],
-    raffine: ["raffine", "raffiné", "chic", "elegant", "élégant"],
-
-    bonjour: ["bonjour", "salut", "coucou", "hello", "hey"],
-    merci: ["merci", "thanks", "merci beaucoup"],
-    faim: ["faim", "j ai faim", "j'ai faim", "affame", "affamé"],
-    soif: ["soif", "j ai soif", "j'ai soif"],
-    triste: ["triste", "deprime", "déprime", "pas bien", "cafard"],
-    fatigue: ["fatigue", "fatigué", "fatiguee", "fatiguée", "creve", "crevé"],
-    fete: ["fete", "fête", "anniversaire", "occasion"],
-    dimanche: ["dimanche", "repas du dimanche"],
-    hiver: ["hiver", "jour froid", "temps froid"],
-    ete: ["ete", "été", "soleil", "estival"],
-    romantique: ["romantique", "amoureux", "date", "diner a deux", "dîner à deux"],
-    enfant: ["enfant", "enfants", "petits", "petit", "kids"],
-    invite: ["invite", "invites", "invité", "invités", "recevoir", "du monde"],
-    reconfort: ["reconfort", "réconfort", "comfort", "remonter le moral"],
-    healthy: ["healthy", "sain", "saine", "equilibre", "équilibré", "équilibrée", "fit"],
-    plaisir: ["plaisir", "envie", "gourmand", "gourmande"],
-    sucre: ["sucre", "sucré", "dessert", "gouter", "goûter"],
-    chaud: ["chaud", "chaude", "rechauffant", "réchauffant"],
-    froid: ["froid", "frais", "rafraichissant", "rafraîchissant"],
-
-    aide: ["aide", "aider", "help", "besoin d aide", "besoin d'aide"],
-    amour: ["amour", "love", "coeur", "cœur"],
-    antoine: ["antoine", "chef antoine", "restaurant d antoine", "restaurant d'antoine"]
-  };
-
-  function normalize(text) {
-    return String(text || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^\w\s-]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
-
-  function findRecipeMentions(text) {
-    const normalized = normalize(text);
-    const mentioned = new Set();
-
-    recipeBrain.forEach((recipe) => {
-      const allNames = [recipe.name, ...(recipe.aliases || [])];
-      const match = allNames.some((name) => normalized.includes(normalize(name)));
-      if (match) {
-        mentioned.add(recipe.key);
-      }
-    });
-
-    return [...mentioned];
-  }
-
-  function detectNegations(text) {
-    const normalized = normalize(text);
-    const negatives = new Set();
-
-    const patterns = [
-      /sans ([a-z0-9\s-]+)/g,
-      /pas de ([a-z0-9\s-]+)/g,
-      /pas d ([a-z0-9\s-]+)/g,
-      /je ne veux pas de ([a-z0-9\s-]+)/g,
-      /je veux pas de ([a-z0-9\s-]+)/g,
-      /pas trop ([a-z0-9\s-]+)/g
+    const recipeRoutes = [
+      { label: "Cailles", keywords: ["caille", "cailles", "petits pois"], url: "cailles.html" },
+      { label: "Crêpes", keywords: ["crepe", "crepes", "crêpe", "crêpes", "pancake"], url: "crepes.html" },
+      { label: "Burgers", keywords: ["burger", "burgers", "hamburger"], url: "burger.html" },
+      { label: "Fondants", keywords: ["fondant", "fondants", "chocolat", "coulant"], url: "fondant.html" },
+      { label: "Marbré", keywords: ["marbre", "marbré", "gateau marbre", "gâteau marbré", "cake"], url: "gateau-marbre.html" },
+      { label: "Poké bowl", keywords: ["poke", "pokebowl", "poké", "poké bowl", "poke bowl", "saumon"], url: "poke-bowl.html" }
     ];
 
-    patterns.forEach((pattern) => {
-      let match;
-      while ((match = pattern.exec(normalized)) !== null) {
-        negatives.add(match[1].trim());
+    function hideSuggestions() {
+      suggestionsBox.style.display = "none";
+      suggestionsBox.innerHTML = "";
+    }
+
+    function showSuggestions(results) {
+      suggestionsBox.innerHTML = "";
+
+      if (!results.length) {
+        hideSuggestions();
+        return;
       }
-    });
 
-    if (normalized.includes("pas lourd") || normalized.includes("pas trop lourd")) {
-      negatives.add("lourd");
-    }
+      results.forEach((recipe) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "search-suggestion-item";
+        button.innerHTML = `🍽️ ${recipe.label}`;
 
-    return [...negatives];
-  }
+        button.addEventListener("click", () => {
+          window.location.href = recipe.url;
+        });
 
-  function extractConcepts(text) {
-    const normalized = normalize(text);
-    const found = new Set();
-
-    Object.entries(lexicon).forEach(([concept, words]) => {
-      const matched = words.some((word) => normalized.includes(normalize(word)));
-      if (matched) found.add(concept);
-    });
-
-    return [...found];
-  }
-
-  function detectSpecialIntent(text, recipeMentions) {
-    const normalized = normalize(text);
-
-    if (!normalized) return null;
-
-    if (recipeMentions.length > 0) return null;
-
-    if (normalized.includes("bonjour") || normalized.includes("salut") || normalized.includes("coucou") || normalized.includes("hello")) {
-      return "bonjour";
-    }
-
-    if (normalized.includes("merci")) {
-      return "merci";
-    }
-
-    if (normalized.includes("aide") || normalized.includes("aider") || normalized.includes("help")) {
-      return "aide";
-    }
-
-    if (normalized.includes("amour") || normalized.includes("love") || normalized.includes("coeur") || normalized.includes("cœur")) {
-      return "amour";
-    }
-
-    if (normalized.includes("antoine")) {
-      return "antoine";
-    }
-
-    if (normalized.includes("faim")) {
-      return "faim";
-    }
-
-    if (normalized.includes("soif")) {
-      return "soif";
-    }
-
-    if (normalized.includes("triste") || normalized.includes("deprime") || normalized.includes("déprime") || normalized.includes("cafard")) {
-      return "triste";
-    }
-
-    if (normalized.includes("fatigue") || normalized.includes("fatigué") || normalized.includes("fatiguee") || normalized.includes("fatiguée")) {
-      return "fatigue";
-    }
-
-    return null;
-  }
-
-  function scoreRecipes(query) {
-    const normalized = normalize(query);
-    const concepts = extractConcepts(normalized);
-    const negatives = detectNegations(normalized);
-    const recipeMentions = findRecipeMentions(normalized);
-
-    const scored = recipeBrain.map((recipe) => {
-      let score = 0;
-      const reasons = [];
-      const blocked = [];
-
-      concepts.forEach((concept) => {
-        if (recipe.tags.includes(concept)) {
-          score += 3;
-          reasons.push(concept);
-        }
+        suggestionsBox.appendChild(button);
       });
 
-      if (recipeMentions.includes(recipe.key)) {
-        score += 10;
-        reasons.push("recette citée");
+      suggestionsBox.style.display = "block";
+    }
+
+    searchInput.addEventListener("input", () => {
+      const value = normalizeText(searchInput.value);
+
+      if (!value) {
+        hideSuggestions();
+        return;
       }
 
-      if (concepts.includes("familial")) {
-        if (recipe.tags.includes("familial")) score += 4;
-        if (recipe.tags.includes("convivial")) score += 2;
-      }
+      const results = recipeRoutes.filter((recipe) =>
+        normalizeText(recipe.label).includes(value) ||
+        recipe.keywords.some((keyword) => normalizeText(keyword).includes(value))
+      );
 
-      if (concepts.includes("leger")) {
-        if (recipe.tags.includes("leger")) score += 5;
-        if (recipe.tags.includes("lourd")) score -= 5;
-        if (recipe.tags.includes("moyen")) score -= 1;
-      }
-
-      if (concepts.includes("pas_trop_lourd")) {
-        if (recipe.tags.includes("leger")) score += 6;
-        if (recipe.tags.includes("moyen")) score += 1;
-        if (recipe.tags.includes("lourd")) score -= 8;
-        if (recipe.tags.includes("raffine")) score -= 1;
-      }
-
-      if (concepts.includes("lourd")) {
-        if (recipe.tags.includes("lourd")) score += 5;
-        if (recipe.tags.includes("leger")) score -= 4;
-      }
-
-      if (normalized.includes("repas")) {
-        if (recipe.tags.includes("plat")) score += 2;
-        if (recipe.tags.includes("dessert")) score -= 2;
-      }
-
-      if (normalized.includes("ce soir") || normalized.includes("soir")) {
-        if (recipe.tags.includes("rapide")) score += 2;
-        if (recipe.tags.includes("leger")) score += 2;
-      }
-
-      if (concepts.includes("fete")) {
-        if (recipe.key === "cailles") score += 4;
-        if (recipe.key === "fondants") score += 2;
-      }
-
-      if (concepts.includes("dimanche")) {
-        if (recipe.key === "cailles") score += 4;
-      }
-
-      if (concepts.includes("ete") || concepts.includes("froid") || concepts.includes("healthy")) {
-        if (recipe.key === "pokebowl") score += 4;
-      }
-
-      if (concepts.includes("hiver") || concepts.includes("reconfort")) {
-        if (recipe.key === "fondants") score += 3;
-        if (recipe.key === "crepes") score += 2;
-        if (recipe.key === "cailles") score += 2;
-      }
-
-      if (concepts.includes("romantique")) {
-        if (recipe.key === "cailles") score += 4;
-        if (recipe.key === "fondants") score += 2;
-      }
-
-      if (concepts.includes("enfant")) {
-        if (recipe.key === "burgers") score += 3;
-        if (recipe.key === "crepes") score += 3;
-        if (recipe.key === "marbre") score += 2;
-      }
-
-      if (concepts.includes("invite")) {
-        if (recipe.key === "cailles") score += 3;
-        if (recipe.key === "burgers") score += 2;
-      }
-
-      if (normalized.includes("famille") && concepts.includes("pas_trop_lourd")) {
-        if (recipe.key === "crepes") score += 4;
-        if (recipe.key === "pokebowl") score += 4;
-        if (recipe.key === "marbre") score += 1;
-        if (recipe.key === "burgers") score -= 3;
-        if (recipe.key === "cailles") score -= 4;
-        if (recipe.key === "fondants") score -= 3;
-      }
-
-      negatives.forEach((negative) => {
-        const neg = normalize(negative);
-
-        if (neg.includes("lourd") && recipe.tags.includes("lourd")) {
-          score -= 12;
-          blocked.push("trop lourd");
-        }
-
-        if ((neg.includes("burger") || neg.includes("hamburger")) && recipe.key === "burgers") {
-          score -= 30;
-          blocked.push("burger exclu");
-        }
-
-        if ((neg.includes("chocolat") || neg.includes("choco") || neg.includes("cacao")) && recipe.tags.includes("chocolat")) {
-          score -= 25;
-          blocked.push("chocolat exclu");
-        }
-
-        if ((neg.includes("poisson") || neg.includes("saumon")) && recipe.tags.includes("poisson")) {
-          score -= 25;
-          blocked.push("poisson exclu");
-        }
-
-        if ((neg.includes("viande") || neg.includes("boeuf") || neg.includes("bœuf")) && recipe.tags.includes("viande")) {
-          score -= 25;
-          blocked.push("viande exclue");
-        }
-
-        if ((neg.includes("dessert") || neg.includes("sucre") || neg.includes("gouter")) && recipe.tags.includes("dessert")) {
-          score -= 15;
-          blocked.push("dessert exclu");
-        }
-
-        if ((neg.includes("sale") || neg.includes("plat") || neg.includes("repas")) && recipe.tags.includes("sale")) {
-          score -= 15;
-          blocked.push("plat salé exclu");
-        }
-
-        const recipeNameBlocked = (recipe.aliases || []).some((alias) => neg.includes(normalize(alias)));
-        if (recipeNameBlocked || neg.includes(normalize(recipe.name))) {
-          score -= 35;
-          blocked.push("recette exclue");
-        }
-      });
-
-      return {
-        ...recipe,
-        score,
-        reasons: [...new Set(reasons)],
-        blocked: [...new Set(blocked)]
-      };
+      showSuggestions(results);
     });
 
-    scored.sort((a, b) => b.score - a.score);
-    return { concepts, negatives, recipeMentions, scored };
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        hideSuggestions();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (target !== searchInput && !suggestionsBox.contains(target)) {
+        hideSuggestions();
+      }
+    });
   }
-
-  function labelConcept(concept) {
-    const labels = {
-      leger: "léger",
-      pas_trop_lourd: "pas trop lourd",
-      lourd: "copieux",
-      familial: "familial",
-      frais: "frais",
-      rapide: "rapide",
-      gourmand: "gourmand",
-      chocolat: "chocolat",
-      viande: "viande",
-      poisson: "poisson",
-      dessert: "dessert",
-      sale: "salé",
-      raffine: "raffiné",
-      reconfort: "réconfortant",
-      healthy: "sain",
-      chaud: "chaud",
-      froid: "froid"
-    };
-    return labels[concept] || concept;
-  }
-
-  function renderSpecialResponse(intent) {
-    if (intent === "bonjour") {
-      result.innerHTML = `
-        <strong>Bonjour 👋</strong><br>
-        Dis-moi ce que tu veux manger et je t’aide à trouver la meilleure recette.
-      `;
-      return;
-    }
-
-    if (intent === "merci") {
-      result.innerHTML = `
-        <strong>Avec plaisir ✨</strong><br>
-        Je suis là pour t’aider à choisir la bonne recette.
-      `;
-      return;
-    }
-
-    if (intent === "aide") {
-      result.innerHTML = `
-        <strong>Bien sûr 👋</strong><br>
-        Je peux t’aider à choisir une recette selon ce que tu veux : léger, familial, rapide, gourmand, sans chocolat, sans burger, etc.<br><br>
-        <strong>Exemples :</strong><br>
-        • un truc pas trop lourd<br>
-        • un repas familial<br>
-        • sans burger et sans chocolat<br>
-        • je veux des crêpes
-      `;
-      return;
-    }
-
-    if (intent === "amour") {
-      result.innerHTML = `
-        <strong>Oh 🫶</strong><br>
-        Moi je peux surtout t’aider côté cuisine et ambiance gourmande.<br>
-        Je peux te proposer une recette réconfortante ou à partager.
-      `;
-      return;
-    }
-
-    if (intent === "antoine") {
-      result.innerHTML = `
-        <strong>Antoine ?</strong><br>
-        C’est le chef du restaurant 😌<br>
-        Je peux t’aider à choisir parmi ses recettes : burgers, crêpes, cailles, fondants, gâteau marbré ou poké bowl.
-      `;
-      return;
-    }
-
-    if (intent === "faim") {
-      result.innerHTML = `
-        <strong>On va régler ça 😌</strong><br>
-        Dis-moi juste : léger, gourmand, familial, rapide, sucré ou salé.
-      `;
-      return;
-    }
-
-    if (intent === "soif") {
-      result.innerHTML = `
-        <strong>Je gère surtout les plats 🍽️</strong><br>
-        Mais je peux déjà t’aider à choisir une recette légère, fraîche ou gourmande.
-      `;
-      return;
-    }
-
-    if (intent === "triste") {
-      result.innerHTML = `
-        <strong>Oh 💛</strong><br>
-        On peut partir sur une recette réconfortante. Par exemple : crêpes, fondants ou gâteau marbré.
-      `;
-      return;
-    }
-
-    if (intent === "fatigue") {
-      result.innerHTML = `
-        <strong>Je vois 😴</strong><br>
-        Dans ce cas, on peut viser un truc simple et rapide. Par exemple : crêpes, burgers ou poké bowl.
-      `;
-    }
-  }
-
-  function renderRecommendation(query) {
-    const normalized = normalize(query);
-    const { concepts, negatives, recipeMentions, scored } = scoreRecipes(normalized);
-    const specialIntent = detectSpecialIntent(normalized, recipeMentions);
-
-    if (specialIntent) {
-      renderSpecialResponse(specialIntent);
-      return;
-    }
-
-    const available = scored.filter((recipe) => recipe.score > -15);
-    const best = available[0] || scored[0];
-    const second = available[1] || scored[1];
-
-    if (!best) {
-      result.innerHTML = `<strong>Aucune recommandation disponible.</strong>`;
-      return;
-    }
-
-    const readableReasons = best.reasons
-      .filter((reason) => reason !== "recette citée")
-      .map(labelConcept);
-
-    let html = `<strong>Je te conseille : ${best.name}</strong><br>`;
-
-    if (recipeMentions.includes(best.key)) {
-      html += `Tu as cité cette recette, donc je l’ai bien prise en compte.<br>`;
-    }
-
-    if (readableReasons.length) {
-      html += `Ça correspond bien à : ${readableReasons.join(", ")}.<br>`;
-    } else {
-      html += `Je l’ai choisie comme meilleure option par rapport à ta demande.<br>`;
-    }
-
-    if (negatives.length) {
-      html += `J’ai évité : ${negatives.join(", ")}.<br>`;
-    }
-
-    if (second && second.key !== best.key) {
-      html += `Deuxième option : ${second.name}.<br>`;
-    }
-
-    html += `<br><a class="primary-btn" href="${best.url}">Voir cette recette</a>`;
-    result.innerHTML = html;
-  }
-
-  button.addEventListener("click", () => {
-    const value = input.value.trim();
-
-    if (!value) {
-      result.innerHTML = `<strong>Bonjour 👋</strong><br>Dis-moi ce que tu cherches, et je te proposerai la recette la plus adaptée.`;
-      return;
-    }
-
-    result.innerHTML = `<strong>Recherche en cours...</strong>`;
-    window.setTimeout(() => renderRecommendation(value), 350);
-  });
-
-  input.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      button.click();
-    }
-  });
-}
 
   /* ==========================================================================
      PLANE ANIMATION
@@ -1267,37 +818,43 @@ function initAiChef() {
         key: "cailles",
         name: "Cailles & Petits pois",
         url: "cailles.html",
-        tags: ["viande", "raffine", "traditionnel", "francais", "sale", "plat", "familial", "moyen"]
+        tags: ["viande", "raffine", "traditionnel", "francais", "sale", "plat", "familial", "moyen", "dimanche", "chaud"],
+        aliases: ["caille", "cailles", "petits pois", "cailles petits pois", "cailles et petits pois"]
       },
       {
         key: "crepes",
         name: "Crêpes gourmandes",
         url: "crepes.html",
-        tags: ["dessert", "gouter", "rapide", "facile", "leger", "familial", "simple", "convivial"]
+        tags: ["dessert", "gouter", "rapide", "facile", "leger", "familial", "simple", "convivial", "sucre", "plaisir", "reconfort"],
+        aliases: ["crepe", "crepes", "crêpe", "crêpes", "pancake", "pancakes"]
       },
       {
         key: "burgers",
         name: "Burgers garnis",
         url: "burger.html",
-        tags: ["viande", "copieux", "gourmand", "rapide", "sale", "plat", "familial", "lourd", "convivial"]
+        tags: ["viande", "copieux", "gourmand", "rapide", "sale", "plat", "familial", "lourd", "convivial", "plaisir", "chaud", "enfant"],
+        aliases: ["burger", "burgers", "hamburger", "hamburgers", "cheeseburger"]
       },
       {
         key: "fondants",
         name: "Fondants intenses",
         url: "fondant.html",
-        tags: ["dessert", "chocolat", "gourmand", "lourd", "plaisir"]
+        tags: ["dessert", "chocolat", "gourmand", "lourd", "plaisir", "sucre", "reconfort"],
+        aliases: ["fondant", "fondants", "fondant chocolat", "fondants chocolat", "coulant", "coulant chocolat"]
       },
       {
         key: "marbre",
         name: "Gâteau marbré",
         url: "gateau-marbre.html",
-        tags: ["dessert", "gouter", "familial", "simple", "leger"]
+        tags: ["dessert", "gouter", "familial", "simple", "leger", "sucre", "plaisir", "enfant"],
+        aliases: ["marbre", "gateau marbre", "gâteau marbré", "cake marbre", "cake marbré"]
       },
       {
         key: "pokebowl",
         name: "Poké bowl hawaïen",
         url: "poke-bowl.html",
-        tags: ["leger", "frais", "healthy", "equilibre", "rapide", "poisson", "sale", "plat", "sain", "familial"]
+        tags: ["leger", "frais", "healthy", "equilibre", "rapide", "poisson", "sale", "plat", "sain", "familial", "froid", "ete"],
+        aliases: ["poke", "pokebowl", "poke bowl", "poké", "poké bowl", "bowl saumon"]
       }
     ];
 
@@ -1305,43 +862,121 @@ function initAiChef() {
       leger: ["leger", "léger", "light", "digeste"],
       pas_trop_lourd: ["pas trop lourd", "pas lourd", "pas trop copieux", "assez leger", "assez léger"],
       lourd: ["lourd", "copieux", "gras", "qui cale", "consistant"],
+
       familial: ["famille", "familial", "convivial", "a plusieurs", "à plusieurs", "partager"],
       frais: ["frais", "froid", "rafraichissant", "rafraîchissant"],
       rapide: ["rapide", "vite", "express", "simple", "ce soir"],
       gourmand: ["gourmand", "gourmande", "plaisir", "reconfortant", "réconfortant"],
       chocolat: ["chocolat", "choco", "cacao"],
-      viande: ["viande", "boeuf", "bœuf", "carne", "burger"],
+      viande: ["viande", "boeuf", "bœuf", "carne"],
       poisson: ["poisson", "saumon"],
       dessert: ["dessert", "sucre", "sucré", "gouter", "goûter", "gateau", "gâteau"],
       sale: ["sale", "salé", "repas", "plat"],
-      raffine: ["raffine", "raffiné", "chic", "elegant", "élégant"]
+      raffine: ["raffine", "raffiné", "chic", "elegant", "élégant"],
+
+      bonjour: ["bonjour", "salut", "coucou", "hello", "hey"],
+      merci: ["merci", "thanks", "merci beaucoup"],
+      faim: ["faim", "j ai faim", "j'ai faim", "affame", "affamé"],
+      soif: ["soif", "j ai soif", "j'ai soif"],
+      triste: ["triste", "deprime", "déprime", "pas bien", "cafard"],
+      fatigue: ["fatigue", "fatigué", "fatiguee", "fatiguée", "creve", "crevé"],
+      fete: ["fete", "fête", "anniversaire", "occasion"],
+      dimanche: ["dimanche", "repas du dimanche"],
+      hiver: ["hiver", "jour froid", "temps froid"],
+      ete: ["ete", "été", "soleil", "estival"],
+      romantique: ["romantique", "amoureux", "date", "diner a deux", "dîner à deux"],
+      enfant: ["enfant", "enfants", "petits", "petit", "kids"],
+      invite: ["invite", "invites", "invité", "invités", "recevoir", "du monde"],
+      reconfort: ["reconfort", "réconfort", "comfort", "remonter le moral"],
+      healthy: ["healthy", "sain", "saine", "equilibre", "équilibré", "équilibrée", "fit"],
+      plaisir: ["plaisir", "envie", "gourmand", "gourmande"],
+      sucre: ["sucre", "sucré", "dessert", "gouter", "goûter"],
+      chaud: ["chaud", "chaude", "rechauffant", "réchauffant"],
+      froid: ["froid", "frais", "rafraichissant", "rafraîchissant"],
+
+      aide: ["aide", "aider", "help", "besoin d aide", "besoin d'aide"],
+      amour: ["amour", "love", "coeur", "cœur"],
+      antoine: ["antoine", "chef antoine", "restaurant d antoine", "restaurant d'antoine"]
     };
 
-    function normalize(text) {
-      return String(text || "")
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^\w\s-]/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+    function findRecipeMentions(text) {
+      const normalized = normalizeAi(text);
+      const mentioned = new Set();
+
+      recipeBrain.forEach((recipe) => {
+        const allNames = [recipe.name, ...(recipe.aliases || [])];
+        const match = allNames.some((name) => normalized.includes(normalizeAi(name)));
+        if (match) {
+          mentioned.add(recipe.key);
+        }
+      });
+
+      return [...mentioned];
+    }
+
+    function detectNegations(text) {
+      const normalized = normalizeAi(text);
+      const negatives = new Set();
+
+      const patterns = [
+        /sans ([a-z0-9\s-]+)/g,
+        /pas de ([a-z0-9\s-]+)/g,
+        /pas d ([a-z0-9\s-]+)/g,
+        /je ne veux pas de ([a-z0-9\s-]+)/g,
+        /je veux pas de ([a-z0-9\s-]+)/g,
+        /pas trop ([a-z0-9\s-]+)/g
+      ];
+
+      patterns.forEach((pattern) => {
+        let match;
+        while ((match = pattern.exec(normalized)) !== null) {
+          negatives.add(match[1].trim());
+        }
+      });
+
+      if (normalized.includes("pas lourd") || normalized.includes("pas trop lourd")) {
+        negatives.add("lourd");
+      }
+
+      return [...negatives];
     }
 
     function extractConcepts(text) {
-      const normalized = normalize(text);
+      const normalized = normalizeAi(text);
       const found = new Set();
 
       Object.entries(lexicon).forEach(([concept, words]) => {
-        const matched = words.some((word) => normalized.includes(normalize(word)));
+        const matched = words.some((word) => normalized.includes(normalizeAi(word)));
         if (matched) found.add(concept);
       });
 
       return [...found];
     }
 
+    function detectSpecialIntent(text, recipeMentions) {
+      const normalized = normalizeAi(text);
+
+      if (!normalized) return null;
+      if (recipeMentions.length > 0) return null;
+
+      if (normalized.includes("bonjour") || normalized.includes("salut") || normalized.includes("coucou") || normalized.includes("hello")) return "bonjour";
+      if (normalized.includes("merci")) return "merci";
+      if (normalized.includes("aide") || normalized.includes("aider") || normalized.includes("help")) return "aide";
+      if (normalized.includes("amour") || normalized.includes("love") || normalized.includes("coeur") || normalized.includes("cœur")) return "amour";
+      if (normalized.includes("antoine")) return "antoine";
+      if (normalized.includes("faim")) return "faim";
+      if (normalized.includes("soif")) return "soif";
+      if (normalized.includes("triste") || normalized.includes("deprime") || normalized.includes("cafard")) return "triste";
+      if (normalized.includes("fatigue") || normalized.includes("fatiguee") || normalized.includes("fatigue")) return "fatigue";
+
+      return null;
+    }
+
     function scoreRecipes(query) {
-      const normalized = normalize(query);
+      const normalized = normalizeAi(query);
       const concepts = extractConcepts(normalized);
+      const negatives = detectNegations(normalized);
+      const recipeMentions = findRecipeMentions(normalized);
 
       const scored = recipeBrain.map((recipe) => {
         let score = 0;
@@ -1353,6 +988,11 @@ function initAiChef() {
             reasons.push(concept);
           }
         });
+
+        if (recipeMentions.includes(recipe.key)) {
+          score += 10;
+          reasons.push("recette citée");
+        }
 
         if (concepts.includes("familial")) {
           if (recipe.tags.includes("familial")) score += 4;
@@ -1368,7 +1008,7 @@ function initAiChef() {
         if (concepts.includes("pas_trop_lourd")) {
           if (recipe.tags.includes("leger")) score += 6;
           if (recipe.tags.includes("moyen")) score += 1;
-          if (recipe.tags.includes("lourd")) score -= 7;
+          if (recipe.tags.includes("lourd")) score -= 8;
           if (recipe.tags.includes("raffine")) score -= 1;
         }
 
@@ -1387,12 +1027,66 @@ function initAiChef() {
           if (recipe.tags.includes("leger")) score += 2;
         }
 
+        if (concepts.includes("fete")) {
+          if (recipe.key === "cailles") score += 4;
+          if (recipe.key === "fondants") score += 2;
+        }
+
+        if (concepts.includes("dimanche")) {
+          if (recipe.key === "cailles") score += 4;
+        }
+
+        if (concepts.includes("ete") || concepts.includes("froid") || concepts.includes("healthy")) {
+          if (recipe.key === "pokebowl") score += 4;
+        }
+
+        if (concepts.includes("hiver") || concepts.includes("reconfort")) {
+          if (recipe.key === "fondants") score += 3;
+          if (recipe.key === "crepes") score += 2;
+          if (recipe.key === "cailles") score += 2;
+        }
+
+        if (concepts.includes("romantique")) {
+          if (recipe.key === "cailles") score += 4;
+          if (recipe.key === "fondants") score += 2;
+        }
+
+        if (concepts.includes("enfant")) {
+          if (recipe.key === "burgers") score += 3;
+          if (recipe.key === "crepes") score += 3;
+          if (recipe.key === "marbre") score += 2;
+        }
+
+        if (concepts.includes("invite")) {
+          if (recipe.key === "cailles") score += 3;
+          if (recipe.key === "burgers") score += 2;
+        }
+
         if (normalized.includes("famille") && concepts.includes("pas_trop_lourd")) {
           if (recipe.key === "crepes") score += 4;
           if (recipe.key === "pokebowl") score += 4;
-          if (recipe.key === "burgers") score -= 2;
-          if (recipe.key === "cailles") score -= 3;
+          if (recipe.key === "marbre") score += 1;
+          if (recipe.key === "burgers") score -= 3;
+          if (recipe.key === "cailles") score -= 4;
+          if (recipe.key === "fondants") score -= 3;
         }
+
+        negatives.forEach((negative) => {
+          const neg = normalizeAi(negative);
+
+          if (neg.includes("lourd") && recipe.tags.includes("lourd")) score -= 12;
+          if ((neg.includes("burger") || neg.includes("hamburger")) && recipe.key === "burgers") score -= 30;
+          if ((neg.includes("chocolat") || neg.includes("choco") || neg.includes("cacao")) && recipe.tags.includes("chocolat")) score -= 25;
+          if ((neg.includes("poisson") || neg.includes("saumon")) && recipe.tags.includes("poisson")) score -= 25;
+          if ((neg.includes("viande") || neg.includes("boeuf") || neg.includes("bœuf")) && recipe.tags.includes("viande")) score -= 25;
+          if ((neg.includes("dessert") || neg.includes("sucre") || neg.includes("gouter")) && recipe.tags.includes("dessert")) score -= 15;
+          if ((neg.includes("sale") || neg.includes("plat") || neg.includes("repas")) && recipe.tags.includes("sale")) score -= 15;
+
+          const recipeNameBlocked = (recipe.aliases || []).some((alias) => neg.includes(normalizeAi(alias)));
+          if (recipeNameBlocked || neg.includes(normalizeAi(recipe.name))) {
+            score -= 35;
+          }
+        });
 
         return {
           ...recipe,
@@ -1402,7 +1096,7 @@ function initAiChef() {
       });
 
       scored.sort((a, b) => b.score - a.score);
-      return { concepts, scored };
+      return { negatives, recipeMentions, scored };
     }
 
     function labelConcept(concept) {
@@ -1419,32 +1113,109 @@ function initAiChef() {
         poisson: "poisson",
         dessert: "dessert",
         sale: "salé",
-        raffine: "raffiné"
+        raffine: "raffiné",
+        reconfort: "réconfortant",
+        healthy: "sain",
+        chaud: "chaud",
+        froid: "froid"
       };
       return labels[concept] || concept;
     }
 
+    function renderSpecialResponse(intent) {
+      if (intent === "bonjour") {
+        result.innerHTML = `<strong>Bonjour 👋</strong><br>Dis-moi ce que tu veux manger et je t’aide à trouver la meilleure recette.`;
+        return;
+      }
+
+      if (intent === "merci") {
+        result.innerHTML = `<strong>Avec plaisir ✨</strong><br>Je suis là pour t’aider à choisir la bonne recette.`;
+        return;
+      }
+
+      if (intent === "aide") {
+        result.innerHTML = `
+          <strong>Bien sûr 👋</strong><br>
+          Je peux t’aider à choisir une recette selon ce que tu veux.<br><br>
+          <strong>Exemples :</strong><br>
+          • un truc pas trop lourd<br>
+          • un repas familial<br>
+          • sans burger et sans chocolat<br>
+          • je veux des crêpes
+        `;
+        return;
+      }
+
+      if (intent === "amour") {
+        result.innerHTML = `<strong>Oh 🫶</strong><br>Moi je peux surtout t’aider côté cuisine et ambiance gourmande.`;
+        return;
+      }
+
+      if (intent === "antoine") {
+        result.innerHTML = `<strong>Antoine ?</strong><br>C’est le chef du restaurant 😌 Je peux t’aider à choisir parmi ses recettes.`;
+        return;
+      }
+
+      if (intent === "faim") {
+        result.innerHTML = `<strong>On va régler ça 😌</strong><br>Dis-moi juste : léger, gourmand, familial, rapide, sucré ou salé.`;
+        return;
+      }
+
+      if (intent === "soif") {
+        result.innerHTML = `<strong>Je gère surtout les plats 🍽️</strong><br>Mais je peux déjà t’aider à choisir une recette légère, fraîche ou gourmande.`;
+        return;
+      }
+
+      if (intent === "triste") {
+        result.innerHTML = `<strong>Oh 💛</strong><br>On peut partir sur une recette réconfortante. Par exemple : crêpes, fondants ou gâteau marbré.`;
+        return;
+      }
+
+      if (intent === "fatigue") {
+        result.innerHTML = `<strong>Je vois 😴</strong><br>Dans ce cas, on peut viser un truc simple et rapide. Par exemple : crêpes, burgers ou poké bowl.`;
+      }
+    }
+
     function renderRecommendation(query) {
-      const { concepts, scored } = scoreRecipes(query);
-      const best = scored[0];
-      const second = scored[1];
+      const normalized = normalizeAi(query);
+      const { negatives, recipeMentions, scored } = scoreRecipes(normalized);
+      const specialIntent = detectSpecialIntent(normalized, recipeMentions);
+
+      if (specialIntent) {
+        renderSpecialResponse(specialIntent);
+        return;
+      }
+
+      const available = scored.filter((recipe) => recipe.score > -15);
+      const best = available[0] || scored[0];
+      const second = available[1] || scored[1];
 
       if (!best) {
         result.innerHTML = `<strong>Aucune recommandation disponible.</strong>`;
         return;
       }
 
-      const readableReasons = best.reasons.map(labelConcept);
+      const readableReasons = best.reasons
+        .filter((reason) => reason !== "recette citée")
+        .map(labelConcept);
 
       let html = `<strong>Je te conseille : ${best.name}</strong><br>`;
+
+      if (recipeMentions.includes(best.key)) {
+        html += `Tu as cité cette recette, donc je l’ai bien prise en compte.<br>`;
+      }
 
       if (readableReasons.length) {
         html += `Ça correspond bien à : ${readableReasons.join(", ")}.<br>`;
       } else {
-        html += `Je l’ai choisie comme recommandation polyvalente.<br>`;
+        html += `Je l’ai choisie comme meilleure option par rapport à ta demande.<br>`;
       }
 
-      if (second) {
+      if (negatives.length) {
+        html += `J’ai évité : ${negatives.join(", ")}.<br>`;
+      }
+
+      if (second && second.key !== best.key) {
         html += `Deuxième option : ${second.name}.<br>`;
       }
 
