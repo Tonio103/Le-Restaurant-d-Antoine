@@ -199,14 +199,14 @@ body.dark-mode::before {
 }
 /* Dynamic Backgrounds */
 body[data-theme-page="accueil"]::before {
-  background-image: url("fondecranaccueil.png");
+  background-image: url("accueil.png");
   background-size: cover;
   background-position: center;
 }
 
 /* Accueil clair : plus de voile devant l'image */
 body[data-theme-page="accueil"]:not(.dark-mode)::before {
-  background-image: url("fondecranaccueil.png");
+  background-image: url("accueil.png");
 }
 
 /* Lisibilité texte accueil */
@@ -2919,7 +2919,7 @@ body[data-theme-page="accueil"]:not(.dark-mode) .hero-text {
 }
 
 body[data-theme-page="accueil"]:not(.dark-mode)::before {
-  background-image: url("fondecranaccueil.png");
+  background-image: url("accueil.png");
 }
 @media (max-width: 600px) {
 
