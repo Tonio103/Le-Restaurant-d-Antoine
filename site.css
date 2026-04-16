@@ -3144,19 +3144,31 @@ body.dark-mode #searchInput::placeholder {
 .top-recipe-box {
   margin-top: 24px;
 }
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 40px;
+  align-items: start;
+}
 
-.top-recipe-card {
+.hero-side {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 18px 22px;
-  background: linear-gradient(135deg, rgba(94, 51, 37, 0.92), rgba(155, 97, 72, 0.88));
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 22px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
-  color: white;
-  overflow: hidden;
+  justify-content: flex-end;
+}
+.top-recipe-card {
+  width: 100%;
+  max-width: 320px;
+  padding: 20px;
+  border-radius: 20px;
+
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255,255,255,0.1);
+
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+
+  font-weight: 500;
 }
 
 .top-recipe-left {
