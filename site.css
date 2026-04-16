@@ -3788,3 +3788,26 @@ body.dark-mode #searchInput::placeholder {
   box-shadow: none;
   backdrop-filter: none;
 }
+@media (max-width: 860px) {
+  .hero {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+
+  .hero-copy {
+    width: 100%;
+  }
+
+  .hero-side {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+  }
+
+  .hero-top-liked,
+  .hero-top-liked-wrap {
+    width: 100%;
+    max-width: 100%;
+  }
+}
