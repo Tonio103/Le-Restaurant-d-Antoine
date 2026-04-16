@@ -3811,3 +3811,23 @@ body.dark-mode #searchInput::placeholder {
     max-width: 100%;
   }
 }
+.hero-side {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-top-liked {
+  margin: 0 auto;
+}
+@media (min-width: 1024px) {
+  .hero-top-liked {
+    max-width: 380px;
+    padding: 28px;
+    transform: scale(1.05);
+  }
+
+  .hero-top-liked h3 {
+    font-size: 26px;
+  }
+}
