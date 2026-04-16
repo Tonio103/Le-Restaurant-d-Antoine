@@ -3909,3 +3909,34 @@ body.dark-mode #searchInput::placeholder {
     text-align: center;
   }
 }
+@media (max-width: 768px) {
+
+  .hero {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center; /* 🔥 centre tout */
+  }
+
+  .hero-side {
+    width: 100%;
+    display: flex;
+    justify-content: center !important; /* 🔥 centre horizontal */
+  }
+
+  .hero-top-liked-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .hero-top-liked {
+    width: 92%; /* 🔥 laisse des marges propres */
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .top-recipe-card {
+    width: 100%;
+  }
+
+}
