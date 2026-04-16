@@ -3770,3 +3770,21 @@ body.dark-mode #searchInput::placeholder {
   font-size: 12px;
   border-radius: 999px;
 }
+.hero-top-liked-wrap {
+  width: 100%;
+  max-width: 320px;
+}
+
+.hero-top-liked-title {
+  margin-bottom: 14px;
+  font-size: 24px;
+  color: #4b2a1f;
+}
+
+.hero-top-liked {
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+}
