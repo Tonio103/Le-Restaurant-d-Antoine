@@ -3831,3 +3831,19 @@ body.dark-mode #searchInput::placeholder {
     font-size: 26px;
   }
 }
+
+  .hero-top-liked h3 {
+    font-size: 26px;
+  }
+}
+@media (min-width: 1024px) {
+  .hero-top-liked {
+    animation: floatCard 6s ease-in-out infinite;
+  }
+}
+
+@keyframes floatCard {
+  0% { transform: translateY(0px) scale(1.05); }
+  50% { transform: translateY(-10px) scale(1.05); }
+  100% { transform: translateY(0px) scale(1.05); }
+}
