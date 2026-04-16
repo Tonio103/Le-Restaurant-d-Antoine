@@ -206,7 +206,7 @@ body[data-theme-page="accueil"]::before {
 
 /* Accueil clair : plus de voile devant l'image */
 body[data-theme-page="accueil"]:not(.dark-mode)::before {
-  background-image: url("Festin gourmet sur table rustique.png");
+  background-image: url("fondecranaccueil.png");
 }
 
 /* Lisibilité texte accueil */
@@ -2919,7 +2919,7 @@ body[data-theme-page="accueil"]:not(.dark-mode) .hero-text {
 }
 
 body[data-theme-page="accueil"]:not(.dark-mode)::before {
-  background-image: url("Festin gourmet sur table rustique.png");
+  background-image: url("fondecranaccueil.png");
 }
 @media (max-width: 600px) {
 
