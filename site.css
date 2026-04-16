@@ -3820,17 +3820,6 @@ body.dark-mode #searchInput::placeholder {
 .hero-top-liked {
   margin: 0 auto;
 }
-@media (min-width: 1024px) {
-  .hero-top-liked {
-    max-width: 380px;
-    padding: 28px;
-    transform: scale(1.05);
-  }
-
-  .hero-top-liked h3 {
-    font-size: 26px;
-  }
-}
 
   .hero-top-liked h3 {
     font-size: 26px;
@@ -3842,8 +3831,26 @@ body.dark-mode #searchInput::placeholder {
   }
 }
 
+@media (min-width: 1024px) {
+  .hero-top-liked {
+    max-width: 420px;
+    padding: 28px;
+    animation: floatCard 6s ease-in-out infinite;
+  }
+
+  .hero-top-liked h3 {
+    font-size: 26px;
+  }
+}
+
 @keyframes floatCard {
-  0% { transform: translateY(0px) scale(1.05); }
-  50% { transform: translateY(-10px) scale(1.05); }
-  100% { transform: translateY(0px) scale(1.05); }
+  0% {
+    transform: translateY(0px) scale(1.05);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0px) scale(1.05);
+  }
 }
