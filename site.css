@@ -3940,3 +3940,91 @@ body.dark-mode #searchInput::placeholder {
   }
 
 }
+@media (max-width: 768px) {
+  .hero {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 24px !important;
+    text-align: center !important;
+  }
+
+  .hero-copy {
+    width: 100% !important;
+  }
+
+  .hero-side {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+  }
+
+  .hero-top-liked-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+  }
+
+  .hero-top-liked {
+    width: calc(100% - 24px) !important;
+    max-width: 430px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    text-align: center !important;
+  }
+
+  .hero-top-liked-title {
+    width: 100% !important;
+    text-align: center !important;
+    margin-bottom: 16px !important;
+  }
+
+  .top-recipe-box {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  .top-recipe-card {
+    width: 100% !important;
+    max-width: 430px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 20px !important;
+  }
+
+  .top-recipe-left {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 12px !important;
+  }
+
+  .top-recipe-text {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .top-recipe-text h4,
+  .top-recipe-text p,
+  .top-recipe-kicker {
+    text-align: center !important;
+  }
+
+  .top-recipe-badge {
+    margin-top: 14px !important;
+  }
+}
