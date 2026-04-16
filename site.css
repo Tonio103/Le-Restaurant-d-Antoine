@@ -199,7 +199,7 @@ body.dark-mode::before {
 }
 /* Dynamic Backgrounds */
 body[data-theme-page="accueil"]::before {
-  background-image: url("Festin gourmet sur table rustique.png");
+  background-image: url("fondecranaccueil.png");
   background-size: cover;
   background-position: center;
 }
