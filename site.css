@@ -194,8 +194,8 @@ body::before {
 
 /* mode sombre */
 body.dark-mode::before {
-  opacity: 0.14;
-  filter: brightness(0.38) saturate(0.9);
+  opacity: 0.35; /* ← ajuste ici */
+  filter: brightness(0.5) saturate(0.9);
 }
 /* Dynamic Backgrounds */
 body[data-theme-page="accueil"]::before {
@@ -3047,10 +3047,6 @@ body[data-theme-page="accueil"]:not(.dark-mode)::before {
     background: rgba(255, 255, 255, 0.08) !important;
     color: #f4eadf !important;
   }
-}
-
-body.dark-mode {
-  background: #161210 !important;
 }
 #searchInput {
   color: #2c211c;
