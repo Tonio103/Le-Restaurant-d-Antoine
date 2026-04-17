@@ -79,7 +79,18 @@ document.addEventListener("DOMContentLoaded", () => {
         { emoji: "", name: "Beurre pour toaster", amount: 20, unit: "g" }
       ]
     },
-
+jusorange: {
+  base: 4,
+  label: "VERRES",
+  targetId: "jusorangeIngredients",
+  labelId: "jusorangeCountLabel",
+  items: [
+    { emoji: "", name: "Oranges bio", amount: 8, unit: "" },
+    { emoji: "", name: "Glaçons", amount: 8, unit: "" },
+    { emoji: "", name: "Feuilles de menthe", amount: 4, unit: "" },
+    { emoji: "", name: "Citron (optionnel)", amount: 1, unit: "" }
+  ]
+}
     fondants: {
       base: 4,
       label: "PERSONNES",
@@ -139,7 +150,8 @@ document.addEventListener("DOMContentLoaded", () => {
     burgers: 4,
     fondants: 4,
     marbre: 4,
-    pokebowl: 2
+    pokebowl: 2,
+    jusorange: 4
   };
 
   const timers = {};
@@ -264,6 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
       { label: "Fondants", keywords: ["fondant", "fondants", "chocolat", "coulant"], url: "fondant.html" },
       { label: "Marbré", keywords: ["marbre", "marbré", "gateau marbre", "gâteau marbré", "cake"], url: "gateau-marbre.html" },
       { label: "Poké bowl", keywords: ["poke", "pokebowl", "poké", "poké bowl", "poke bowl", "saumon"], url: "poke-bowl.html" }
+      { label: "Jus d’orange", keywords: ["jus", "orange", "jus d'orange", "boisson", "bio"], url: "jus-orange.html" }
     ];
 
     function hideSuggestions() {
