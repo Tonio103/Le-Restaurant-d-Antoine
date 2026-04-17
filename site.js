@@ -90,7 +90,7 @@ jusorange: {
     { emoji: "", name: "Feuilles de menthe", amount: 4, unit: "" },
     { emoji: "", name: "Citron (optionnel)", amount: 1, unit: "" }
   ]
-}
+},
     fondants: {
       base: 4,
       label: "PERSONNES",
@@ -275,7 +275,7 @@ jusorange: {
       { label: "Burgers", keywords: ["burger", "burgers", "hamburger"], url: "burger.html" },
       { label: "Fondants", keywords: ["fondant", "fondants", "chocolat", "coulant"], url: "fondant.html" },
       { label: "Marbré", keywords: ["marbre", "marbré", "gateau marbre", "gâteau marbré", "cake"], url: "gateau-marbre.html" },
-      { label: "Poké bowl", keywords: ["poke", "pokebowl", "poké", "poké bowl", "poke bowl", "saumon"], url: "poke-bowl.html" }
+      { label: "Poké bowl", keywords: ["poke", "pokebowl", "poké", "poké bowl", "poke bowl", "saumon"], url: "poke-bowl.html" },
       { label: "Jus d’orange", keywords: ["jus", "orange", "jus d'orange", "boisson", "bio"], url: "jus-orange.html" }
     ];
 
