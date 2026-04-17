@@ -835,6 +835,13 @@ jusorange: {
         aliases: ["caille", "cailles", "petits pois", "cailles petits pois", "cailles et petits pois"]
       },
       {
+  key: "jusorange",
+  name: "Jus d'orange frais",
+  url: "Jusorange.html",
+  tags: ["boisson", "frais", "orange", "bio", "rapide", "facile", "été"],
+  aliases: ["jus", "jus orange", "orange", "jus d'orange", "boisson"]
+},
+      {
         key: "crepes",
         name: "Crêpes gourmandes",
         url: "crepes.html",
