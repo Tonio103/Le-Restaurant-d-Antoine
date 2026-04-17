@@ -225,6 +225,10 @@ body[data-theme-page="crepes"]::before {
   background-image: url("Crêpes dorées sur plateaux rustique.png");
 }
 
+body[data-theme-page="jusorange"]::before {
+  background-image: url("jus-orange-fond.png");
+}
+
 body[data-theme-page="burgers"]::before {
   background-image: url("Burger appétissant sur surface en bois.png");
 }
