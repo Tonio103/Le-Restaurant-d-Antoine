@@ -52,14 +52,19 @@ saladecesar: {
   targetId: "saladecesarIngredients",
   labelId: "saladecesarCountLabel",
   items: [
-    { emoji: "", name: "Blancs de poulet", amount: 2, unit: "pièces" },
-    { emoji: "", name: "Salade romaine", amount: 2, unit: "pièces" },
-    { emoji: "", name: "Croûtons", amount: 120, unit: "g" },
-    { emoji: "", name: "Parmesan", amount: 80, unit: "g" },
-    { emoji: "", name: "Œufs", amount: 2, unit: "pièces" },
-    { emoji: "", name: "Huile d’olive", amount: 3, unit: "c. à soupe" },
-    { emoji: "", name: "Jus de citron", amount: 2, unit: "c. à soupe" },
-    { emoji: "", name: "Sauce César", amount: 4, unit: "c. à soupe" }
+    { emoji: "", name: "Pain de campagne", amount: 140, unit: "g" },
+    { emoji: "", name: "Beurre", amount: 30, unit: "g" },
+    { emoji: "", name: "Câpres", amount: 30, unit: "g" },
+    { emoji: "", name: "Jaunes d’œufs", amount: 2, unit: "pièces" },
+    { emoji: "", name: "Jus de citron", amount: 30, unit: "ml" },
+    { emoji: "", name: "Filets d’anchois hachés", amount: 4, unit: "pièces" },
+    { emoji: "", name: "Gousse d’ail", amount: 1, unit: "pièce" },
+    { emoji: "", name: "Huile végétale", amount: 125, unit: "ml" },
+    { emoji: "", name: "Huile d’olive", amount: 30, unit: "ml" },
+    { emoji: "", name: "Laitues romaines", amount: 2, unit: "pièces" },
+    { emoji: "", name: "Parmesan râpé", amount: 40, unit: "g" },
+    { emoji: "", name: "Parmesan en copeaux", amount: 40, unit: "g" },
+    { emoji: "", name: "Bacon cuit croustillant", amount: 8, unit: "tranches" }
   ]
 },
     crepes: {
@@ -1052,12 +1057,12 @@ saladecesar: {
         tags: ["boisson", "frais", "orange", "bio", "rapide", "facile", "ete", "froid"],
         aliases: ["jus", "jus orange", "orange", "jus d orange", "jus d'orange", "boisson"]
       },
-      {
+    {
   key: "saladecesar",
   name: "Salade César",
   url: "salade-cesar.html",
-  tags: ["leger", "frais", "rapide", "sale", "plat", "familial", "healthy", "sain", "froid"],
-  aliases: ["salade cesar", "salade césar", "cesar", "césar", "salade poulet"]
+  tags: ["leger", "frais", "gourmand", "sale", "plat", "familial", "healthy", "froid", "rapide"],
+  aliases: ["salade cesar", "salade césar", "cesar", "césar", "romaine", "parmesan", "bacon"]
 },
       {
         key: "crepes",
