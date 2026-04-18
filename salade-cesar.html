@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salade César | Le restaurant d’Antoine</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body data-theme-page="saladecesar">
+
+  <div class="page-background"></div>
+  <div class="page-background-overlay"></div>
+  <div class="page-noise"></div>
+
+  <svg width="0" height="0" style="position: absolute; display: none;" aria-hidden="true">
+    <filter id="glass-distortion">
+      <feTurbulence
+        type="turbulence"
+        baseFrequency="0.008"
+        numOctaves="2"
+        result="noise"
+      />
+      <feDisplacementMap
+        id="glassDisplacement"
+        in="SourceGraphic"
+        in2="noise"
+        scale="8"
+      />
+    </filter>
+  </svg>
+
+  <div id="loader">
+    <div class="loader-inner">
+      <div class="glass-card loader-bubble">
+        <div class="glass-filter"></div>
+        <div class="glass-distortion-overlay"></div>
+        <div class="glass-overlay"></div>
+        <div class="glass-specular"></div>
+
+        <div class="glass-content">
+          <div class="loader-icons">
+            <span>🥗</span>
+            <span>🥓</span>
+            <span>🧀</span>
+            <span>🍋</span>
+          </div>
+        </div>
+      </div>
+      <h1>Préparation en cours...</h1>
+    </div>
+  </div>
+
+  <header class="site-header" id="siteHeader">
+    <nav class="navbar">
+      <div class="logo-wrap">
+        <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+        <div class="logo-text">
+          <strong>Le restaurant d’Antoine</strong>
+          <span>Maison gourmande & recettes favorites</span>
+        </div>
+      </div>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+      <div class="nav-center" id="navCenter">
+        <div class="search-wrap">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Rechercher une recette..."
+            autocomplete="off"
+          />
+          <div id="searchSuggestions" class="search-suggestions"></div>
+        </div>
+      </div>
+
+      <div class="nav-links">
+        <a href="questions.html">Questions</a>
+        <a href="avis.html">Avis</a>
+        <a href="infos.html">Infos</a>
+      </div>
+
+      <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+    </nav>
+  </header>
+
+  <main class="main-layout">
+    <section class="page-section active">
+
+      <section class="hero recipe-hero">
+        <div class="hero-copy">
+          <p class="badge">Salade fraîche • sauce crémeuse • croûtons maison • style bistrot</p>
+          <h1>Salade César</h1>
+          <h2>Une version gourmande, croquante et très parfumée</h2>
+          <p class="hero-text">
+            Cette salade César mise sur l’équilibre : une romaine bien fraîche, des croûtons dorés,
+            une sauce onctueuse au citron, à l’ail et aux anchois, du parmesan, du bacon croustillant
+            et une finition très savoureuse avec des câpres.
+          </p>
+
+          <div class="recipe-meta-row">
+            <div class="mini-stat">
+              <strong>25 min</strong>
+              <span>préparation</span>
+            </div>
+            <div class="mini-stat">
+              <strong>12 min</strong>
+              <span>cuisson</span>
+            </div>
+            <div class="mini-stat">
+              <strong>4</strong>
+              <span>portions</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-side">
+          <div class="glass-card recipe-hero-image-card lightboxable">
+            <img src="salade-cesar.jpg" alt="Salade César" class="recipe-hero-image" />
+          </div>
+        </div>
+      </section>
+
+      <div class="glass-card intro-card tilt-card top-gap liquid-glass-card">
+        <div class="glass-filter"></div>
+        <div class="glass-distortion-overlay"></div>
+        <div class="glass-overlay"></div>
+        <div class="glass-specular"></div>
+
+        <div class="glass-content intro-content">
+          <div>
+            <h3>À propos de cette recette</h3>
+            <p>
+              Cette page reprend l’idée générale de la recette publiée par RICARDO, mais avec une
+              rédaction reformulée pour ton site. La recette d’origine indique notamment des croûtons
+              au beurre, des câpres poêlées, une vinaigrette à base de jaunes d’œufs, citron, anchois,
+              ail et huiles, puis une salade avec romaine, parmesan et bacon. :contentReference[oaicite:1]{index=1}
+            </p>
+          </div>
+          <div class="intro-emoji">🥗</div>
+        </div>
+      </div>
+
+      <div class="recipe-layout top-gap">
+
+        <div class="recipe-main-column">
+
+          <div class="glass-card recipe-card-section">
+            <h3>Ingrédients</h3>
+
+            <div class="portion-controls">
+              <button class="portion-btn" onclick="changePortions('saladecesar', -1)">−</button>
+              <div id="saladecesarCountLabel" class="portion-label">4 PERSONNES</div>
+              <button class="portion-btn" onclick="changePortions('saladecesar', 1)">+</button>
+              <button class="portion-btn secondary" onclick="resetPortions('saladecesar')">Réinitialiser</button>
+            </div>
+
+            <div id="saladecesarIngredients" class="ingredients-grid"></div>
+          </div>
+
+          <div class="glass-card recipe-card-section top-gap">
+            <h3>Préparation</h3>
+
+            <div class="checklist" data-fill="saladeProgressFill" data-text="saladeProgressText">
+              <label><input type="checkbox" /> Préchauffer le four à 165°C.</label>
+              <label><input type="checkbox" /> Couper le pain en petits dés pour faire les croûtons.</label>
+              <label><input type="checkbox" /> Faire dorer les dés de pain avec le beurre, puis finir au four jusqu’à ce qu’ils soient croustillants.</label>
+              <label><input type="checkbox" /> Faire revenir les câpres dans un peu d’huile jusqu’à ce qu’elles deviennent croustillantes.</label>
+              <label><input type="checkbox" /> Hacher finement une partie des câpres pour la sauce.</label>
+              <label><input type="checkbox" /> Fouetter les jaunes d’œufs avec le jus de citron, les anchois, l’ail et les câpres hachées.</label>
+              <label><input type="checkbox" /> Verser progressivement l’huile végétale puis l’huile d’olive pour obtenir une sauce lisse et crémeuse.</label>
+              <label><input type="checkbox" /> Mélanger la romaine avec le parmesan râpé, une partie des copeaux, le bacon et les croûtons.</label>
+              <label><input type="checkbox" /> Ajouter la sauce, mélanger délicatement et finir avec le reste du parmesan, du bacon, des croûtons et des câpres croustillantes.</label>
+            </div>
+
+            <div class="progress-wrap">
+              <div class="progress-bar">
+                <div id="saladeProgressFill" class="progress-fill"></div>
+              </div>
+              <div id="saladeProgressText" class="progress-text">0 / 9</div>
+            </div>
+          </div>
+
+          <div class="glass-card recipe-card-section top-gap">
+            <h3>Minuteurs utiles</h3>
+
+            <div class="timers-grid">
+              <div class="timer-box">
+                <h4>Croûtons au four</h4>
+                <div class="timer-display" id="saladeTimerCroutons">00:00</div>
+                <div class="timer-actions">
+                  <button onclick="startTimer(360, 'saladeTimerCroutons')">6 min</button>
+                  <button onclick="resetTimer('saladeTimerCroutons')">Reset</button>
+                </div>
+              </div>
+
+              <div class="timer-box">
+                <h4>Câpres croustillantes</h4>
+                <div class="timer-display" id="saladeTimerCapres">00:00</div>
+                <div class="timer-actions">
+                  <button onclick="startTimer(300, 'saladeTimerCapres')">5 min</button>
+                  <button onclick="resetTimer('saladeTimerCapres')">Reset</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card recipe-card-section top-gap">
+            <h3>Conseils d’Antoine</h3>
+            <ul class="tips-list">
+              <li>Utilise une romaine bien froide pour garder un maximum de croquant.</li>
+              <li>Ajoute la vinaigrette au dernier moment pour éviter que la salade ramollisse.</li>
+              <li>Tu peux garder un peu de parmesan et de croûtons pour la finition au moment du service.</li>
+              <li>Si tu veux une version plus légère, réduis un peu la quantité de bacon.</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <aside class="recipe-side-column">
+
+          <div class="glass-card recipe-card-section">
+            <h3>Profil de la recette</h3>
+            <div class="choice-summary">
+              <p><strong>Style :</strong> frais, gourmand, croquant</p>
+              <p><strong>Niveau :</strong> facile à moyen</p>
+              <p><strong>Moment :</strong> déjeuner, dîner léger</p>
+              <p><strong>Ambiance :</strong> bistrot chic</p>
+            </div>
+          </div>
+
+          <div class="glass-card recipe-card-section top-gap">
+            <h3>Idées d’accompagnement</h3>
+            <div class="choice-group">
+              <button type="button" onclick="toggleChoice(this, 'saladeBoissonOutput')">Jus d’orange</button>
+              <button type="button" onclick="toggleChoice(this, 'saladeBoissonOutput')">Citronnade</button>
+              <button type="button" onclick="toggleChoice(this, 'saladeBoissonOutput')">Eau pétillante</button>
+            </div>
+            <p class="choice-output">Boisson : <span id="saladeBoissonOutput">Aucune</span></p>
+
+            <div class="choice-group top-gap-small">
+              <button type="button" onclick="toggleMultiChoice(this, 'saladePlusOutput')">Plus de parmesan</button>
+              <button type="button" onclick="toggleMultiChoice(this, 'saladePlusOutput')">Plus de croûtons</button>
+              <button type="button" onclick="toggleMultiChoice(this, 'saladePlusOutput')">Version très citronnée</button>
+            </div>
+            <p class="choice-output">Options : <span id="saladePlusOutput">Aucune</span></p>
+          </div>
+
+          <div class="glass-card recipe-card-section top-gap">
+            <h3>Galerie</h3>
+            <div class="recipe-gallery-grid">
+              <img src="salade-cesar.jpg" alt="Salade César dressée" class="lightboxable" />
+              <img src="salade-cesar.jpg" alt="Salade César vue de près" class="lightboxable" />
+            </div>
+          </div>
+
+          <div class="glass-card recipe-card-section top-gap">
+            <h3>Source d’inspiration</h3>
+            <p>
+              Cette page s’inspire de la recette « Salade César (la meilleure) » publiée par RICARDO.
+              La recette originale mentionne des croûtons, des câpres, une vinaigrette César maison,
+              de la romaine, du parmesan et du bacon. :contentReference[oaicite:2]{index=2}
+            </p>
+          </div>
+
+        </aside>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    </div>
+  </footer>
+
+  <div id="secretToast"></div>
+  <button id="scrollTopBtn" title="Retourner en haut de la page">↑</button>
+
+  <div id="lightbox">
+    <div class="lightbox-backdrop"></div>
+    <img src="" alt="" class="lightbox-image" id="lightboxImage" />
+    <button class="lightbox-close" id="lightboxClose">×</button>
+  </div>
+
+  <button class="ai-fab" id="aiFab" type="button" aria-label="Ouvrir l'assistant cuisine">
+    💬
+  </button>
+
+  <div class="ai-widget hidden" id="aiWidget">
+    <div class="ai-widget-header">
+      <strong>Assistant cuisine</strong>
+
+      <div class="ai-widget-header-actions">
+        <button
+          class="ai-widget-expand"
+          id="aiWidgetExpand"
+          type="button"
+          aria-label="Agrandir l'assistant"
+        >
+          ⤢
+        </button>
+        <button
+          class="ai-widget-close"
+          id="aiWidgetClose"
+          type="button"
+          aria-label="Fermer l'assistant"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+
+    <div class="ai-widget-body">
+      <div id="aiChefResult" class="ai-chef-result">
+        <strong>Bonjour 👋</strong><br>
+        Je peux t’aider à trouver la recette idéale.
+      </div>
+
+      <div class="ai-widget-input-row">
+        <input
+          type="text"
+          id="aiChefInput"
+          placeholder="Que cherchez-vous ?"
+          autocomplete="off"
+        />
+        <button id="aiChefBtn" class="ai-send-btn" type="button" aria-label="Envoyer">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="site.js"></script>
+  <script type="module" src="likes-firebase.js"></script>
+</body>
+</html>
