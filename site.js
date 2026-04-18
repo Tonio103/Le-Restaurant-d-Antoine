@@ -46,7 +46,22 @@ document.addEventListener("DOMContentLoaded", () => {
         { emoji: "", name: "Bouquet garni (thym, laurier)", amount: 1, unit: "bouquet" }
       ]
     },
-
+saladecesar: {
+  base: 4,
+  label: "PERSONNES",
+  targetId: "saladecesarIngredients",
+  labelId: "saladecesarCountLabel",
+  items: [
+    { emoji: "", name: "Blancs de poulet", amount: 2, unit: "pièces" },
+    { emoji: "", name: "Salade romaine", amount: 2, unit: "pièces" },
+    { emoji: "", name: "Croûtons", amount: 120, unit: "g" },
+    { emoji: "", name: "Parmesan", amount: 80, unit: "g" },
+    { emoji: "", name: "Œufs", amount: 2, unit: "pièces" },
+    { emoji: "", name: "Huile d’olive", amount: 3, unit: "c. à soupe" },
+    { emoji: "", name: "Jus de citron", amount: 2, unit: "c. à soupe" },
+    { emoji: "", name: "Sauce César", amount: 4, unit: "c. à soupe" }
+  ]
+},
     crepes: {
       base: 4,
       label: "PERSONNES",
@@ -154,7 +169,8 @@ document.addEventListener("DOMContentLoaded", () => {
     jusorange: 4,
     fondants: 4,
     marbre: 4,
-    pokebowl: 2
+    pokebowl: 2,
+    saladecesar: 4,
   };
 
   const timers = {};
@@ -316,7 +332,8 @@ document.addEventListener("DOMContentLoaded", () => {
       { label: "Fondants", keywords: ["fondant", "fondants", "chocolat", "coulant"], url: "fondant.html" },
       { label: "Marbré", keywords: ["marbre", "marbré", "gateau marbre", "gâteau marbré", "cake"], url: "gateau-marbre.html" },
       { label: "Poké bowl", keywords: ["poke", "pokebowl", "poké", "poké bowl", "poke bowl", "saumon"], url: "poke-bowl.html" },
-      { label: "Jus d’orange", keywords: ["jus", "orange", "jus d orange", "jus d'orange", "boisson", "frais"], url: "jusorange.html" }
+      { label: "Jus d’orange", keywords: ["jus", "orange", "jus d orange", "jus d'orange", "boisson", "frais"], url: "jusorange.html" },
+      { label: "Salade César", keywords: ["salade", "cesar", "césar", "salade cesar", "salade césar", "poulet"], url: "salade-cesar.html" },
     ];
 
     let activeIndex = -1;
@@ -1036,6 +1053,13 @@ document.addEventListener("DOMContentLoaded", () => {
         aliases: ["jus", "jus orange", "orange", "jus d orange", "jus d'orange", "boisson"]
       },
       {
+  key: "saladecesar",
+  name: "Salade César",
+  url: "salade-cesar.html",
+  tags: ["leger", "frais", "rapide", "sale", "plat", "familial", "healthy", "sain", "froid"],
+  aliases: ["salade cesar", "salade césar", "cesar", "césar", "salade poulet"]
+},
+      {
         key: "crepes",
         name: "Crêpes gourmandes",
         url: "crepes.html",
@@ -1209,6 +1233,12 @@ document.addEventListener("DOMContentLoaded", () => {
           if (recipe.tags.includes("familial")) score += 4;
           if (recipe.tags.includes("convivial")) score += 2;
         }
+        if (concepts.includes("frais")) {
+  if (recipe.key === "saladecesar") score += 3;
+}
+        if (concepts.includes("ete")) {
+  if (recipe.key === "saladecesar") score += 3;
+}
 
         if (concepts.includes("leger")) {
           if (recipe.tags.includes("leger")) score += 5;
