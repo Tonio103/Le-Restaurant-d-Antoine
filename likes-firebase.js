@@ -19,7 +19,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const RECIPE_KEYS = ["cailles", "crepes", "burgers", "fondants", "marbre", "pokebowl"];
+const RECIPE_KEYS = [
+  "cailles",
+  "crepes",
+  "burgers",
+  "fondants",
+  "marbre",
+  "pokebowl",
+  "jusorange"
+];
 
 const recipesMeta = {
   cailles: { name: "Cailles", url: "cailles.html", emoji: "🍗" },
@@ -27,7 +35,8 @@ const recipesMeta = {
   burgers: { name: "Burger maison", url: "burger.html", emoji: "🍔" },
   fondants: { name: "Fondant au chocolat", url: "fondant.html", emoji: "🍫" },
   marbre: { name: "Gâteau marbré", url: "gateau-marbre.html", emoji: "🍰" },
-  pokebowl: { name: "Poké Bowl", url: "poke-bowl.html", emoji: "🥗" }
+  pokebowl: { name: "Poké Bowl", url: "poke-bowl.html", emoji: "🥗" },
+  jusorange: { name: "Jus d’orange frais", url: "Jusorange.html", emoji: "🍊" }
 };
 
 const STORAGE_KEY = "antoine-user-liked-recipes";
