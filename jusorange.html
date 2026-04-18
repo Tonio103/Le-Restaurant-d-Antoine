@@ -3,170 +3,174 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Burgers garnis| Le restaurant d’Antoine</title>
+  <title>Jus d'orange frais | Le restaurant d’Antoine</title>
   <link rel="stylesheet" href="site.css" />
 </head>
-<body data-theme-page="burgers">
+<body data-theme-page="jusorange">
 
   <header class="site-header">
-  <nav class="navbar">
+    <nav class="navbar">
 
-    <div class="logo-wrap">
-      <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
-      <div class="logo-text">
-        <strong>Le restaurant d’Antoine</strong>
-        <span>Maison gourmande & recettes favorites</span>
+      <div class="logo-wrap">
+        <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+        <div class="logo-text">
+          <strong>Le restaurant d’Antoine</strong>
+          <span>Maison gourmande & recettes favorites</span>
+        </div>
       </div>
-    </div>
 
-    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
 
-    <div class="nav-center" id="navCenter">
-      <div style="position:relative; width:100%;">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Rechercher une recette..."
-          autocomplete="off"
-          style="padding:10px; border-radius:10px; border:none; width:100%;"
-        />
-        <div id="searchSuggestions" class="search-suggestions"></div>
+      <div class="nav-center" id="navCenter">
+        <div style="position:relative; width:100%;">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Rechercher une recette..."
+            autocomplete="off"
+            style="padding:10px; border-radius:10px; border:none; width:100%;"
+          />
+          <div id="searchSuggestions" class="search-suggestions"></div>
+        </div>
       </div>
-    </div>
 
-    <div class="nav-links">
-      <a href="questions.html">Questions</a>
-      <a href="avis.html">Avis</a>
-      <a href="infos.html">Infos</a>
-    </div>
+      <div class="nav-links">
+        <a href="questions.html">Questions</a>
+        <a href="avis.html">Avis</a>
+        <a href="infos.html">Infos</a>
+      </div>
 
-    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+      <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
 
-  </nav>
-</header>
+    </nav>
+  </header>
 
   <main class="main-layout">
-    <section class="page-section active" id="burgers">
+    <section class="page-section active" id="jusorange">
+
       <div class="recipe-banner glass-card tilt-card">
         <div>
-          <p class="section-kicker">Univers 2</p>
-          <h3>Hamburgers gourmands</h3>
-          <p>La recette ultime pour des soirées conviviales : un burger chaud, généreux, avec un fromage hyper coulant et des légumes croquants.</p>
-          <button class="like-btn" onclick="toggleLike('burgers')">
-  ❤️ <span id="likes-burgers">0</span>
-</button>
+          <p class="section-kicker">Univers 7</p>
+          <h3>Jus d'orange bio pressé maison</h3>
+          <p>
+            Une boisson fraîche, vitaminée et ultra simple à préparer, parfaite pour le matin,
+            le brunch ou une pause ensoleillée avec de vrais quartiers d’orange pressés minute.
+          </p>
+          <button class="like-btn" onclick="toggleLike('jusorange')">
+            ❤️ <span id="likes-jusorange">0</span>
+          </button>
         </div>
-        <div class="recipe-big-emoji">🍔</div>
+        <div class="recipe-big-emoji">🍊</div>
       </div>
 
-      <div class="recipe-gallery-grid burger-gallery">
-        <img src="Burger appétissant sur surface en bois.png" alt="Hamburger" class="gallery-main lightboxable" />
-        <img src="Burger sur le gril en gros plan.png" alt="Deux hamburgers" class="lightboxable" />
-        <img src="Préparation de légumes sur une planche en bois.png" alt="Détail burger" class="lightboxable" />
+      <div class="recipe-gallery-grid jus-gallery">
+        <img src="jusorange.png" alt="Verre de jus d'orange frais" class="gallery-main lightboxable" />
+        <img src="jusorange2.png" alt="Jus d'orange avec glaçons" class="lightboxable" />
+        <img src="jusorange3.png" alt="Oranges fraîches et jus pressé" class="lightboxable" />
       </div>
 
       <div class="glass-card">
         <div class="recipe-header">
-          <h3>Ingrédients des burgers</h3>
+          <h3>Ingrédients du jus d'orange</h3>
           <div class="portion-box">
-            <span id="burgersCountLabel">4 BURGERS</span>
+            <span id="jusorangeCountLabel">2 VERRES</span>
             <div class="portion-controls">
-              <button type="button" onclick="changePortions('burgers', -1)">−</button>
-              <button type="button" onclick="resetPortions('burgers')">↻</button>
-              <button type="button" onclick="changePortions('burgers', 1)">+</button>
+              <button type="button" onclick="changePortions('jusorange', -1)">−</button>
+              <button type="button" onclick="resetPortions('jusorange')">↻</button>
+              <button type="button" onclick="changePortions('jusorange', 1)">+</button>
             </div>
           </div>
         </div>
-        <div class="ingredient-grid" id="burgersIngredients"></div>
+        <div class="ingredient-grid" id="jusorangeIngredients"></div>
       </div>
 
-     <div class="two-col">
+      <div class="two-col">
 
-  <div class="glass-card">
-   <div class="prep-header">
-  <h3>Préparation détaillée</h3>
-  <span class="prep-time">⏱ 25 min</span>
-</div>
+        <div class="glass-card">
+          <div class="prep-header">
+            <h3>Préparation détaillée</h3>
+            <span class="prep-time">⏱ 10 min</span>
+          </div>
 
-    <div class="step-grid top-gap">
-      <div class="step"><span>1</span><p>Laver et découper les tomates en rondelles régulières, détacher les feuilles de salade et émincer finement les oignons rouges.</p></div>
-      <div class="step"><span>2</span><p>Sortir les steaks hachés du réfrigérateur 10 minutes avant cuisson. Les saler et poivrer sur les deux faces.</p></div>
-      <div class="step"><span>3</span><p>Faire chauffer une poêle en fonte ou une plancha à feu vif avec un filet d'huile ou une noisette de beurre.</p></div>
-      <div class="step"><span>4</span><p>Cuire les steaks selon la cuisson souhaitée. Saisir pour créer une belle croûte caramélisée.</p></div>
-      <div class="step"><span>5</span><p>Une minute avant la fin de la cuisson, déposer les tranches de cheddar sur les steaks, ajouter une cuillère d’eau dans la poêle et couvrir pour faire fondre le fromage.</p></div>
-      <div class="step"><span>6</span><p>Pendant ce temps, couper les pains burger en deux et les toaster légèrement.</p></div>
-      <div class="step"><span>7</span><p>Montage : sauce, salade, tomate, steak fromagé, oignons, puis le chapeau du burger.</p></div>
-      <div class="step"><span>8</span><p>Servir immédiatement avec des frites maison ou des potatoes.</p></div>
-    </div>
-  </div>
+          <div class="step-grid top-gap">
+            <div class="step"><span>1</span><p>Laver soigneusement les oranges à l’eau claire, surtout si elles sont bio et que tu veux garder un rendu très propre au service.</p></div>
+            <div class="step"><span>2</span><p>Couper les oranges en deux dans le sens de la largeur pour faciliter le pressage.</p></div>
+            <div class="step"><span>3</span><p>Presser chaque moitié à l’aide d’un presse-agrumes manuel ou électrique jusqu’à extraire un maximum de jus.</p></div>
+            <div class="step"><span>4</span><p>Filtrer le jus si tu veux une texture plus lisse, ou le garder avec un peu de pulpe pour un résultat plus naturel.</p></div>
+            <div class="step"><span>5</span><p>Ajouter quelques glaçons dans les verres pour un effet bien frais et désaltérant.</p></div>
+            <div class="step"><span>6</span><p>Verser le jus d’orange fraîchement pressé dans les verres sans trop attendre pour garder toutes ses saveurs.</p></div>
+            <div class="step"><span>7</span><p>Ajouter une paille, une rondelle d’orange ou une feuille de menthe si tu veux une présentation plus jolie.</p></div>
+            <div class="step"><span>8</span><p>Servir immédiatement bien frais, idéalement au petit-déjeuner ou au goûter.</p></div>
+          </div>
+        </div>
 
-  <div class="glass-card">
-    <h3>Composition personnalisée</h3>
+        <div class="glass-card">
+          <h3>Composition personnalisée</h3>
 
-    <div class="chip-group multi-choice-group">
-      <button type="button" onclick="toggleMultiChoice(this, 'burgerChoice')">Cheddar affiné</button>
-      <button type="button" onclick="toggleMultiChoice(this, 'burgerChoice')">Tranches de bacon grillé</button>
-      <button type="button" onclick="toggleMultiChoice(this, 'burgerChoice')">Salade iceberg croquante</button>
-      <button type="button" onclick="toggleMultiChoice(this, 'burgerChoice')">Tomate Cœur de Bœuf</button>
-      <button type="button" onclick="toggleMultiChoice(this, 'burgerChoice')">Oignons caramélisés</button>
-      <button type="button" onclick="toggleMultiChoice(this, 'burgerChoice')">Sauce burger maison</button>
-      <button type="button" onclick="toggleMultiChoice(this, 'burgerChoice')">Cornichons (pickles)</button>
-      <button type="button" onclick="toggleMultiChoice(this, 'burgerChoice')">Sauce barbecue</button>
-    </div>
+          <div class="chip-group multi-choice-group">
+            <button type="button" onclick="toggleMultiChoice(this, 'jusorangeChoice')">Glaçons</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'jusorangeChoice')">Pulpe naturelle</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'jusorangeChoice')">Feuilles de menthe</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'jusorangeChoice')">Rondelle d'orange</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'jusorangeChoice')">Zeste fin</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'jusorangeChoice')">Paille noire</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'jusorangeChoice')">Un trait de citron</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'jusorangeChoice')">Très frais</button>
+          </div>
 
-    <p class="selected-line">Ta composition : <span id="burgerChoice">Aucune</span></p>
+          <p class="selected-line">Ta composition : <span id="jusorangeChoice">Aucune</span></p>
 
-    <div class="pairing-box top-gap">
-      <h4>Meilleures associations de saveurs</h4>
-      <ul>
-        <li><strong>Le Bacon Cheeseburger :</strong> Double cheddar + 2 tranches de bacon grillé + sauce BBQ.</li>
-        <li><strong>Le Frais & Croquant :</strong> Tomate + salade iceberg + oignons rouges crus + sauce burger aux herbes.</li>
-        <li><strong>Le Sucré-Salé :</strong> Oignons caramélisés + fromage fondant.</li>
-        <li><strong>Le Minimaliste :</strong> Pain brioché + steak + cheddar vieux.</li>
-      </ul>
-    </div>
+          <div class="pairing-box top-gap">
+            <h4>Meilleures associations de fraîcheur</h4>
+            <ul>
+              <li><strong>Le Classique frais :</strong> jus pressé + glaçons + paille noire.</li>
+              <li><strong>Le Tropical chic :</strong> jus d’orange + menthe + rondelle d’orange.</li>
+              <li><strong>Le Naturel :</strong> jus avec pulpe + oranges bio bien mûres.</li>
+              <li><strong>Le Réveil tonique :</strong> jus d’orange + un léger trait de citron.</li>
+            </ul>
+          </div>
 
-    <h3 class="top-gap">Checklist du burger parfait</h3>
-    <div class="checklist" data-fill="burgerFill" data-text="burgerText">
-      <label><input type="checkbox" /> Préparer et couper tous les légumes</label>
-      <label><input type="checkbox" /> Toaster les pains burger</label>
-      <label><input type="checkbox" /> Saisir les steaks à feu vif</label>
-      <label><input type="checkbox" /> Réussir la fonte du fromage</label>
-      <label><input type="checkbox" /> Monter les burgers rapidement pour servir chaud</label>
-    </div>
+          <h3 class="top-gap">Checklist du jus parfait</h3>
+          <div class="checklist" data-fill="jusorangeFill" data-text="jusorangeText">
+            <label><input type="checkbox" /> Laver les oranges</label>
+            <label><input type="checkbox" /> Couper les fruits en deux</label>
+            <label><input type="checkbox" /> Presser tout le jus</label>
+            <label><input type="checkbox" /> Ajouter les glaçons</label>
+            <label><input type="checkbox" /> Servir immédiatement bien frais</label>
+          </div>
 
-    <div class="progress-wrap">
-      <div class="progress-bar"><div class="progress-fill" id="burgerFill"></div></div>
-      <p id="burgerText">0 / 5</p>
-    </div>
+          <div class="progress-wrap">
+            <div class="progress-bar"><div class="progress-fill" id="jusorangeFill"></div></div>
+            <p id="jusorangeText">0 / 5</p>
+          </div>
 
-    <div class="timer-box top-gap">
-      <p class="timer-title">Temps de cuisson du steak</p>
-      <p style="font-size:14px; opacity:0.75; margin-bottom:10px;">
-        Choisis la cuisson et le temps total estimé :
-      </p>
-      <div id="timerDisplayBurgers">00:00</div>
-      <div class="timer-actions">
-        <button type="button" onclick="startTimer(180, 'timerDisplayBurgers')">3 min (saignant)</button>
-        <button type="button" onclick="startTimer(240, 'timerDisplayBurgers')">4 min (à point)</button>
-        <button type="button" onclick="startTimer(360, 'timerDisplayBurgers')">6 min (bien cuit)</button>
-        <button type="button" onclick="startTimer(1500, 'timerDisplayBurgers')">25 min (préparation totale)</button>
-        <button type="button" onclick="resetTimer('timerDisplayBurgers')" class="reset-btn">Reset</button>
+          <div class="timer-box top-gap">
+            <p class="timer-title">Temps de préparation</p>
+            <p style="font-size:14px; opacity:0.75; margin-bottom:10px;">
+              Choisis un temps selon ton rythme :
+            </p>
+            <div id="timerDisplayJusorange">00:00</div>
+            <div class="timer-actions">
+              <button type="button" onclick="startTimer(180, 'timerDisplayJusorange')">3 min rapide</button>
+              <button type="button" onclick="startTimer(300, 'timerDisplayJusorange')">5 min classique</button>
+              <button type="button" onclick="startTimer(600, 'timerDisplayJusorange')">10 min tranquille</button>
+              <button type="button" onclick="resetTimer('timerDisplayJusorange')" class="reset-btn">Reset</button>
+            </div>
+          </div>
+
+        </div>
+
       </div>
-    </div>
-
-  </div>
-
-</div>
     </section>
   </main>
-<!-- Footer -->
+
   <footer class="site-footer">
     <div class="footer-content">
       <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
     </div>
   </footer>
- <script src="site.js"></script>
-<script type="module" src="likes-firebase.js"></script>
+
+  <script src="site.js"></script>
+  <script type="module" src="likes-firebase.js"></script>
 </body>
 </html>
