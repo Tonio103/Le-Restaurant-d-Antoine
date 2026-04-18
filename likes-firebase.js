@@ -143,7 +143,7 @@ function renderTopRecipe() {
       <div class="top-recipe-left">
         <div class="top-recipe-emoji">${recipe.emoji}</div>
         <div class="top-recipe-text">
-          <span class="top-recipe-kicker">Recette la plus aimée</span>
+          <span class="top-recipe-kicker"></span>
           <h4>${recipe.name}</h4>
           <p>La favorite actuelle des visiteurs.</p>
         </div>
