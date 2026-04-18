@@ -1,6 +1,6 @@
 /**
  * LE RESTAURANT D'ANTOINE - SCRIPT PRINCIPAL
- * Version simplifiée pour site multi-pages
+ * Version complète pour site multi-pages
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -22,7 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
      STORAGE KEYS
      ========================================================================== */
   const STORAGE_KEYS = {
-    theme: "antoine-theme"
+    theme: "antoine-theme",
+    aiWidgetOpen: "antoine-ai-widget-open"
   };
 
   /* ==========================================================================
@@ -79,18 +80,20 @@ document.addEventListener("DOMContentLoaded", () => {
         { emoji: "", name: "Beurre pour toaster", amount: 20, unit: "g" }
       ]
     },
-jusorange: {
-  base: 4,
-  label: "VERRES",
-  targetId: "jusorangeIngredients",
-  labelId: "jusorangeCountLabel",
-  items: [
-    { emoji: "", name: "Oranges bio", amount: 8, unit: "" },
-    { emoji: "", name: "Glaçons", amount: 8, unit: "" },
-    { emoji: "", name: "Feuilles de menthe", amount: 4, unit: "" },
-    { emoji: "", name: "Citron (optionnel)", amount: 1, unit: "" }
-  ]
-},
+
+    jusorange: {
+      base: 4,
+      label: "VERRES",
+      targetId: "jusorangeIngredients",
+      labelId: "jusorangeCountLabel",
+      items: [
+        { emoji: "", name: "Oranges bio", amount: 8, unit: "pièces" },
+        { emoji: "", name: "Glaçons", amount: 8, unit: "pièces" },
+        { emoji: "", name: "Feuilles de menthe", amount: 4, unit: "feuilles" },
+        { emoji: "", name: "Citron (optionnel)", amount: 1, unit: "pièce" }
+      ]
+    },
+
     fondants: {
       base: 4,
       label: "PERSONNES",
@@ -148,14 +151,16 @@ jusorange: {
     cailles: 4,
     crepes: 4,
     burgers: 4,
+    jusorange: 4,
     fondants: 4,
     marbre: 4,
-    pokebowl: 2,
-    jusorange: 4
+    pokebowl: 2
   };
 
   const timers = {};
   let toastTimeout = null;
+  let revealObserver = null;
+  let countersObserver = null;
 
   /* ==========================================================================
      HELPERS
@@ -164,7 +169,7 @@ jusorange: {
     try {
       const value = localStorage.getItem(key);
       return value ?? fallback;
-    } catch {
+    } catch (error) {
       return fallback;
     }
   }
@@ -172,7 +177,15 @@ jusorange: {
   function safeSetStorage(key, value) {
     try {
       localStorage.setItem(key, value);
-    } catch {
+    } catch (error) {
+      /* ignore */
+    }
+  }
+
+  function safeRemoveStorage(key) {
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
       /* ignore */
     }
   }
@@ -223,6 +236,17 @@ jusorange: {
       .trim();
   }
 
+  function debounce(callback, delay = 200) {
+    let timeoutId = null;
+
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => {
+        callback(...args);
+      }, delay);
+    };
+  }
+
   /* ==========================================================================
      THEME
      ========================================================================== */
@@ -243,7 +267,9 @@ jusorange: {
     const savedTheme = safeGetStorage(STORAGE_KEYS.theme, "light");
     applyTheme(savedTheme);
 
-    themeToggle?.addEventListener("click", () => {
+    if (!themeToggle) return;
+
+    themeToggle.addEventListener("click", () => {
       const nextTheme = body.classList.contains("dark-mode") ? "light" : "dark";
       safeSetStorage(STORAGE_KEYS.theme, nextTheme);
       applyTheme(nextTheme);
@@ -255,9 +281,23 @@ jusorange: {
      NAVIGATION
      ========================================================================== */
   function initNavigation() {
-    menuToggle?.addEventListener("click", () => {
-      navCenter?.classList.toggle("open");
-    });
+    if (menuToggle && navCenter) {
+      menuToggle.addEventListener("click", () => {
+        navCenter.classList.toggle("open");
+        menuToggle.classList.toggle("active");
+      });
+
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        const clickedInsideNav = navCenter.contains(target);
+        const clickedToggle = menuToggle.contains(target);
+
+        if (!clickedInsideNav && !clickedToggle) {
+          navCenter.classList.remove("open");
+          menuToggle.classList.remove("active");
+        }
+      });
+    }
   }
 
   /* ==========================================================================
@@ -276,12 +316,29 @@ jusorange: {
       { label: "Fondants", keywords: ["fondant", "fondants", "chocolat", "coulant"], url: "fondant.html" },
       { label: "Marbré", keywords: ["marbre", "marbré", "gateau marbre", "gâteau marbré", "cake"], url: "gateau-marbre.html" },
       { label: "Poké bowl", keywords: ["poke", "pokebowl", "poké", "poké bowl", "poke bowl", "saumon"], url: "poke-bowl.html" },
-      { label: "Jus d’orange", keywords: ["jus", "orange", "jus d'orange", "boisson", "bio"], url: "jusorange.html" }
+      { label: "Jus d’orange", keywords: ["jus", "orange", "jus d orange", "jus d'orange", "boisson", "frais"], url: "jusorange.html" }
     ];
+
+    let activeIndex = -1;
 
     function hideSuggestions() {
       suggestionsBox.style.display = "none";
       suggestionsBox.innerHTML = "";
+      activeIndex = -1;
+    }
+
+    function getButtons() {
+      return Array.from(suggestionsBox.querySelectorAll(".search-suggestion-item"));
+    }
+
+    function setActiveButton(index) {
+      const buttons = getButtons();
+
+      buttons.forEach((button, buttonIndex) => {
+        button.classList.toggle("active", buttonIndex === index);
+      });
+
+      activeIndex = index;
     }
 
     function showSuggestions(results) {
@@ -306,9 +363,10 @@ jusorange: {
       });
 
       suggestionsBox.style.display = "block";
+      activeIndex = -1;
     }
 
-    searchInput.addEventListener("input", () => {
+    const handleInput = debounce(() => {
       const value = normalizeText(searchInput.value);
 
       if (!value) {
@@ -316,17 +374,49 @@ jusorange: {
         return;
       }
 
-      const results = recipeRoutes.filter((recipe) =>
-        normalizeText(recipe.label).includes(value) ||
-        recipe.keywords.some((keyword) => normalizeText(keyword).includes(value))
-      );
+      const results = recipeRoutes.filter((recipe) => {
+        return (
+          normalizeText(recipe.label).includes(value) ||
+          recipe.keywords.some((keyword) => normalizeText(keyword).includes(value))
+        );
+      });
 
       showSuggestions(results);
+    }, 120);
+
+    searchInput.addEventListener("input", handleInput);
+
+    searchInput.addEventListener("focus", () => {
+      if (searchInput.value.trim()) {
+        handleInput();
+      }
     });
 
     searchInput.addEventListener("keydown", (event) => {
+      const buttons = getButtons();
+
       if (event.key === "Escape") {
         hideSuggestions();
+        return;
+      }
+
+      if (!buttons.length) return;
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        const nextIndex = activeIndex < buttons.length - 1 ? activeIndex + 1 : 0;
+        setActiveButton(nextIndex);
+      }
+
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        const nextIndex = activeIndex > 0 ? activeIndex - 1 : buttons.length - 1;
+        setActiveButton(nextIndex);
+      }
+
+      if (event.key === "Enter" && activeIndex >= 0 && buttons[activeIndex]) {
+        event.preventDefault();
+        buttons[activeIndex].click();
       }
     });
 
@@ -343,6 +433,7 @@ jusorange: {
      ========================================================================== */
   function initPlaneAnimation() {
     const plane = document.getElementById("plane");
+    const trail = document.getElementById("planeTrail");
     if (!plane) return;
 
     let startTime = null;
@@ -356,21 +447,31 @@ jusorange: {
 
       if (progress >= 1) {
         plane.style.opacity = "0";
+        if (trail) trail.style.opacity = "0";
         return;
       }
 
-      const x = progress * (window.innerWidth + 120) - 60;
-      const y = window.innerHeight * 0.38 + Math.sin(progress * Math.PI * 1.4) * 70;
+      const x = progress * (window.innerWidth + 140) - 70;
+      const y = window.innerHeight * 0.30 + Math.sin(progress * Math.PI * 1.4) * 70;
 
-      const nextX = (progress + 0.001) * (window.innerWidth + 120) - 60;
-      const nextY = window.innerHeight * 0.38 + Math.sin((progress + 0.001) * Math.PI * 1.4) * 70;
+      const nextX = (progress + 0.001) * (window.innerWidth + 140) - 70;
+      const nextY = window.innerHeight * 0.30 + Math.sin((progress + 0.001) * Math.PI * 1.4) * 70;
 
       const angleRad = Math.atan2(nextY - y, nextX - x);
+      const trailOffset = 34;
 
       plane.style.opacity = "1";
       plane.style.left = `${x}px`;
       plane.style.top = `${y}px`;
       plane.style.transform = `translate(-50%, -50%) rotate(${angleRad}rad)`;
+
+      if (trail) {
+        const trailX = x - Math.cos(angleRad) * trailOffset;
+        const trailY = y - Math.sin(angleRad) * trailOffset;
+        trail.style.opacity = "1";
+        trail.style.left = `${trailX}px`;
+        trail.style.top = `${trailY}px`;
+      }
 
       requestAnimationFrame(animatePlane);
     }
@@ -402,9 +503,12 @@ jusorange: {
       const left = document.createElement("div");
       left.className = "ingredient-left";
 
-      const emoji = document.createElement("span");
-      emoji.className = "ingredient-emoji";
-      emoji.textContent = item.emoji || "";
+      if (item.emoji) {
+        const emoji = document.createElement("span");
+        emoji.className = "ingredient-emoji";
+        emoji.textContent = item.emoji;
+        left.appendChild(emoji);
+      }
 
       const name = document.createElement("div");
       name.className = "ingredient-name";
@@ -412,13 +516,31 @@ jusorange: {
 
       const amount = document.createElement("div");
       amount.className = "ingredient-amount";
-      amount.textContent = `${formatAmount(scaledAmount)} ${item.unit}`;
+      amount.textContent = item.unit
+        ? `${formatAmount(scaledAmount)} ${item.unit}`
+        : `${formatAmount(scaledAmount)}`;
 
-      left.appendChild(emoji);
       left.appendChild(name);
       card.appendChild(left);
       card.appendChild(amount);
       container.appendChild(card);
+    });
+  }
+
+  function initIngredientCardsHover() {
+    const cards = document.querySelectorAll(".ingredient-card");
+
+    cards.forEach((card) => {
+      if (card.dataset.hoverBound === "true") return;
+      card.dataset.hoverBound = "true";
+
+      card.addEventListener("mouseenter", () => {
+        card.classList.add("is-hovered");
+      });
+
+      card.addEventListener("mouseleave", () => {
+        card.classList.remove("is-hovered");
+      });
     });
   }
 
@@ -438,9 +560,22 @@ jusorange: {
       const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
       audio.volume = 0.4;
       void audio.play();
-    } catch {
+    } catch (error) {
       /* ignore */
     }
+  }
+
+  function initTimerDisplays() {
+    const timerDisplays = document.querySelectorAll("[data-timer-display-id]");
+    timerDisplays.forEach((display) => {
+      const id = display.getAttribute("data-timer-display-id");
+      if (!id) return;
+
+      if (!timers[id]) {
+        timers[id] = { seconds: 0, interval: null };
+      }
+      updateTimerDisplay(id);
+    });
   }
 
   /* ==========================================================================
@@ -482,6 +617,7 @@ jusorange: {
      ========================================================================== */
   function initCounters() {
     const counters = document.querySelectorAll(".counter");
+    if (!counters.length) return;
 
     const runCounter = (counter) => {
       const target = Number(counter.dataset.target || 0);
@@ -508,8 +644,8 @@ jusorange: {
       }, stepTime);
     };
 
-    const observer = new IntersectionObserver(
-      (entries) => {
+    countersObserver = new IntersectionObserver(
+      (entries, observer) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             runCounter(entry.target);
@@ -517,23 +653,20 @@ jusorange: {
           }
         });
       },
-      { threshold: 0.5 }
+      { threshold: 0.45 }
     );
 
     counters.forEach((counter) => {
-      if (counter.dataset.observed !== "true") {
-        counter.dataset.observed = "true";
-        observer.observe(counter);
-      }
+      countersObserver.observe(counter);
     });
   }
 
   /* ==========================================================================
      SCROLL REVEAL
      ========================================================================== */
-  function revealOnScroll() {
+  function revealOnScrollFallback() {
     const elements = document.querySelectorAll(
-      ".glass-card, .universe-card, .feature-box, .recipe-banner, .recipe-gallery-grid img"
+      ".glass-card, .universe-card, .feature-box, .recipe-banner, .recipe-gallery-grid img, .ingredient-card, .hero-card, .bento-card"
     );
 
     const triggerBottom = window.innerHeight * 0.9;
@@ -543,6 +676,35 @@ jusorange: {
         element.classList.add("revealed");
       }
     });
+  }
+
+  function initReveal() {
+    const elements = document.querySelectorAll(
+      ".glass-card, .universe-card, .feature-box, .recipe-banner, .recipe-gallery-grid img, .ingredient-card, .hero-card, .bento-card"
+    );
+
+    if (!elements.length) return;
+
+    if ("IntersectionObserver" in window) {
+      revealObserver = new IntersectionObserver(
+        (entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("revealed");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12 }
+      );
+
+      elements.forEach((element) => {
+        revealObserver.observe(element);
+      });
+    } else {
+      revealOnScrollFallback();
+      window.addEventListener("scroll", revealOnScrollFallback);
+    }
   }
 
   /* ==========================================================================
@@ -586,7 +748,7 @@ jusorange: {
     const lightboxClose = document.getElementById("lightboxClose");
     const lightboxBackdrop = document.querySelector(".lightbox-backdrop");
 
-    if (!lightbox || !lightboxImage) return;
+    if (!lightbox || !lightboxImage || !images.length) return;
 
     const closeLightbox = () => {
       lightbox.classList.remove("open");
@@ -679,7 +841,7 @@ jusorange: {
     const cards = document.querySelectorAll(".bento-card, .bento-badge");
     if (!cards.length) return;
 
-    window.addEventListener("mousemove", (event) => {
+    const onMouseMove = debounce((event) => {
       const x = (window.innerWidth / 2 - event.clientX) / 30;
       const y = (window.innerHeight / 2 - event.clientY) / 30;
 
@@ -687,23 +849,53 @@ jusorange: {
         const speed = Number(card.getAttribute("data-speed")) || 1;
         card.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
       });
-    });
+    }, 10);
+
+    window.addEventListener("mousemove", onMouseMove);
   }
 
   /* ==========================================================================
      SCROLL TOP BUTTON
      ========================================================================== */
   function initScrollTopButton() {
+    if (!scrollTopBtn) return;
+
     const toggleVisibility = () => {
-      if (!scrollTopBtn) return;
       scrollTopBtn.classList.toggle("show", window.scrollY > 400);
     };
 
     window.addEventListener("scroll", toggleVisibility);
     toggleVisibility();
 
-    scrollTopBtn?.addEventListener("click", () => {
+    scrollTopBtn.addEventListener("click", () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  /* ==========================================================================
+     CARD IMAGE ZOOM ONLY
+     ========================================================================== */
+  function initRecipeCardsZoom() {
+    const cards = document.querySelectorAll(".recipe-card, .glass-card, .recipe-preview-card");
+
+    cards.forEach((card) => {
+      if (card.dataset.zoomBound === "true") return;
+      card.dataset.zoomBound = "true";
+
+      const media =
+        card.querySelector("img") ||
+        card.querySelector(".card-image") ||
+        card.querySelector(".recipe-card-image");
+
+      if (!media) return;
+
+      card.addEventListener("mouseenter", () => {
+        media.style.transform = "scale(1.06)";
+      });
+
+      card.addEventListener("mouseleave", () => {
+        media.style.transform = "";
+      });
     });
   }
 
@@ -727,6 +919,7 @@ jusorange: {
 
     portions[recipeKey] = nextValue;
     renderIngredients(recipeKey);
+    initIngredientCardsHover();
   };
 
   window.resetPortions = (recipeKey) => {
@@ -734,6 +927,7 @@ jusorange: {
 
     portions[recipeKey] = recipeData[recipeKey].base;
     renderIngredients(recipeKey);
+    initIngredientCardsHover();
     showToast("Portions réinitialisées.");
   };
 
@@ -835,12 +1029,12 @@ jusorange: {
         aliases: ["caille", "cailles", "petits pois", "cailles petits pois", "cailles et petits pois"]
       },
       {
-  key: "jusorange",
-  name: "Jus d'orange frais",
-  url: "Jusorange.html",
-  tags: ["boisson", "frais", "orange", "bio", "rapide", "facile", "été"],
-  aliases: ["jus", "jus orange", "orange", "jus d'orange", "boisson"]
-},
+        key: "jusorange",
+        name: "Jus d'orange frais",
+        url: "jusorange.html",
+        tags: ["boisson", "frais", "orange", "bio", "rapide", "facile", "ete", "froid"],
+        aliases: ["jus", "jus orange", "orange", "jus d orange", "jus d'orange", "boisson"]
+      },
       {
         key: "crepes",
         name: "Crêpes gourmandes",
@@ -882,7 +1076,6 @@ jusorange: {
       leger: ["leger", "léger", "light", "digeste"],
       pas_trop_lourd: ["pas trop lourd", "pas lourd", "pas trop copieux", "assez leger", "assez léger"],
       lourd: ["lourd", "copieux", "gras", "qui cale", "consistant"],
-
       familial: ["famille", "familial", "convivial", "a plusieurs", "à plusieurs", "partager"],
       frais: ["frais", "froid", "rafraichissant", "rafraîchissant"],
       rapide: ["rapide", "vite", "express", "simple", "ce soir"],
@@ -893,7 +1086,6 @@ jusorange: {
       dessert: ["dessert", "sucre", "sucré", "gouter", "goûter", "gateau", "gâteau"],
       sale: ["sale", "salé", "repas", "plat"],
       raffine: ["raffine", "raffiné", "chic", "elegant", "élégant"],
-
       bonjour: ["bonjour", "salut", "coucou", "hello", "hey"],
       merci: ["merci", "thanks", "merci beaucoup"],
       faim: ["faim", "j ai faim", "j'ai faim", "affame", "affamé"],
@@ -913,7 +1105,6 @@ jusorange: {
       sucre: ["sucre", "sucré", "dessert", "gouter", "goûter"],
       chaud: ["chaud", "chaude", "rechauffant", "réchauffant"],
       froid: ["froid", "frais", "rafraichissant", "rafraîchissant"],
-
       aide: ["aide", "aider", "help", "besoin d aide", "besoin d'aide"],
       amour: ["amour", "love", "coeur", "cœur"],
       antoine: ["antoine", "chef antoine", "restaurant d antoine", "restaurant d'antoine"]
@@ -987,7 +1178,7 @@ jusorange: {
       if (normalized.includes("faim")) return "faim";
       if (normalized.includes("soif")) return "soif";
       if (normalized.includes("triste") || normalized.includes("deprime") || normalized.includes("cafard")) return "triste";
-      if (normalized.includes("fatigue") || normalized.includes("fatiguee") || normalized.includes("fatigue")) return "fatigue";
+      if (normalized.includes("fatigue") || normalized.includes("fatiguee") || normalized.includes("fatigué") || normalized.includes("fatiguée")) return "fatigue";
 
       return null;
     }
@@ -1045,6 +1236,7 @@ jusorange: {
         if (normalized.includes("ce soir") || normalized.includes("soir")) {
           if (recipe.tags.includes("rapide")) score += 2;
           if (recipe.tags.includes("leger")) score += 2;
+          if (recipe.tags.includes("froid")) score += 1;
         }
 
         if (concepts.includes("fete")) {
@@ -1058,6 +1250,7 @@ jusorange: {
 
         if (concepts.includes("ete") || concepts.includes("froid") || concepts.includes("healthy")) {
           if (recipe.key === "pokebowl") score += 4;
+          if (recipe.key === "jusorange") score += 5;
         }
 
         if (concepts.includes("hiver") || concepts.includes("reconfort")) {
@@ -1075,16 +1268,19 @@ jusorange: {
           if (recipe.key === "burgers") score += 3;
           if (recipe.key === "crepes") score += 3;
           if (recipe.key === "marbre") score += 2;
+          if (recipe.key === "jusorange") score += 2;
         }
 
         if (concepts.includes("invite")) {
           if (recipe.key === "cailles") score += 3;
           if (recipe.key === "burgers") score += 2;
+          if (recipe.key === "jusorange") score += 1;
         }
 
         if (normalized.includes("famille") && concepts.includes("pas_trop_lourd")) {
           if (recipe.key === "crepes") score += 4;
           if (recipe.key === "pokebowl") score += 4;
+          if (recipe.key === "jusorange") score += 3;
           if (recipe.key === "marbre") score += 1;
           if (recipe.key === "burgers") score -= 3;
           if (recipe.key === "cailles") score -= 4;
@@ -1144,7 +1340,7 @@ jusorange: {
 
     function renderSpecialResponse(intent) {
       if (intent === "bonjour") {
-        result.innerHTML = `<strong>Bonjour 👋</strong><br>Dis-moi ce que tu veux manger et je t’aide à trouver la meilleure recette.`;
+        result.innerHTML = `<strong>Bonjour 👋</strong><br>Dis-moi ce que tu veux manger ou boire et je t’aide à trouver la meilleure recette.`;
         return;
       }
 
@@ -1161,7 +1357,9 @@ jusorange: {
           • un truc pas trop lourd<br>
           • un repas familial<br>
           • sans burger et sans chocolat<br>
-          • je veux des crêpes
+          • je veux un truc frais<br>
+          • je veux des crêpes<br>
+          • j’ai soif
         `;
         return;
       }
@@ -1182,7 +1380,7 @@ jusorange: {
       }
 
       if (intent === "soif") {
-        result.innerHTML = `<strong>Je gère surtout les plats 🍽️</strong><br>Mais je peux déjà t’aider à choisir une recette légère, fraîche ou gourmande.`;
+        result.innerHTML = `<strong>Je peux aussi t’aider 👌</strong><br>Si tu veux quelque chose de frais, le jus d’orange est une très bonne option.`;
         return;
       }
 
@@ -1192,7 +1390,7 @@ jusorange: {
       }
 
       if (intent === "fatigue") {
-        result.innerHTML = `<strong>Je vois 😴</strong><br>Dans ce cas, on peut viser un truc simple et rapide. Par exemple : crêpes, burgers ou poké bowl.`;
+        result.innerHTML = `<strong>Je vois 😴</strong><br>Dans ce cas, on peut viser un truc simple et rapide. Par exemple : crêpes, jus d’orange ou poké bowl.`;
       }
     }
 
@@ -1222,13 +1420,13 @@ jusorange: {
       let html = `<strong>Je te conseille : ${best.name}</strong><br>`;
 
       if (recipeMentions.includes(best.key)) {
-        html += `Tu as cité cette recette, donc je l’ai bien prise en compte.<br>`;
+        html += `Oui bien sûr ! J'ai ce qu'il te faut.<br>`;
       }
 
       if (readableReasons.length) {
         html += `Ça correspond bien à : ${readableReasons.join(", ")}.<br>`;
       } else {
-        html += `Je l’ai choisie comme meilleure option par rapport à ta demande.<br>`;
+        html += `Je pense que cela pourrait te plaire.<br>`;
       }
 
       if (negatives.length) {
@@ -1252,7 +1450,7 @@ jusorange: {
       }
 
       result.innerHTML = `<strong>Recherche en cours...</strong>`;
-      window.setTimeout(() => renderRecommendation(value), 350);
+      window.setTimeout(() => renderRecommendation(value), 300);
     });
 
     input.addEventListener("keydown", (event) => {
@@ -1277,12 +1475,14 @@ jusorange: {
     function openWidget() {
       aiWidget.classList.remove("hidden");
       aiFab.classList.add("hidden");
+      safeSetStorage(STORAGE_KEYS.aiWidgetOpen, "true");
     }
 
     function closeWidget() {
       aiWidget.classList.add("hidden");
       aiWidget.classList.remove("expanded");
       aiFab.classList.remove("hidden");
+      safeRemoveStorage(STORAGE_KEYS.aiWidgetOpen);
     }
 
     function toggleExpand() {
@@ -1296,15 +1496,23 @@ jusorange: {
     aiFab.addEventListener("click", openWidget);
     aiWidgetClose?.addEventListener("click", closeWidget);
     aiWidgetExpand?.addEventListener("click", toggleExpand);
+
+    const wasOpen = safeGetStorage(STORAGE_KEYS.aiWidgetOpen, "false");
+    if (wasOpen === "true") {
+      openWidget();
+    }
   }
 
   /* ==========================================================================
      GLOBAL EVENTS
      ========================================================================== */
-  window.addEventListener("scroll", revealOnScroll);
   window.addEventListener("error", () => {
     hideLoader();
   });
+
+  window.addEventListener("resize", debounce(() => {
+    revealOnScrollFallback();
+  }, 120));
 
   /* ==========================================================================
      INIT
@@ -1315,16 +1523,23 @@ jusorange: {
   initPlaneAnimation();
   initChecklists();
   initCounters();
+  initReveal();
   initTilt();
   initLightbox();
   initHeroParallax();
   initLiquidGlass();
   initScrollTopButton();
+  initRecipeCardsZoom();
   initAiChef();
   initAiWidget();
+  initTimerDisplays();
 
-  Object.keys(recipeData).forEach(renderIngredients);
-  revealOnScroll();
+  Object.keys(recipeData).forEach((recipeKey) => {
+    renderIngredients(recipeKey);
+  });
+
+  initIngredientCardsHover();
+  revealOnScrollFallback();
 
   window.setTimeout(hideLoader, 900);
 });
