@@ -1233,7 +1233,13 @@ saladecesar: {
           score += 10;
           reasons.push("recette citée");
         }
+if (concepts.includes("frais")) {
+  if (recipe.key === "saladecesar") score += 4;
+}
 
+if (concepts.includes("ete") || concepts.includes("healthy")) {
+  if (recipe.key === "saladecesar") score += 4;
+}
         if (concepts.includes("familial")) {
           if (recipe.tags.includes("familial")) score += 4;
           if (recipe.tags.includes("convivial")) score += 2;
