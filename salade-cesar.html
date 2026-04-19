@@ -52,9 +52,15 @@
           <p class="section-kicker">Univers 3</p>
           <h3>Salade César gourmande</h3>
           <p>Une salade fraîche, croquante et généreuse, avec une sauce crémeuse, du parmesan, du bacon croustillant et des croûtons bien dorés.</p>
-          <button class="like-btn" onclick="toggleLike('saladecesar')">
-            ❤️ <span id="likes-saladecesar">0</span>
-          </button>
+         <button
+  class="like-btn"
+  data-recipe="saladecesar"
+  onclick="toggleLike('saladecesar')"
+  aria-pressed="false"
+  title="Liker cette recette"
+>
+  ❤️ <span id="likes-saladecesar">0</span>
+</button>
         </div>
         <div class="recipe-big-emoji">🥗</div>
       </div>
