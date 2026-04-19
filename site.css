@@ -3562,10 +3562,6 @@ body[data-theme-page="accueil"]:not(.dark-mode) .hero-text {
   color: #fff4ec;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
 }
-.universe-card,
-.recipe-card {
-  transform: none !important;
-}
 
 .universe-card:hover,
 .recipe-card:hover {
