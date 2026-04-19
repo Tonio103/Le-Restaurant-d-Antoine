@@ -1,0 +1,173 @@
+a<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Avocado toast | Le restaurant d’Antoine</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body data-theme-page="avocadotoast">
+
+  <header class="site-header">
+    <nav class="navbar">
+
+      <div class="logo-wrap">
+        <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+        <div class="logo-text">
+          <strong>Le restaurant d’Antoine</strong>
+          <span>Maison gourmande & recettes favorites</span>
+        </div>
+      </div>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+      <div class="nav-center" id="navCenter">
+        <div style="position:relative; width:100%;">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Rechercher une recette..."
+            autocomplete="off"
+            style="padding:10px; border-radius:10px; border:none; width:100%;"
+          />
+          <div id="searchSuggestions" class="search-suggestions"></div>
+        </div>
+      </div>
+
+      <div class="nav-links">
+        <a href="questions.html">Questions</a>
+        <a href="avis.html">Avis</a>
+        <a href="infos.html">Infos</a>
+      </div>
+
+      <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+
+    </nav>
+  </header>
+
+  <main class="main-layout">
+    <section class="page-section active" id="avocadotoast">
+      <div class="recipe-banner glass-card tilt-card">
+        <div>
+          <p class="section-kicker">Univers 3</p>
+          <h3>Avocado toast gourmand</h3>
+          <p>Une recette fraîche, élégante et généreuse : pain grillé croustillant, avocat citronné bien assaisonné, œuf coulant et finitions ultra gourmandes.</p>
+          <button class="like-btn" onclick="toggleLike('avocadotoast')">
+            ❤️ <span id="likes-avocadotoast">0</span>
+          </button>
+        </div>
+        <div class="recipe-big-emoji">🥑</div>
+      </div>
+
+      <div class="recipe-gallery-grid">
+        <img src="avocado-toast-principal.png" alt="Avocado toast principal" class="gallery-main lightboxable" />
+        <img src="avocado-toast-oeuf.png" alt="Avocado toast avec œuf" class="lightboxable" />
+        <img src="avocado-toast-preparation.png" alt="Préparation de l'avocado toast" class="lightboxable" />
+      </div>
+
+      <div class="glass-card">
+        <div class="recipe-header">
+          <h3>Ingrédients de l’avocado toast</h3>
+          <div class="portion-box">
+            <span id="avocadoCountLabel">2 PERSONNES</span>
+            <div class="portion-controls">
+              <button type="button" onclick="changePortions('avocadotoast', -1)">−</button>
+              <button type="button" onclick="resetPortions('avocadotoast')">↻</button>
+              <button type="button" onclick="changePortions('avocadotoast', 1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="ingredient-grid" id="avocadoIngredients"></div>
+      </div>
+
+      <div class="two-col">
+
+        <div class="glass-card">
+          <div class="prep-header">
+            <h3>Préparation détaillée</h3>
+            <span class="prep-time">⏱ 20 min</span>
+          </div>
+
+          <div class="step-grid top-gap">
+            <div class="step"><span>1</span><p>Choisir des avocats bien mûrs. Les couper en deux, retirer le noyau puis récupérer la chair avec une cuillère.</p></div>
+            <div class="step"><span>2</span><p>Écraser grossièrement l’avocat à la fourchette avec du jus de citron, un filet d’huile d’olive, du sel, du poivre et une petite pointe de piment si tu veux plus de caractère.</p></div>
+            <div class="step"><span>3</span><p>Faire griller les tranches de pain jusqu’à ce qu’elles soient bien dorées à l’extérieur mais encore moelleuses au centre.</p></div>
+            <div class="step"><span>4</span><p>Dans une poêle, faire revenir rapidement les tomates cerises coupées en deux avec un peu d’huile d’olive pour les rendre plus fondantes et parfumées.</p></div>
+            <div class="step"><span>5</span><p>Cuire les œufs. Pour un résultat très gourmand, privilégier un œuf mollet ou un œuf poché afin d’avoir un jaune bien coulant.</p></div>
+            <div class="step"><span>6</span><p>Tartiner généreusement chaque tranche avec l’écrasé d’avocat, sans lisser complètement pour garder un effet rustique et naturel.</p></div>
+            <div class="step"><span>7</span><p>Ajouter les tomates, quelques copeaux de feta ou de parmesan, puis déposer l’œuf par-dessus avec délicatesse.</p></div>
+            <div class="step"><span>8</span><p>Terminer avec des graines, des herbes fraîches, un trait d’huile d’olive et un peu de fleur de sel avant de servir immédiatement.</p></div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <h3>Composition personnalisée</h3>
+
+          <div class="chip-group multi-choice-group">
+            <button type="button" onclick="toggleMultiChoice(this, 'avocadoChoice')">Œuf mollet coulant</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'avocadoChoice')">Tomates cerises rôties</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'avocadoChoice')">Feta émiettée</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'avocadoChoice')">Graines de sésame</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'avocadoChoice')">Piment doux</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'avocadoChoice')">Herbes fraîches</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'avocadoChoice')">Saumon fumé</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'avocadoChoice')">Zeste de citron</button>
+          </div>
+
+          <p class="selected-line">Ta composition : <span id="avocadoChoice">Aucune</span></p>
+
+          <div class="pairing-box top-gap">
+            <h4>Meilleures associations de saveurs</h4>
+            <ul>
+              <li><strong>Le très frais :</strong> avocat + tomates cerises + herbes fraîches + zeste de citron.</li>
+              <li><strong>Le gourmand :</strong> avocat + œuf mollet + feta + graines de sésame.</li>
+              <li><strong>Le brunch chic :</strong> avocat + saumon fumé + citron + poivre noir.</li>
+              <li><strong>Le minimaliste :</strong> pain grillé + avocat citronné + fleur de sel + huile d’olive.</li>
+            </ul>
+          </div>
+
+          <h3 class="top-gap">Checklist du toast parfait</h3>
+          <div class="checklist" data-fill="avocadoFill" data-text="avocadoText">
+            <label><input type="checkbox" /> Préparer l’avocat et l’assaisonnement</label>
+            <label><input type="checkbox" /> Faire griller le pain correctement</label>
+            <label><input type="checkbox" /> Cuire l’œuf sans casser le jaune</label>
+            <label><input type="checkbox" /> Ajouter les garnitures choisies</label>
+            <label><input type="checkbox" /> Servir immédiatement pendant que le pain est croustillant</label>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-bar"><div class="progress-fill" id="avocadoFill"></div></div>
+            <p id="avocadoText">0 / 5</p>
+          </div>
+
+          <div class="timer-box top-gap">
+            <p class="timer-title">Temps de préparation</p>
+            <p style="font-size:14px; opacity:0.75; margin-bottom:10px;">
+              Choisis un minuteur utile pour la recette :
+            </p>
+            <div id="timerDisplayAvocado">00:00</div>
+            <div class="timer-actions">
+              <button type="button" onclick="startTimer(360, 'timerDisplayAvocado')">6 min (œuf mollet)</button>
+              <button type="button" onclick="startTimer(180, 'timerDisplayAvocado')">3 min (pain grillé)</button>
+              <button type="button" onclick="startTimer(300, 'timerDisplayAvocado')">5 min (dressage)</button>
+              <button type="button" onclick="startTimer(1200, 'timerDisplayAvocado')">20 min (préparation totale)</button>
+              <button type="button" onclick="resetTimer('timerDisplayAvocado')" class="reset-btn">Reset</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    </div>
+  </footer>
+
+  <script src="site.js"></script>
+  <script type="module" src="likes-firebase.js"></script>
+</body>
+</html>

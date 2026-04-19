@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ramen maison | Le restaurant d’Antoine</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body data-theme-page="ramen">
+
+  <header class="site-header">
+    <nav class="navbar">
+
+      <div class="logo-wrap">
+        <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
+        <div class="logo-text">
+          <strong>Le restaurant d’Antoine</strong>
+          <span>Maison gourmande & recettes favorites</span>
+        </div>
+      </div>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+
+      <div class="nav-center" id="navCenter">
+        <div style="position:relative; width:100%;">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Rechercher une recette..."
+            autocomplete="off"
+            style="padding:10px; border-radius:10px; border:none; width:100%;"
+          />
+          <div id="searchSuggestions" class="search-suggestions"></div>
+        </div>
+      </div>
+
+      <div class="nav-links">
+        <a href="questions.html">Questions</a>
+        <a href="avis.html">Avis</a>
+        <a href="infos.html">Infos</a>
+      </div>
+
+      <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+
+    </nav>
+  </header>
+
+  <main class="main-layout">
+    <section class="page-section active" id="ramen">
+      <div class="recipe-banner glass-card tilt-card">
+        <div>
+          <p class="section-kicker">Univers 4</p>
+          <h3>Ramen maison généreux</h3>
+          <p>Un grand bol réconfortant avec un bouillon parfumé, des nouilles fondantes, des légumes croquants, un œuf mariné et des garnitures ultra savoureuses.</p>
+          <button class="like-btn" onclick="toggleLike('ramen')">
+            ❤️ <span id="likes-ramen">0</span>
+          </button>
+        </div>
+        <div class="recipe-big-emoji">🍜</div>
+      </div>
+
+      <div class="recipe-gallery-grid">
+        <img src="ramen-bol-principal.png" alt="Bol de ramen maison" class="gallery-main lightboxable" />
+        <img src="ramen-bouillon.png" alt="Bouillon ramen" class="lightboxable" />
+        <img src="ramen-garnitures.png" alt="Préparation des garnitures ramen" class="lightboxable" />
+      </div>
+
+      <div class="glass-card">
+        <div class="recipe-header">
+          <h3>Ingrédients du ramen</h3>
+          <div class="portion-box">
+            <span id="ramenCountLabel">2 BOLS</span>
+            <div class="portion-controls">
+              <button type="button" onclick="changePortions('ramen', -1)">−</button>
+              <button type="button" onclick="resetPortions('ramen')">↻</button>
+              <button type="button" onclick="changePortions('ramen', 1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="ingredient-grid" id="ramenIngredients"></div>
+      </div>
+
+      <div class="two-col">
+
+        <div class="glass-card">
+          <div class="prep-header">
+            <h3>Préparation détaillée</h3>
+            <span class="prep-time">⏱ 45 min</span>
+          </div>
+
+          <div class="step-grid top-gap">
+            <div class="step"><span>1</span><p>Commencer par préparer le bouillon. Faire revenir ail, gingembre et oignon dans un filet d’huile pour développer les arômes.</p></div>
+            <div class="step"><span>2</span><p>Ajouter le bouillon de volaille ou de légumes, puis parfumer avec sauce soja, huile de sésame, un peu de miso et éventuellement une touche de vinaigre de riz.</p></div>
+            <div class="step"><span>3</span><p>Laisser mijoter doucement pour que le bouillon prenne du goût. Plus il infuse, plus le ramen sera riche et profond.</p></div>
+            <div class="step"><span>4</span><p>Faire cuire les œufs pendant 6 à 7 minutes pour obtenir un jaune encore crémeux. Les plonger dans l’eau froide puis les écaler délicatement.</p></div>
+            <div class="step"><span>5</span><p>Préparer les garnitures : émincer les champignons, couper les carottes en fins bâtonnets, trancher le poulet ou le tofu et ciseler la ciboule.</p></div>
+            <div class="step"><span>6</span><p>Poêler rapidement le poulet ou le tofu pour qu’il soit bien doré. Faire revenir aussi les champignons pour renforcer leur saveur.</p></div>
+            <div class="step"><span>7</span><p>Cuire les nouilles séparément dans de l’eau frémissante selon le temps indiqué, puis les égoutter sans les surcuire.</p></div>
+            <div class="step"><span>8</span><p>Assembler les bols : nouilles au fond, bouillon brûlant par-dessus, puis disposer harmonieusement les garnitures, l’œuf coupé en deux et quelques graines ou herbes fraîches.</p></div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <h3>Composition personnalisée</h3>
+
+          <div class="chip-group multi-choice-group">
+            <button type="button" onclick="toggleMultiChoice(this, 'ramenChoice')">Œuf mollet mariné</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'ramenChoice')">Poulet doré</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'ramenChoice')">Tofu grillé</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'ramenChoice')">Champignons sautés</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'ramenChoice')">Maïs doux</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'ramenChoice')">Ciboule fraîche</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'ramenChoice')">Graines de sésame</button>
+            <button type="button" onclick="toggleMultiChoice(this, 'ramenChoice')">Huile pimentée</button>
+          </div>
+
+          <p class="selected-line">Ta composition : <span id="ramenChoice">Aucune</span></p>
+
+          <div class="pairing-box top-gap">
+            <h4>Meilleures associations de saveurs</h4>
+            <ul>
+              <li><strong>Le ramen classique :</strong> bouillon parfumé + poulet doré + œuf mollet + ciboule.</li>
+              <li><strong>Le ramen végétarien :</strong> miso + tofu grillé + champignons + maïs + graines de sésame.</li>
+              <li><strong>Le ramen intense :</strong> poulet + œuf + huile pimentée + ail + gingembre.</li>
+              <li><strong>Le ramen équilibré :</strong> nouilles + légumes croquants + champignons + herbes fraîches.</li>
+            </ul>
+          </div>
+
+          <h3 class="top-gap">Checklist du ramen parfait</h3>
+          <div class="checklist" data-fill="ramenFill" data-text="ramenText">
+            <label><input type="checkbox" /> Préparer le bouillon parfumé</label>
+            <label><input type="checkbox" /> Cuire correctement les œufs</label>
+            <label><input type="checkbox" /> Préparer et cuire les garnitures</label>
+            <label><input type="checkbox" /> Cuire les nouilles sans les casser</label>
+            <label><input type="checkbox" /> Dresser le bol juste avant de servir</label>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-bar"><div class="progress-fill" id="ramenFill"></div></div>
+            <p id="ramenText">0 / 5</p>
+          </div>
+
+          <div class="timer-box top-gap">
+            <p class="timer-title">Temps de cuisson et d’assemblage</p>
+            <p style="font-size:14px; opacity:0.75; margin-bottom:10px;">
+              Choisis un minuteur utile pour la recette :
+            </p>
+            <div id="timerDisplayRamen">00:00</div>
+            <div class="timer-actions">
+              <button type="button" onclick="startTimer(420, 'timerDisplayRamen')">7 min (œufs)</button>
+              <button type="button" onclick="startTimer(240, 'timerDisplayRamen')">4 min (nouilles)</button>
+              <button type="button" onclick="startTimer(900, 'timerDisplayRamen')">15 min (bouillon express)</button>
+              <button type="button" onclick="startTimer(2700, 'timerDisplayRamen')">45 min (préparation totale)</button>
+              <button type="button" onclick="resetTimer('timerDisplayRamen')" class="reset-btn">Reset</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    </div>
+  </footer>
+
+  <script src="site.js"></script>
+  <script type="module" src="likes-firebase.js"></script>
+</body>
+</html>
