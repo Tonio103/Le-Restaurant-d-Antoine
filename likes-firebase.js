@@ -31,46 +31,14 @@ const RECIPE_KEYS = [
 ];
 
 const recipesMeta = {
-  cailles: {
-    name: "Cailles",
-    url: "cailles.html",
-    emoji: "🍗"
-  },
-  crepes: {
-    name: "Crêpes",
-    url: "crepes.html",
-    emoji: "🥞"
-  },
-  burgers: {
-    name: "Burger maison",
-    url: "burger.html",
-    emoji: "🍔"
-  },
-  fondants: {
-    name: "Fondant au chocolat",
-    url: "fondant.html",
-    emoji: "🍫"
-  },
-  marbre: {
-    name: "Gâteau marbré",
-    url: "gateau-marbre.html",
-    emoji: "🍰"
-  },
-  pokebowl: {
-    name: "Poké Bowl",
-    url: "poke-bowl.html",
-    emoji: "🥗"
-  },
-  jusorange: {
-    name: "Jus d’orange frais",
-    url: "Jusorange.html",
-    emoji: "🍊"
-  },
-  saladecesar: {
-    name: "Salade César",
-    url: "salade-cesar.html",
-    emoji: "🥗"
-  }
+  cailles: { name: "Cailles", url: "cailles.html", emoji: "🍗" },
+  crepes: { name: "Crêpes", url: "crepes.html", emoji: "🥞" },
+  burgers: { name: "Burger maison", url: "burger.html", emoji: "🍔" },
+  fondants: { name: "Fondant au chocolat", url: "fondant.html", emoji: "🍫" },
+  marbre: { name: "Gâteau marbré", url: "gateau-marbre.html", emoji: "🍰" },
+  pokebowl: { name: "Poké Bowl", url: "poke-bowl.html", emoji: "🥗" },
+  jusorange: { name: "Jus d’orange frais", url: "Jusorange.html", emoji: "🍊" },
+  saladecesar: { name: "Salade César", url: "salade-cesar.html", emoji: "🥗" }
 };
 
 const STORAGE_KEY = "antoine-user-liked-recipes";
@@ -116,20 +84,20 @@ function showToast(message) {
 }
 
 function updateLikeDisplay(recipe) {
-  const countEl = document.getElementById(`likes-${recipe}`);
-  const button = document.querySelector(`[onclick="toggleLike('${recipe}')"]`);
-  const isLiked = hasUserLiked(recipe);
   const count = liveLikes[recipe] || 0;
+  const isLiked = hasUserLiked(recipe);
 
+  const countEl = document.getElementById(`likes-${recipe}`);
   if (countEl) {
     countEl.textContent = count;
   }
 
-  if (button) {
+  const buttons = document.querySelectorAll(`[data-recipe="${recipe}"]`);
+  buttons.forEach((button) => {
     button.classList.toggle("liked", isLiked);
     button.setAttribute("aria-pressed", isLiked ? "true" : "false");
     button.title = isLiked ? "Retirer mon like" : "Liker cette recette";
-  }
+  });
 }
 
 function getTopRecipe() {
@@ -226,14 +194,17 @@ async function toggleLike(recipe) {
     if (alreadyLiked) {
       const nextLiked = likedRecipes.filter((item) => item !== recipe);
       saveUserLikedRecipes(nextLiked);
+      liveLikes[recipe] = Math.max(0, (liveLikes[recipe] || 0) - 1);
       showToast("Like retiré.");
     } else {
-      likedRecipes.push(recipe);
-      saveUserLikedRecipes(likedRecipes);
+      const nextLiked = [...likedRecipes, recipe];
+      saveUserLikedRecipes(nextLiked);
+      liveLikes[recipe] = (liveLikes[recipe] || 0) + 1;
       showToast("Recette likée ❤️");
     }
 
     updateLikeDisplay(recipe);
+    renderTopRecipe();
   } catch (error) {
     console.error("Erreur Firebase likes :", error);
     showToast("Impossible de mettre à jour le like.");
