@@ -3716,3 +3716,34 @@ body.dark-mode #searchInput::placeholder {
   background: rgba(255, 120, 0, 0.95);
   color: white;
 }
+@media (max-width: 768px) {
+  body.dark-mode .glass-card,
+  body.dark-mode .liquid-glass-card,
+  body.dark-mode .intro-card,
+  body.dark-mode .hero-top-liked,
+  body.dark-mode .top-recipe-card {
+    background: rgba(38, 29, 25, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 14px 38px rgba(0, 0, 0, 0.45) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  body.dark-mode .liquid-glass-card .glass-overlay,
+  body.dark-mode .liquid-glass-card .glass-specular,
+  body.dark-mode .liquid-glass-card .glass-distortion-overlay,
+  body.dark-mode .liquid-glass-card .glass-filter {
+    display: none !important;
+  }
+
+  body.dark-mode .hero-copy h1,
+  body.dark-mode .hero-copy h2,
+  body.dark-mode .hero-text,
+  body.dark-mode .badge,
+  body.dark-mode .glass-card h3,
+  body.dark-mode .glass-card h4,
+  body.dark-mode .glass-card p {
+    color: #f4eadf !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45) !important;
+  }
+}
