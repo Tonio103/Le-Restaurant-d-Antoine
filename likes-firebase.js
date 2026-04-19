@@ -27,7 +27,9 @@ const RECIPE_KEYS = [
   "marbre",
   "pokebowl",
   "jusorange",
-  "saladecesar"
+  "saladecesar",
+  "avocadotoast",
+  "ramen"
 ];
 
 const recipesMeta = {
@@ -37,8 +39,10 @@ const recipesMeta = {
   fondants: { name: "Fondant au chocolat", url: "fondant.html", emoji: "🍫" },
   marbre: { name: "Gâteau marbré", url: "gateau-marbre.html", emoji: "🍰" },
   pokebowl: { name: "Poké Bowl", url: "poke-bowl.html", emoji: "🥗" },
-  jusorange: { name: "Jus d’orange frais", url: "Jusorange.html", emoji: "🍊" },
-  saladecesar: { name: "Salade César", url: "salade-cesar.html", emoji: "🥗" }
+  jusorange: { name: "Jus d’orange frais", url: "jusorange.html", emoji: "🍊" },
+  saladecesar: { name: "Salade César", url: "salade-cesar.html", emoji: "🥗" },
+  avocadotoast: { name: "Avocado toast", url: "avocado-toast.html", emoji: "🥑" },
+  ramen: { name: "Ramen maison", url: "ramen.html", emoji: "🍜" }
 };
 
 const STORAGE_KEY = "antoine-user-liked-recipes";
@@ -92,10 +96,22 @@ function updateLikeDisplay(recipe) {
     countEl.textContent = count;
   }
 
-  const buttons = document.querySelectorAll(`[data-recipe="${recipe}"]`);
-  buttons.forEach((button) => {
+  const likeButtons = document.querySelectorAll(".like-btn");
+
+  likeButtons.forEach((button) => {
+    const onclickValue = button.getAttribute("onclick") || "";
+    const buttonRecipe = button.dataset.recipe || "";
+
+    const matchesRecipe =
+      buttonRecipe === recipe ||
+      onclickValue.includes(`'${recipe}'`) ||
+      onclickValue.includes(`"${recipe}"`);
+
+    if (!matchesRecipe) return;
+
     button.classList.toggle("liked", isLiked);
     button.setAttribute("aria-pressed", isLiked ? "true" : "false");
+    button.setAttribute("data-recipe", recipe);
     button.title = isLiked ? "Retirer mon like" : "Liker cette recette";
   });
 }
@@ -172,6 +188,12 @@ function listenLikes(recipe) {
 }
 
 async function toggleLike(recipe) {
+  if (!RECIPE_KEYS.includes(recipe)) {
+    console.warn(`Recette inconnue pour les likes : ${recipe}`);
+    showToast("Cette recette n'est pas reconnue.");
+    return;
+  }
+
   const ref = doc(db, "likes", recipe);
   const likedRecipes = getUserLikedRecipes();
   const alreadyLiked = likedRecipes.includes(recipe);
