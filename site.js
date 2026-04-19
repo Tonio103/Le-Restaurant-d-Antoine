@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
      DOM REFERENCES
      ========================================================================== */
   const body = document.body;
+  const loader = document.getElementById("loader");
   const menuToggle = document.getElementById("menuToggle");
   const navCenter = document.getElementById("navCenter");
   const themeToggle = document.getElementById("themeToggle");
@@ -45,27 +46,29 @@ document.addEventListener("DOMContentLoaded", () => {
         { emoji: "", name: "Bouquet garni (thym, laurier)", amount: 1, unit: "bouquet" }
       ]
     },
-saladecesar: {
-  base: 4,
-  label: "PERSONNES",
-  targetId: "saladecesarIngredients",
-  labelId: "saladecesarCountLabel",
-  items: [
-    { emoji: "", name: "Pain de campagne", amount: 140, unit: "g" },
-    { emoji: "", name: "Beurre", amount: 30, unit: "g" },
-    { emoji: "", name: "Câpres", amount: 30, unit: "g" },
-    { emoji: "", name: "Jaunes d’œufs", amount: 2, unit: "pièces" },
-    { emoji: "", name: "Jus de citron", amount: 30, unit: "ml" },
-    { emoji: "", name: "Filets d’anchois hachés", amount: 4, unit: "pièces" },
-    { emoji: "", name: "Gousse d’ail", amount: 1, unit: "pièce" },
-    { emoji: "", name: "Huile végétale", amount: 125, unit: "ml" },
-    { emoji: "", name: "Huile d’olive", amount: 30, unit: "ml" },
-    { emoji: "", name: "Laitues romaines", amount: 2, unit: "pièces" },
-    { emoji: "", name: "Parmesan râpé", amount: 40, unit: "g" },
-    { emoji: "", name: "Parmesan en copeaux", amount: 40, unit: "g" },
-    { emoji: "", name: "Bacon cuit croustillant", amount: 8, unit: "tranches" }
-  ]
-},
+
+    saladecesar: {
+      base: 4,
+      label: "PERSONNES",
+      targetId: "saladecesarIngredients",
+      labelId: "saladecesarCountLabel",
+      items: [
+        { emoji: "", name: "Pain de campagne", amount: 140, unit: "g" },
+        { emoji: "", name: "Beurre", amount: 30, unit: "g" },
+        { emoji: "", name: "Câpres", amount: 30, unit: "g" },
+        { emoji: "", name: "Jaunes d’œufs", amount: 2, unit: "pièces" },
+        { emoji: "", name: "Jus de citron", amount: 30, unit: "ml" },
+        { emoji: "", name: "Filets d’anchois hachés", amount: 4, unit: "pièces" },
+        { emoji: "", name: "Gousse d’ail", amount: 1, unit: "pièce" },
+        { emoji: "", name: "Huile végétale", amount: 125, unit: "ml" },
+        { emoji: "", name: "Huile d’olive", amount: 30, unit: "ml" },
+        { emoji: "", name: "Laitues romaines", amount: 2, unit: "pièces" },
+        { emoji: "", name: "Parmesan râpé", amount: 40, unit: "g" },
+        { emoji: "", name: "Parmesan en copeaux", amount: 40, unit: "g" },
+        { emoji: "", name: "Bacon cuit croustillant", amount: 8, unit: "tranches" }
+      ]
+    },
+
     crepes: {
       base: 4,
       label: "PERSONNES",
@@ -160,6 +163,46 @@ saladecesar: {
         { emoji: "", name: "Fèves edamame", amount: 100, unit: "g" },
         { emoji: "", name: "Sauce soja", amount: 3, unit: "c. à soupe" }
       ]
+    },
+
+    avocadotoast: {
+      base: 2,
+      label: "PERSONNES",
+      targetId: "avocadoIngredients",
+      labelId: "avocadoCountLabel",
+      items: [
+        { emoji: "", name: "Grandes tranches de pain de campagne", amount: 2, unit: "tranches" },
+        { emoji: "", name: "Avocats mûrs", amount: 2, unit: "pièces" },
+        { emoji: "", name: "Œufs", amount: 2, unit: "pièces" },
+        { emoji: "", name: "Citron jaune", amount: 1, unit: "pièce" },
+        { emoji: "", name: "Huile d’olive", amount: 2, unit: "c. à soupe" },
+        { emoji: "", name: "Tomates cerises", amount: 120, unit: "g" },
+        { emoji: "", name: "Feta émiettée", amount: 60, unit: "g" },
+        { emoji: "", name: "Graines de sésame", amount: 1, unit: "c. à soupe" },
+        { emoji: "", name: "Fleur de sel", amount: 1, unit: "pincée" },
+        { emoji: "", name: "Poivre noir", amount: 1, unit: "pincée" }
+      ]
+    },
+
+    ramen: {
+      base: 2,
+      label: "BOLS",
+      targetId: "ramenIngredients",
+      labelId: "ramenCountLabel",
+      items: [
+        { emoji: "", name: "Nouilles ramen", amount: 2, unit: "paquets" },
+        { emoji: "", name: "Bouillon de volaille ou de légumes", amount: 1000, unit: "ml" },
+        { emoji: "", name: "Œufs", amount: 2, unit: "pièces" },
+        { emoji: "", name: "Filets de poulet ou tofu ferme", amount: 200, unit: "g" },
+        { emoji: "", name: "Champignons", amount: 150, unit: "g" },
+        { emoji: "", name: "Carottes", amount: 1, unit: "pièce" },
+        { emoji: "", name: "Ciboule", amount: 2, unit: "tiges" },
+        { emoji: "", name: "Sauce soja", amount: 3, unit: "c. à soupe" },
+        { emoji: "", name: "Huile de sésame", amount: 1, unit: "c. à soupe" },
+        { emoji: "", name: "Ail", amount: 2, unit: "gousses" },
+        { emoji: "", name: "Gingembre frais", amount: 20, unit: "g" },
+        { emoji: "", name: "Miso (optionnel)", amount: 1, unit: "c. à soupe" }
+      ]
     }
   };
 
@@ -168,13 +211,15 @@ saladecesar: {
      ========================================================================== */
   const portions = {
     cailles: 4,
+    saladecesar: 4,
     crepes: 4,
     burgers: 4,
     jusorange: 4,
     fondants: 4,
     marbre: 4,
     pokebowl: 2,
-    saladecesar: 4,
+    avocadotoast: 2,
+    ramen: 2
   };
 
   const timers = {};
@@ -220,6 +265,11 @@ saladecesar: {
     toastTimeout = window.setTimeout(() => {
       toast.classList.remove("show");
     }, 3000);
+  }
+
+  function hideLoader() {
+    if (!loader) return;
+    loader.classList.add("hidden");
   }
 
   function formatAmount(value) {
@@ -326,13 +376,15 @@ saladecesar: {
 
     const recipeRoutes = [
       { label: "Cailles", keywords: ["caille", "cailles", "petits pois"], url: "cailles.html" },
+      { label: "Salade César", keywords: ["salade", "cesar", "césar", "salade cesar", "salade césar", "poulet"], url: "salade-cesar.html" },
       { label: "Crêpes", keywords: ["crepe", "crepes", "crêpe", "crêpes", "pancake"], url: "crepes.html" },
       { label: "Burgers", keywords: ["burger", "burgers", "hamburger"], url: "burger.html" },
+      { label: "Jus d’orange", keywords: ["jus", "orange", "jus d orange", "jus d'orange", "boisson", "frais"], url: "jusorange.html" },
       { label: "Fondants", keywords: ["fondant", "fondants", "chocolat", "coulant"], url: "fondant.html" },
       { label: "Marbré", keywords: ["marbre", "marbré", "gateau marbre", "gâteau marbré", "cake"], url: "gateau-marbre.html" },
       { label: "Poké bowl", keywords: ["poke", "pokebowl", "poké", "poké bowl", "poke bowl", "saumon"], url: "poke-bowl.html" },
-      { label: "Jus d’orange", keywords: ["jus", "orange", "jus d orange", "jus d'orange", "boisson", "frais"], url: "jusorange.html" },
-      { label: "Salade César", keywords: ["salade", "cesar", "césar", "salade cesar", "salade césar", "poulet"], url: "salade-cesar.html" },
+      { label: "Avocado toast", keywords: ["avocado", "toast", "avocat", "avocado toast", "toast avocat", "oeuf"], url: "avocado-toast.html" },
+      { label: "Ramen", keywords: ["ramen", "nouilles", "bouillon", "soupe", "japonais"], url: "ramen.html" }
     ];
 
     let activeIndex = -1;
@@ -582,14 +634,20 @@ saladecesar: {
   }
 
   function initTimerDisplays() {
-    const timerDisplays = document.querySelectorAll("[data-timer-display-id]");
-    timerDisplays.forEach((display) => {
-      const id = display.getAttribute("data-timer-display-id");
-      if (!id) return;
+    const ids = [
+      "timerDisplayBurgers",
+      "timerDisplayAvocado",
+      "timerDisplayRamen"
+    ];
+
+    ids.forEach((id) => {
+      const display = document.getElementById(id);
+      if (!display) return;
 
       if (!timers[id]) {
         timers[id] = { seconds: 0, interval: null };
       }
+
       updateTimerDisplay(id);
     });
   }
@@ -726,12 +784,10 @@ saladecesar: {
   /* ==========================================================================
      TILT EFFECT
      ========================================================================== */
-  /* ==========================================================================
-   TILT EFFECT
-   ========================================================================== */
-function initTilt() {
-  return;
-}
+  function initTilt() {
+    return;
+  }
+
   /* ==========================================================================
      LIGHTBOX
      ========================================================================== */
@@ -1029,13 +1085,13 @@ function initTilt() {
         tags: ["boisson", "frais", "orange", "bio", "rapide", "facile", "ete", "froid"],
         aliases: ["jus", "jus orange", "orange", "jus d orange", "jus d'orange", "boisson"]
       },
-    {
-  key: "saladecesar",
-  name: "Salade César",
-  url: "salade-cesar.html",
-  tags: ["leger", "frais", "gourmand", "sale", "plat", "familial", "healthy", "froid", "rapide"],
-  aliases: ["salade cesar", "salade césar", "cesar", "césar", "romaine", "parmesan", "bacon"]
-},
+      {
+        key: "saladecesar",
+        name: "Salade César",
+        url: "salade-cesar.html",
+        tags: ["leger", "frais", "gourmand", "sale", "plat", "familial", "healthy", "froid", "rapide"],
+        aliases: ["salade cesar", "salade césar", "cesar", "césar", "romaine", "parmesan", "bacon"]
+      },
       {
         key: "crepes",
         name: "Crêpes gourmandes",
@@ -1070,6 +1126,20 @@ function initTilt() {
         url: "poke-bowl.html",
         tags: ["leger", "frais", "healthy", "equilibre", "rapide", "poisson", "sale", "plat", "sain", "familial", "froid", "ete"],
         aliases: ["poke", "pokebowl", "poke bowl", "poké", "poké bowl", "bowl saumon"]
+      },
+      {
+        key: "avocadotoast",
+        name: "Avocado toast gourmand",
+        url: "avocado-toast.html",
+        tags: ["leger", "frais", "healthy", "rapide", "gourmand", "sale", "plat", "brunch", "equilibre", "familial"],
+        aliases: ["avocado toast", "toast avocat", "avocat", "toast", "oeuf coulant", "œuf"]
+      },
+      {
+        key: "ramen",
+        name: "Ramen maison généreux",
+        url: "ramen.html",
+        tags: ["chaud", "reconfort", "gourmand", "sale", "plat", "familial", "japonais", "nouilles", "bouillon", "moyen"],
+        aliases: ["ramen", "nouilles", "bouillon", "soupe japonaise", "ramen maison"]
       }
     ];
 
@@ -1082,7 +1152,7 @@ function initTilt() {
       rapide: ["rapide", "vite", "express", "simple", "ce soir"],
       gourmand: ["gourmand", "gourmande", "plaisir", "reconfortant", "réconfortant"],
       chocolat: ["chocolat", "choco", "cacao"],
-      viande: ["viande", "boeuf", "bœuf", "carne"],
+      viande: ["viande", "boeuf", "bœuf", "carne", "poulet"],
       poisson: ["poisson", "saumon"],
       dessert: ["dessert", "sucre", "sucré", "gouter", "goûter", "gateau", "gâteau"],
       sale: ["sale", "salé", "repas", "plat"],
@@ -1108,7 +1178,9 @@ function initTilt() {
       froid: ["froid", "frais", "rafraichissant", "rafraîchissant"],
       aide: ["aide", "aider", "help", "besoin d aide", "besoin d'aide"],
       amour: ["amour", "love", "coeur", "cœur"],
-      antoine: ["antoine", "chef antoine", "restaurant d antoine", "restaurant d'antoine"]
+      antoine: ["antoine", "chef antoine", "restaurant d antoine", "restaurant d'antoine"],
+      brunch: ["brunch", "matin", "petit dej", "petit-déj", "dejeuner leger", "déjeuner léger"],
+      japonais: ["japonais", "asie", "asiatique", "nouilles", "ramen", "bouillon"]
     };
 
     function findRecipeMentions(text) {
@@ -1205,23 +1277,23 @@ function initTilt() {
           score += 10;
           reasons.push("recette citée");
         }
-if (concepts.includes("frais")) {
-  if (recipe.key === "saladecesar") score += 4;
-}
 
-if (concepts.includes("ete") || concepts.includes("healthy")) {
-  if (recipe.key === "saladecesar") score += 4;
-}
+        if (concepts.includes("frais")) {
+          if (recipe.key === "saladecesar") score += 4;
+          if (recipe.key === "avocadotoast") score += 5;
+        }
+
+        if (concepts.includes("ete") || concepts.includes("healthy")) {
+          if (recipe.key === "saladecesar") score += 4;
+          if (recipe.key === "avocadotoast") score += 5;
+          if (recipe.key === "pokebowl") score += 4;
+          if (recipe.key === "jusorange") score += 5;
+        }
+
         if (concepts.includes("familial")) {
           if (recipe.tags.includes("familial")) score += 4;
           if (recipe.tags.includes("convivial")) score += 2;
         }
-        if (concepts.includes("frais")) {
-  if (recipe.key === "saladecesar") score += 3;
-}
-        if (concepts.includes("ete")) {
-  if (recipe.key === "saladecesar") score += 3;
-}
 
         if (concepts.includes("leger")) {
           if (recipe.tags.includes("leger")) score += 5;
@@ -1241,6 +1313,17 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
           if (recipe.tags.includes("leger")) score -= 4;
         }
 
+        if (concepts.includes("brunch")) {
+          if (recipe.key === "avocadotoast") score += 7;
+          if (recipe.key === "crepes") score += 2;
+          if (recipe.key === "jusorange") score += 2;
+        }
+
+        if (concepts.includes("japonais")) {
+          if (recipe.key === "ramen") score += 8;
+          if (recipe.key === "pokebowl") score += 3;
+        }
+
         if (normalized.includes("repas")) {
           if (recipe.tags.includes("plat")) score += 2;
           if (recipe.tags.includes("dessert")) score -= 2;
@@ -1250,6 +1333,7 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
           if (recipe.tags.includes("rapide")) score += 2;
           if (recipe.tags.includes("leger")) score += 2;
           if (recipe.tags.includes("froid")) score += 1;
+          if (recipe.key === "ramen") score += 2;
         }
 
         if (concepts.includes("fete")) {
@@ -1261,20 +1345,17 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
           if (recipe.key === "cailles") score += 4;
         }
 
-        if (concepts.includes("ete") || concepts.includes("froid") || concepts.includes("healthy")) {
-          if (recipe.key === "pokebowl") score += 4;
-          if (recipe.key === "jusorange") score += 5;
-        }
-
         if (concepts.includes("hiver") || concepts.includes("reconfort")) {
           if (recipe.key === "fondants") score += 3;
           if (recipe.key === "crepes") score += 2;
           if (recipe.key === "cailles") score += 2;
+          if (recipe.key === "ramen") score += 6;
         }
 
         if (concepts.includes("romantique")) {
           if (recipe.key === "cailles") score += 4;
           if (recipe.key === "fondants") score += 2;
+          if (recipe.key === "avocadotoast") score += 1;
         }
 
         if (concepts.includes("enfant")) {
@@ -1288,6 +1369,7 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
           if (recipe.key === "cailles") score += 3;
           if (recipe.key === "burgers") score += 2;
           if (recipe.key === "jusorange") score += 1;
+          if (recipe.key === "ramen") score += 2;
         }
 
         if (normalized.includes("famille") && concepts.includes("pas_trop_lourd")) {
@@ -1295,6 +1377,7 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
           if (recipe.key === "pokebowl") score += 4;
           if (recipe.key === "jusorange") score += 3;
           if (recipe.key === "marbre") score += 1;
+          if (recipe.key === "avocadotoast") score += 4;
           if (recipe.key === "burgers") score -= 3;
           if (recipe.key === "cailles") score -= 4;
           if (recipe.key === "fondants") score -= 3;
@@ -1307,7 +1390,7 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
           if ((neg.includes("burger") || neg.includes("hamburger")) && recipe.key === "burgers") score -= 30;
           if ((neg.includes("chocolat") || neg.includes("choco") || neg.includes("cacao")) && recipe.tags.includes("chocolat")) score -= 25;
           if ((neg.includes("poisson") || neg.includes("saumon")) && recipe.tags.includes("poisson")) score -= 25;
-          if ((neg.includes("viande") || neg.includes("boeuf") || neg.includes("bœuf")) && recipe.tags.includes("viande")) score -= 25;
+          if ((neg.includes("viande") || neg.includes("boeuf") || neg.includes("bœuf") || neg.includes("poulet")) && recipe.tags.includes("viande")) score -= 25;
           if ((neg.includes("dessert") || neg.includes("sucre") || neg.includes("gouter")) && recipe.tags.includes("dessert")) score -= 15;
           if ((neg.includes("sale") || neg.includes("plat") || neg.includes("repas")) && recipe.tags.includes("sale")) score -= 15;
 
@@ -1346,7 +1429,9 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
         reconfort: "réconfortant",
         healthy: "sain",
         chaud: "chaud",
-        froid: "froid"
+        froid: "froid",
+        brunch: "brunch",
+        japonais: "japonais"
       };
       return labels[concept] || concept;
     }
@@ -1371,7 +1456,8 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
           • un repas familial<br>
           • sans burger et sans chocolat<br>
           • je veux un truc frais<br>
-          • je veux des crêpes<br>
+          • je veux un brunch léger<br>
+          • je veux un truc japonais chaud<br>
           • j’ai soif
         `;
         return;
@@ -1388,7 +1474,7 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
       }
 
       if (intent === "faim") {
-        result.innerHTML = `<strong>On va régler ça 😌</strong><br>Dis-moi juste : léger, gourmand, familial, rapide, sucré ou salé.`;
+        result.innerHTML = `<strong>On va régler ça 😌</strong><br>Dis-moi juste : léger, gourmand, familial, rapide, sucré, salé, brunch ou japonais.`;
         return;
       }
 
@@ -1398,12 +1484,12 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
       }
 
       if (intent === "triste") {
-        result.innerHTML = `<strong>Oh 💛</strong><br>On peut partir sur une recette réconfortante. Par exemple : crêpes, fondants ou gâteau marbré.`;
+        result.innerHTML = `<strong>Oh 💛</strong><br>On peut partir sur une recette réconfortante. Par exemple : crêpes, fondants, ramen ou gâteau marbré.`;
         return;
       }
 
       if (intent === "fatigue") {
-        result.innerHTML = `<strong>Je vois 😴</strong><br>Dans ce cas, on peut viser un truc simple et rapide. Par exemple : crêpes, jus d’orange ou poké bowl.`;
+        result.innerHTML = `<strong>Je vois 😴</strong><br>Dans ce cas, on peut viser un truc simple et rapide. Par exemple : crêpes, jus d’orange, poké bowl ou avocado toast.`;
       }
     }
 
@@ -1519,7 +1605,6 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
   /* ==========================================================================
      GLOBAL EVENTS
      ========================================================================== */
-
   window.addEventListener("resize", debounce(() => {
     revealOnScrollFallback();
   }, 120));
