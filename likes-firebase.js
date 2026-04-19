@@ -26,17 +26,51 @@ const RECIPE_KEYS = [
   "fondants",
   "marbre",
   "pokebowl",
-  "jusorange"
+  "jusorange",
+  "saladecesar"
 ];
 
 const recipesMeta = {
-  cailles: { name: "Cailles", url: "cailles.html", emoji: "🍗" },
-  crepes: { name: "Crêpes", url: "crepes.html", emoji: "🥞" },
-  burgers: { name: "Burger maison", url: "burger.html", emoji: "🍔" },
-  fondants: { name: "Fondant au chocolat", url: "fondant.html", emoji: "🍫" },
-  marbre: { name: "Gâteau marbré", url: "gateau-marbre.html", emoji: "🍰" },
-  pokebowl: { name: "Poké Bowl", url: "poke-bowl.html", emoji: "🥗" },
-  jusorange: { name: "Jus d’orange frais", url: "Jusorange.html", emoji: "🍊" }
+  cailles: {
+    name: "Cailles",
+    url: "cailles.html",
+    emoji: "🍗"
+  },
+  crepes: {
+    name: "Crêpes",
+    url: "crepes.html",
+    emoji: "🥞"
+  },
+  burgers: {
+    name: "Burger maison",
+    url: "burger.html",
+    emoji: "🍔"
+  },
+  fondants: {
+    name: "Fondant au chocolat",
+    url: "fondant.html",
+    emoji: "🍫"
+  },
+  marbre: {
+    name: "Gâteau marbré",
+    url: "gateau-marbre.html",
+    emoji: "🍰"
+  },
+  pokebowl: {
+    name: "Poké Bowl",
+    url: "poke-bowl.html",
+    emoji: "🥗"
+  },
+  jusorange: {
+    name: "Jus d’orange frais",
+    url: "Jusorange.html",
+    emoji: "🍊"
+  },
+  saladecesar: {
+    name: "Salade César",
+    url: "salade-cesar.html",
+    emoji: "🥗"
+  }
 };
 
 const STORAGE_KEY = "antoine-user-liked-recipes";
@@ -143,7 +177,7 @@ function renderTopRecipe() {
       <div class="top-recipe-left">
         <div class="top-recipe-emoji">${recipe.emoji}</div>
         <div class="top-recipe-text">
-          <span class="top-recipe-kicker"></span>
+          <span class="top-recipe-kicker">Recette mise en avant</span>
           <h4>${recipe.name}</h4>
           <p>La favorite actuelle des visiteurs.</p>
         </div>
