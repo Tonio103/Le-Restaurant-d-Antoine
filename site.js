@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
      DOM REFERENCES
      ========================================================================== */
   const body = document.body;
-  const loader = document.getElementById("loader");
   const menuToggle = document.getElementById("menuToggle");
   const navCenter = document.getElementById("navCenter");
   const themeToggle = document.getElementById("themeToggle");
@@ -221,11 +220,6 @@ saladecesar: {
     toastTimeout = window.setTimeout(() => {
       toast.classList.remove("show");
     }, 3000);
-  }
-
-  function hideLoader() {
-    if (!loader) return;
-    loader.classList.add("hidden");
   }
 
   function formatAmount(value) {
@@ -1525,9 +1519,6 @@ if (concepts.includes("ete") || concepts.includes("healthy")) {
   /* ==========================================================================
      GLOBAL EVENTS
      ========================================================================== */
-  window.addEventListener("error", () => {
-    hideLoader();
-  });
 
   window.addEventListener("resize", debounce(() => {
     revealOnScrollFallback();
