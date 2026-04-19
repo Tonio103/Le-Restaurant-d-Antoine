@@ -736,30 +736,6 @@ saladecesar: {
     if (!window.matchMedia("(min-width: 860px)").matches) return;
 
     const tiltCards = document.querySelectorAll(".tilt-card");
-
-    tiltCards.forEach((card) => {
-      if (card.dataset.tiltBound === "true") return;
-      card.dataset.tiltBound = "true";
-
-      card.addEventListener("mousemove", (event) => {
-        const rect = card.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        const rotateX = ((y - centerY) / centerY) * -4;
-        const rotateY = ((x - centerX) / centerX) * 4;
-
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      });
-
-      card.addEventListener("mouseleave", () => {
-        card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg)";
-      });
-    });
-  }
-
   /* ==========================================================================
      LIGHTBOX
      ========================================================================== */
