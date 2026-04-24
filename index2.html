@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service Infini</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="game-shell" id="runner-shell">
+        <canvas id="game-canvas" aria-label="Service Infini" role="img"></canvas>
+
+        <header class="hud" aria-live="polite">
+          <div class="hud__cluster">
+            <div class="hud__item">
+              <span>Score</span>
+              <strong data-score>00000</strong>
+            </div>
+            <div class="hud__item">
+              <span>Best</span>
+              <strong data-best>00000</strong>
+            </div>
+            <div class="hud__item hud__item--small">
+              <span>Vies</span>
+              <strong data-lives>3</strong>
+            </div>
+            <div class="hud__item hud__item--wide">
+              <span>Zone</span>
+              <strong data-theme>RESTAURANT</strong>
+            </div>
+          </div>
+
+          <div class="hud__cluster hud__cluster--right">
+            <div class="hud__item hud__item--meter">
+              <span data-state-label>Star</span>
+              <strong data-rush>0%</strong>
+              <div class="hud__meter" aria-hidden="true">
+                <i data-rush-fill></i>
+              </div>
+            </div>
+            <button type="button" class="icon-button" data-action="togglePause" aria-label="Pause">
+              II
+            </button>
+            <button type="button" class="icon-button" data-action="mute" aria-label="Son">
+              ON
+            </button>
+          </div>
+        </header>
+
+        <div class="mobile-zones" aria-hidden="true">
+          <span>Swipe bas</span>
+          <span>Tap saut</span>
+        </div>
+
+        <div class="overlay" data-overlay>
+          <section class="panel panel--active" data-panel="ready">
+            <h1>Service Infini</h1>
+            <button type="button" class="primary-button" data-action="start">Jouer</button>
+          </section>
+
+          <section class="panel" data-panel="paused">
+            <h2>Pause</h2>
+            <button type="button" class="primary-button" data-action="resume">Reprendre</button>
+          </section>
+
+          <section class="panel" data-panel="gameover">
+            <h2>Service termine</h2>
+            <p><span>Score</span><strong data-final-score>00000</strong></p>
+            <p><span>Best</span><strong data-final-best>00000</strong></p>
+            <p><span>Pieces</span><strong data-final-bonuses>0</strong></p>
+            <button type="button" class="primary-button" data-action="restart">Rejouer</button>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="game-animated.js?v=cart-hole-clean-roll-run-6" defer></script>
+  </body>
+</html>
