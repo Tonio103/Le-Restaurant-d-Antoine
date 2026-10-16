@@ -1,102 +1,102 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Questions | Le restaurant d’Antoine</title>
-  <link rel="stylesheet" href="site.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Poser une question · Le restaurant d'Antoine</title>
+  <meta name="description" content="Une question sur une recette, une suggestion ou un souci sur le site ? Écris au restaurant d'Antoine.">
+  <meta name="theme-color" content="#f6efe4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#15100c" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Le restaurant d'Antoine">
+  <meta property="og:title" content="Poser une question · Le restaurant d'Antoine">
+  <meta property="og:description" content="Une question sur une recette, une suggestion ou un souci sur le site ? Écris au restaurant d'Antoine.">
+  <meta property="og:image" content="img/accueil.webp">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..700,0..100;1,9..144,400..700,0..100&family=Manrope:wght@400..800&display=swap">
+  <link rel="stylesheet" href="site.css">
+  <script>try{var t=localStorage.getItem("antoine-theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="recettes-data.js" defer></script>
+  <script src="site.js" defer></script>
+  <script src="chatbot.js" defer></script>
 </head>
-<body data-theme-page="questions">
-
-  <header class="site-header">
-  <nav class="navbar">
-
-    <div class="logo-wrap">
-      <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
-      <div class="logo-text">
-        <strong>Le restaurant d’Antoine</strong>
-        <span>Maison gourmande & recettes favorites</span>
-      </div>
-    </div>
-
-    <div class="nav-center" id="navCenter">
-      <div style="position:relative; width:100%;">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Rechercher une recette..."
-          autocomplete="off"
-          style="padding:10px; border-radius:10px; border:none; width:100%;"
-        />
-        <div id="searchSuggestions" class="search-suggestions"></div>
-      </div>
-    </div>
-
-    <!-- 🔥 NAV DROITE -->
-    <div class="nav-links">
-      <a href="questions.html" class="active-link">Questions</a>
-      <a href="avis.html">Avis</a>
-      <a href="infos.html">Infos</a>
-    </div>
-
-    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
-
-  </nav>
-</header>
-  <main class="main-layout">
-    <section class="page-section active" id="questions">
-      <div class="glass-card">
-        <h3>Poser une question au Chef</h3>
-        <p class="muted">
-          Tu as une interrogation sur une étape de cuisson, tu ne trouves pas un ingrédient,
-          ou tu as une suggestion d'amélioration pour le design du site ? Écris-nous !
-        </p>
-
-        <form class="question-form" action="https://formspree.io/f/xeepdkvr" method="POST">
-          <div class="form-row">
-            <input type="text" name="nom" placeholder="Ton prénom ou pseudo" required />
-            <input type="email" name="email" placeholder="Ton adresse email" required />
-          </div>
-
-          <input type="text" name="sujet" placeholder="Sujet global de ta demande" required />
-
-          <select name="categorie" required>
-            <option value="" disabled selected>Choisis la catégorie concernée...</option>
-            <option value="cailles">Recette : Cailles aux petits pois</option>
-            <option value="crepes">Recette : Crêpes faciles</option>
-            <option value="burgers">Recette : Burgers maison</option>
-            <option value="fondants">Recette : Fondants au chocolat</option>
-            <option value="marbre">Recette : Gâteau marbré</option>
-            <option value="pokebowl">Recette : Poké bowl frais</option>
-            <option value="technique">Question technique de cuisine</option>
-            <option value="site">Avis ou question sur le design du site web</option>
-            <option value="idee">Suggestion de nouvelle recette</option>
-            <option value="bug">Signaler un bug technique sur le site</option>
-          </select>
-
-          <textarea
-            name="message"
-            placeholder="Écris ta question détaillée ici. Plus tu donnes de détails, plus la réponse sera précise !"
-            required
-          ></textarea>
-
-          <button type="submit" class="primary-btn submit-full">Envoyer le message au restaurant</button>
-        </form>
-
-        <div class="info-note"></div>
-      </div>
+<body data-page="questions">
+  <main id="main" class="container">
+    <section class="page-hero">
+      <p class="eyebrow">On t'écoute</p>
+      <h1>Une question pour <em style="color:var(--accent)">le chef ?</em></h1>
+      <p class="lead">Une étape qui coince, un ingrédient introuvable, une idée de recette ou un bug sur le site ? Écris-nous, on te répond par e-mail.</p>
     </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="footer-content">
-      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    <div class="two-cols">
+      <form class="card form-card" id="questionForm" action="https://formspree.io/f/xeepdkvr" method="POST" data-reveal>
+        <div class="form-row">
+          <div class="field">
+            <label for="qNom">Ton prénom ou pseudo</label>
+            <input class="input" id="qNom" type="text" name="nom" autocomplete="given-name" required>
+          </div>
+          <div class="field">
+            <label for="qEmail">Ton e-mail</label>
+            <input class="input" id="qEmail" type="email" name="email" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="qSujet">Sujet</label>
+          <input class="input" id="qSujet" type="text" name="sujet" required>
+        </div>
+        <div class="field">
+          <label for="questionCategory">Catégorie</label>
+          <select class="select" id="questionCategory" name="categorie" required>
+            <option value="" disabled selected>Choisis une catégorie…</option>
+            <optgroup label="Le site et la cuisine">
+              <option value="technique">Question technique de cuisine</option>
+              <option value="idee">Suggestion de nouvelle recette</option>
+              <option value="site">Avis ou question sur le design du site</option>
+              <option value="bug">Signaler un bug sur le site</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field">
+          <label for="qMessage">Ton message</label>
+          <textarea class="textarea" id="qMessage" name="message" maxlength="1500" placeholder="Plus tu donnes de détails, plus la réponse sera précise !" required></textarea>
+          <span class="field-hint" id="questionCounter">0/1500</span>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Envoyer au restaurant</button>
+        <p class="field-hint">Le formulaire est envoyé via le service Formspree. Ton adresse e-mail sert uniquement à te répondre.</p>
+      </form>
+      <aside data-reveal="zoom">
+        <div class="card">
+          <div class="card-title"><h2>Questions fréquentes</h2></div>
+          <div class="faq">
+            <details>
+              <summary>Comment adapter une recette au nombre de personnes ?</summary>
+              <p>Sur chaque recette, utilise les boutons − et + au-dessus des ingrédients : toutes les quantités sont recalculées automatiquement. Tu peux aussi demander à l'assistant : « ingrédients des crêpes pour 8 ».</p>
+            </details>
+            <details>
+              <summary>C'est quoi le mode cuisine ?</summary>
+              <p>Un affichage plein écran, une étape à la fois, en gros caractères. Les minuteurs sont à portée de doigt et, si ton navigateur le permet, l'écran reste allumé pendant que tu cuisines. Flèches du clavier ou balayage pour avancer.</p>
+            </details>
+            <details>
+              <summary>Les minuteurs continuent-ils si je change de page ?</summary>
+              <p>Oui : ils sont gardés dans ton navigateur et réapparaissent en bas à gauche sur toutes les pages du site. Tu peux en lancer plusieurs en même temps.</p>
+            </details>
+            <details>
+              <summary>Où est ma liste de courses ?</summary>
+              <p>Clique sur l'icône panier en haut de l'écran. Le bouton « Ajouter à ma liste » d'une recette y place les ingrédients avec les bonnes quantités. Tu peux cocher, copier ou vider la liste.</p>
+            </details>
+            <details>
+              <summary>L'assistant du chef est-il une intelligence artificielle ?</summary>
+              <p>Non. Il fonctionne avec des règles simples et les données des recettes, directement dans ton navigateur : rien de ce que tu lui écris n'est envoyé ailleurs. Il connaît bien les recettes de la maison, mais pas tout !</p>
+            </details>
+            <details>
+              <summary>Les allergènes indiqués sont-ils fiables ?</summary>
+              <p>Ils sont déduits des ingrédients de chaque recette. Les produits du commerce peuvent contenir d'autres allergènes ou des traces : vérifie toujours les étiquettes.</p>
+            </details>
+          </div>
+        </div>
+      </aside>
     </div>
-  </footer>
-
-  <div id="secretToast"></div>
-  <button id="scrollTopBtn" title="Retourner en haut de la page">↑</button>
-
-  <script src="site.js"></script>
+  </main>
 </body>
 </html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quiz du chef · Le restaurant d'Antoine</title>
+  <meta name="description" content="10 questions sur les recettes de la maison, les techniques de cuisine et l'histoire des plats. Toutes les réponses culturelles sont sourcées.">
+  <meta name="theme-color" content="#f6efe4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#15100c" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Le restaurant d'Antoine">
+  <meta property="og:title" content="Quiz du chef · Le restaurant d'Antoine">
+  <meta property="og:description" content="10 questions sur les recettes de la maison, les techniques de cuisine et l'histoire des plats. Toutes les réponses culturelles sont sourcées.">
+  <meta property="og:image" content="img/accueil.webp">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..700,0..100;1,9..144,400..700,0..100&family=Manrope:wght@400..800&display=swap">
+  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="jeux.css">
+  <script>try{var t=localStorage.getItem("antoine-theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="recettes-data.js" defer></script>
+  <script src="site.js" defer></script>
+  <script src="chatbot.js" defer></script>
+  <script src="jeu-quiz.js" defer></script>
+</head>
+<body data-page="games">
+  <main id="main" class="container game-page">
+    <div class="game-head">
+      <div>
+        <p class="eyebrow"><a href="jeux.html" style="text-decoration:none">Mini-jeux</a></p>
+        <h1>Quiz du <em style="color:var(--accent)">chef</em></h1>
+        <p class="lead" style="margin-top:10px">Recettes de la maison, techniques et histoire des plats : réponds vite pour gagner plus de points.</p>
+      </div>
+    </div>
+    <div class="game-board" id="quizBoard">
+      <div class="hud-bar">
+        <div class="hud-stat"><span>Score</span><strong id="quizScore">0</strong></div>
+        <div class="hud-stat"><span>Question</span><strong id="quizCount">–</strong></div>
+        <div class="hud-stat"><span>Série</span><strong id="quizStreak">0</strong></div>
+        <div class="hud-stat"><span>Record</span><strong id="quizBest">–</strong></div>
+      </div>
+      <div class="quiz-progress" id="quizProgress" aria-hidden="true"></div>
+      <div class="quiz-timer" aria-hidden="true"><i id="quizTimer"></i></div>
+      <div id="quizStage" aria-live="polite"></div>
+      <div class="game-overlay" id="quizOverlay">
+        <div class="game-modal">
+          <div class="big" aria-hidden="true">🧠</div>
+          <h2>Prêt pour le quiz ?</h2>
+          <ul class="rules">
+            <li><span aria-hidden="true">🍽️</span> 10 questions : recettes du site, techniques, sécurité et culture.</li>
+            <li><span aria-hidden="true">⏱</span> 20 secondes par question : plus tu réponds vite, plus tu gagnes de points.</li>
+            <li><span aria-hidden="true">🔥</span> Enchaîne les bonnes réponses pour un bonus de série.</li>
+            <li><span aria-hidden="true">⌨️</span> Raccourcis : touches 1 à 4 ou A à D.</li>
+          </ul>
+          <div class="btn-row"><button class="btn btn-primary" type="button" data-start>Commencer</button></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

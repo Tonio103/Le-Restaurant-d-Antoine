@@ -633,7 +633,7 @@
       });
 
       this.root.addEventListener("pointerdown", (event) => {
-        if (!event.isPrimary || event.target.closest("button")) {
+        if (!event.isPrimary || event.target.closest("button, a")) {
           return;
         }
         event.preventDefault();
@@ -736,6 +736,8 @@
         finalScore: root.querySelector("[data-final-score]"),
         finalBest: root.querySelector("[data-final-best]"),
         finalCoins: root.querySelector("[data-final-bonuses]"),
+        newRecord: root.querySelector("[data-new-record]"),
+        readyBest: root.querySelector("[data-ready-best]"),
       };
 
       this.assets = new AssetBank(ASSETS);
@@ -744,6 +746,10 @@
       this.spriteAssets = {};
 
       this.best = this.loadBest();
+      this.runStartBest = this.best;
+      if (this.ui.readyBest) {
+        this.ui.readyBest.textContent = String(this.best).padStart(5, "0");
+      }
       this.state = "loading";
       this.lastFrame = performance.now();
       this.resetRun();
@@ -807,6 +813,7 @@
             }
           } else if (action === "mute") {
             button.textContent = this.audio.toggle() ? "ON" : "OFF";
+            button.setAttribute("aria-label", button.textContent === "ON" ? "Couper le son" : "Activer le son");
           }
         });
       }
@@ -869,6 +876,7 @@
     }
 
     start() {
+      this.runStartBest = this.best;
       this.resetRun();
       this.input.reset();
       this.state = "running";
@@ -893,9 +901,18 @@
     gameOver() {
       this.state = "gameover";
       this.hitFlash = 0.32;
-      if (this.score > this.best) {
-        this.best = this.score;
+      // Le HUD met déjà à jour this.best pendant la partie : on compare donc
+      // au record du début de partie pour savoir s'il faut l'enregistrer.
+      const isRecord = this.score > (this.runStartBest ?? 0);
+      if (isRecord) {
+        this.best = Math.max(this.best, this.score);
         this.saveBest();
+      }
+      if (this.ui.newRecord) {
+        this.ui.newRecord.hidden = !isRecord;
+      }
+      if (this.ui.readyBest) {
+        this.ui.readyBest.textContent = String(this.best).padStart(5, "0");
       }
       this.ui.finalScore.textContent = String(this.score).padStart(5, "0");
       this.ui.finalBest.textContent = String(this.best).padStart(5, "0");
@@ -1367,7 +1384,7 @@
       const starPercent = clamp(this.starTimer / 6.2, 0, 1);
       this.ui.meter.textContent = this.starTimer > 0 ? `${Math.ceil(this.starTimer)}s` : "0%";
       this.ui.meterFill.style.width = `${Math.round(starPercent * 100)}%`;
-      this.ui.stateLabel.textContent = "Star";
+      this.ui.stateLabel.textContent = "Étoile";
       if (this.score > this.best) {
         this.best = this.score;
       }
