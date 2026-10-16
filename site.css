@@ -826,6 +826,11 @@ button {
   display: none;
 }
 
+body.menu-open .chat-fab,
+body.menu-open .timer-dock {
+  display: none;
+}
+
 .mobile-menu a {
   padding: 14px 4px;
   border-bottom: 1px solid var(--line);
@@ -2475,11 +2480,16 @@ button {
 .cook {
   position: fixed;
   inset: 0;
-  z-index: 500;
+  z-index: 800;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
   background: var(--paper);
   animation: fade-in 0.3s ease;
+}
+
+.cook > * {
+  min-width: 0;
 }
 
 .cook[hidden] {
@@ -2620,6 +2630,47 @@ button {
 
 .cook-ings[hidden] {
   display: none;
+}
+
+body.is-cooking .chat-fab,
+body.is-cooking .chat {
+  display: none;
+}
+
+body.is-cooking .timer-dock {
+  z-index: 900;
+  bottom: 92px;
+}
+
+body.is-cooking .toast-zone {
+  bottom: 96px;
+}
+
+@media (max-width: 560px) {
+  .cook-top {
+    gap: 10px;
+  }
+
+  .cook-top .avatar {
+    display: none;
+  }
+
+  .cook-top [data-show-ings] span,
+  .cook-bottom [data-cook-pos] {
+    display: none;
+  }
+
+  .cook-bottom .btn {
+    padding: 0 16px;
+  }
+
+  .cook-dots i {
+    width: 18px;
+  }
+
+  .cook-dots i.is-current {
+    width: 30px;
+  }
 }
 
 .cook-finish .big {
@@ -3087,6 +3138,20 @@ button {
   opacity: 0;
   pointer-events: none;
   transform: scale(0.6);
+}
+
+body[data-page="games"] .chat-fab {
+  padding: 0 7px;
+}
+
+body[data-page="games"] .chat-fab .fab-label {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  body[data-page="games"] .chat-fab {
+    display: none;
+  }
 }
 
 @media (max-width: 560px) {
@@ -3657,8 +3722,9 @@ button {
 }
 
 .star-input {
-  display: inline-flex;
+  display: flex;
   flex-direction: row-reverse;
+  justify-content: flex-end;
   gap: 4px;
   border: 0;
   margin: 0;
@@ -3749,6 +3815,7 @@ button {
 }
 
 .review-head .avatar {
+  font-size: 0.95rem;
   font-family: var(--font-display);
   font-weight: 600;
   color: #22150c;

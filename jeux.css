@@ -441,12 +441,6 @@
   gap: clamp(14px, 2.4vw, 28px);
 }
 
-@media (max-width: 760px) {
-  .kitchen {
-    grid-template-columns: 1fr;
-  }
-}
-
 .ticket {
   position: relative;
   padding: 20px 20px 18px;
@@ -731,4 +725,82 @@
   20% { opacity: 1; transform: translate(-50%, 0); }
   80% { opacity: 1; }
   100% { opacity: 0; transform: translate(-50%, -10px); }
+}
+
+/* ---------- Petits écrans ---------- */
+@media (max-width: 760px) {
+  .kitchen {
+    grid-template-columns: minmax(0, 1fr) 112px;
+    gap: 10px;
+  }
+
+  .ticket {
+    padding: 14px 12px 12px;
+  }
+
+  .ticket h2 {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+  }
+
+  .ticket-steps {
+    gap: 5px;
+  }
+
+  .ticket-steps li {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    font-size: 1.1rem;
+  }
+
+  .plate-zone {
+    min-height: 0;
+    padding-bottom: 10px;
+  }
+
+  .plate-stack span {
+    margin-top: -12px;
+    font-size: 1.7rem;
+  }
+
+  .plate-zone .flash-msg {
+    top: auto;
+    bottom: 100%;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .pantry {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .pantry button {
+    padding: 6px 2px;
+    font-size: 0.66rem;
+  }
+
+  .pantry button span {
+    font-size: 1.45rem;
+  }
+
+  .game-page .game-head .lead {
+    display: none;
+  }
+
+  .hud-bar {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .hud-stat {
+    flex: 1 1 28%;
+    padding: 6px 10px;
+  }
+
+  .hud-stat strong {
+    font-size: 1.15rem;
+  }
 }

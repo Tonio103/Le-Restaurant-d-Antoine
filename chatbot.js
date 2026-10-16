@@ -234,6 +234,7 @@
   const SUBSTITUTIONS = {
     oeufs: {
       label: "les œufs",
+      deconseille: ["fondants"],
       texte:
         "En pâtisserie (gâteaux, crêpes), un œuf peut être remplacé par 1 c. à soupe de graines de lin moulues mélangée à 3 c. à soupe d'eau (laisse gonfler 5 minutes), ou par environ 60 g de compote de pommes (plus moelleux, un peu sucré). Dans un fondant au chocolat, l'œuf est difficile à remplacer : le résultat sera différent."
     },
@@ -257,6 +258,7 @@
     },
     chocolat: {
       label: "le chocolat",
+      deconseille: ["fondants"],
       texte:
         "Dans les fondants, le chocolat est la base : difficile de le remplacer. Dans le gâteau marbré, du cacao en poudre non sucré peut le remplacer dans la pâte chocolat (ajoute un peu de lait si la pâte devient trop épaisse)."
     },
@@ -326,8 +328,10 @@
   }
 
   function findConcepts(text) {
+    // « sans viande », « pas de chocolat » ne doivent pas compter comme des envies.
+    const positive = text.replace(/\b(?:sans|pas de|pas d|pas)\s+(?!trop\b|lourd\b|lourde\b)\S+/g, " ");
     return Object.entries(CONCEPTS)
-      .filter(([, c]) => has(text, c.mots))
+      .filter(([, c]) => has(positive, c.mots))
       .map(([k]) => k);
   }
 
@@ -409,7 +413,8 @@
      ========================================================================== */
   const ctx = {
     recette: A.page === "recipe" ? document.body.dataset.recipe : null,
-    portions: null
+    portions: null,
+    portionsKey: null
   };
 
   /* ==========================================================================
@@ -426,8 +431,9 @@
   const QUICK_RECIPE = ["Les ingrédients", "Combien de temps ?", "Les étapes", "Une astuce", "Le mode cuisine"];
 
   function answerIngredients(r, text) {
-    const n = findPortions(text, r) || ctx.portions || r.portions.base;
+    const n = findPortions(text, r) || (ctx.portionsKey === r.key ? ctx.portions : null) || r.portions.base;
     ctx.portions = n;
+    ctx.portionsKey = r.key;
     const lignes = A.tousIngredients(r)
       .map((i) => {
         const q = A.quantiteIngredient(i, r, n);
@@ -534,7 +540,7 @@
       const total = META.tempsTotal(r);
       concepts.forEach((c) => {
         const tags = CONCEPT_TAGS[c] || [];
-        if (tags.some((t) => r.tags.includes(t))) s += 3;
+        s += 3 * Math.min(2, tags.filter((t) => r.tags.includes(t)).length);
       });
       if (concepts.includes("dessert")) s += r.categorie === "dessert" ? 7 : -4;
       if (concepts.includes("plat") || concepts.includes("faim")) s += r.categorie === "plat" ? 5 : r.categorie === "brunch" ? 2 : -3;
@@ -588,7 +594,7 @@
       return { r, matched, missing, ratio: ings.length ? matched.length / ings.length : 0 };
     })
       .filter((o) => o.matched.length)
-      .sort((a, b) => b.matched.length - a.matched.length || b.ratio - a.ratio)
+      .sort((a, b) => a.missing.length - b.missing.length || b.matched.length - a.matched.length)
       .slice(0, 3);
     if (!results.length) {
       return {
@@ -622,12 +628,17 @@
     }
     const sub = SUBSTITUTIONS[key];
     const usedIn = RECETTES.filter((x) => RECIPE_INGS[x.key].some((i) => i.keys.includes(key))).map((x) => x.titreCourt.toLowerCase());
-    const contexte = r && RECIPE_INGS[r.key].some((i) => i.keys.includes(key)) ? `<p>Pour ${recipeLink(r)}, c'est tout à fait possible.</p>` : "";
+    const concerne = r && RECIPE_INGS[r.key].some((i) => i.keys.includes(key));
+    const contexte = !concerne
+      ? ""
+      : (sub.deconseille || []).includes(r.key)
+        ? `<p>Pour ${recipeLink(r)}, je te déconseille de le remplacer : c'est un ingrédient clé de la recette.</p>`
+        : `<p>Pour ${recipeLink(r)}, tu peux essayer cette solution.</p>`;
     return {
       html: `<p><strong>Pour remplacer ${esc(sub.label)} :</strong> ${esc(sub.texte)}</p>${contexte}${
         usedIn.length && !contexte ? `<p class="muted">On en trouve dans : ${esc(listeFr(usedIn))}.</p>` : ""
       }`,
-      quick: ["Remplacer le beurre", "Remplacer le lait", "Une idée de recette"]
+      quick: [{ oeufs: "Des recettes sans œufs", lait: "Des recettes sans lactose", chocolat: "Des recettes sans chocolat", farine: "Des recettes sans gluten" }[key], "Remplacer le beurre", "Une idée de recette"].filter(Boolean)
     };
   }
 
@@ -661,7 +672,7 @@
     m = text.match(/(\d+(?:[.,]\d+)?)?\s*(?:cups?|tasses?)\b/);
     if (m) {
       const q = m[1] ? n(m[1]) : 1;
-      return { html: `<p>${fmt(q, 2)} cup américaine ≈ <strong>${fmt(q * 240)} ml</strong> (exactement 236,6 ml par cup).</p><p class="muted">En poids, cela dépend de l'ingrédient (une cup de farine pèse bien moins qu'une cup de sucre).</p>` };
+      return { html: `<p>${fmt(q, 2)} ${q > 1 ? "cups américaines" : "cup américaine"} ≈ <strong>${fmt(q * 240)} ml</strong> (exactement 236,6 ml par cup).</p><p class="muted">En poids, cela dépend de l'ingrédient (une cup de farine pèse bien moins qu'une cup de sucre).</p>` };
     }
     m = text.match(/(\d+(?:[.,]\d+)?)\s*(?:oz|onces?|ounces?)\b/);
     if (m) {
@@ -718,7 +729,7 @@
     }
 
     // --- Remplacements ---
-    if (has(text, ["remplacer", "remplace", "substituer", "substitut", "a la place", "alternative", "equivalent", "je n ai pas de", "j ai pas de", "je n ai plus de", "j ai plus de", "il me manque", "manque de"])) {
+    if (has(text, ["remplacer", "remplace", "substituer", "substitut", "a la place", "alternative", "equivalent", "je n ai pas de", "j ai pas de", "je n ai plus de", "j ai plus de", "je n ai pas d", "j ai pas d", "je n ai plus d", "j ai plus d", "il me manque", "manque de"])) {
       return substitution(text, current);
     }
 
@@ -801,7 +812,17 @@
     }
 
     // --- Questions sur une recette ---
-    if (current) {
+    const concepts = findConcepts(text);
+    const excl = findExclusions(text);
+    const maxMin = findMaxMinutes(text);
+    const wantsNew = !r && (concepts.length > 0 || excl.ex.length > 0 || maxMin || has(text, ["idee", "envie", "propose", "suggestion", "autre chose", "quoi manger", "quoi cuisiner"]));
+    if (current && !wantsNew) {
+      if (has(text, ["calorie", "kcal", "nutrition", "nutritionnel", "nutritionnelle", "proteine", "glucide", "lipide"])) {
+        return { html: `<p>Je n'ai pas d'informations nutritionnelles fiables pour ${recipeLink(current)}, donc je préfère ne pas te donner de chiffre inventé. Une application de nutrition, avec les quantités de la liste d'ingrédients, te donnera une estimation.</p>` };
+      }
+      if (has(text, ["prix", "cout", "combien ca coute", "budget"])) {
+        return { html: `<p>Je n'ai pas de données de prix : ils varient trop selon les magasins et les saisons pour que je te donne un chiffre fiable.</p>` };
+      }
       if (has(text, ["origine", "d ou vient", "d ou viennent", "histoire", "qui a invente", "invente", "pays"])) return answerOrigin(current);
       if (has(text, ["combien de temps", "temps", "duree", "long", "rapide a faire", "ca prend"])) return answerTime(current);
       const asksIngredients = has(text, ["ingredient", "il faut quoi", "faut quoi", "qu est ce qu il faut", "quantite", "combien de", "liste", "pour combien"]);
@@ -811,17 +832,11 @@
         return { html: `<p>👩‍🍳 Le mode cuisine affiche une étape à la fois en grand, avec les minuteurs et l'écran qui reste allumé.</p>`, actions: [{ label: "Lancer le mode cuisine", type: "link", href: `${current.url}#cuisine` }] };
       }
       if (has(text, ["etape", "comment faire", "comment on fait", "comment je fais", "comment le faire", "comment la faire", "comment les faire", "preparation", "deroulement"])) return answerSteps(current);
-      if (has(text, ["astuce", "conseil", "secret", "truc", "reussir"])) return answerTips(current);
+      if (has(text, ["astuce", "conseil", "secret", "reussir", "rater"])) return answerTips(current);
       if (has(text, ["conserver", "conservation", "garder", "frigo", "congeler", "congelation", "le lendemain", "reste"])) return answerStorage(current);
       if (has(text, ["allergene", "allergie", "gluten", "lactose", "intolerance", "arachide"]) && !has(text, ["sans", "recette", "recettes"])) return answerAllergens(current);
       if (has(text, ["four", "temperature", "degres", "thermostat", "°c"])) return answerOven(current);
       if (has(text, ["difficile", "complique", "niveau", "difficulte"])) return { html: `<p>${recipeLink(current)} : niveau <strong>${esc(current.difficulte.toLowerCase())}</strong>, ${current.etapes.length} étapes.</p>` };
-      if (has(text, ["calorie", "calories", "kcal", "nutrition", "nutritionnel", "proteines", "glucides", "regime"])) {
-        return { html: `<p>Je n'ai pas d'informations nutritionnelles fiables pour cette recette, donc je préfère ne pas te donner de chiffre inventé. Une application de nutrition, avec les quantités de la liste d'ingrédients, te donnera une estimation.</p>` };
-      }
-      if (has(text, ["prix", "cout", "combien ca coute", "budget", "cher"])) {
-        return { html: `<p>Je n'ai pas de données de prix : ils varient trop selon les magasins et les saisons pour que je te donne un chiffre fiable.</p>` };
-      }
       if (has(text, ["vin", "boire avec", "accompagner", "accompagnement", "accord", "avec quoi servir", "servir avec"])) {
         return { html: `<p>Idées pour accompagner ${recipeLink(current)} :</p><ul>${current.accords.map((a) => `<li><strong>${esc(a.titre)}</strong> : ${esc(a.texte)}</li>`).join("")}</ul>` };
       }
@@ -835,9 +850,6 @@
     }
 
     // --- Recommandation ---
-    const concepts = findConcepts(text);
-    const excl = findExclusions(text);
-    const maxMin = findMaxMinutes(text);
     if (concepts.length || excl.ex.length || excl.recipeEx.length || maxMin || has(text, ["idee", "envie", "propose", "suggestion", "conseille", "cuisiner", "manger", "quoi faire", "recette", "ce soir", "menu"])) {
       if (has(text, ["soif"]) && !concepts.includes("boisson")) concepts.push("boisson");
       return recommend(text, concepts, excl, maxMin);

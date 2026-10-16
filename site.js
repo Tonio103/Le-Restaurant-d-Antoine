@@ -426,6 +426,7 @@
       toggle.setAttribute("aria-expanded", String(open));
       toggle.setAttribute("aria-label", open ? "Fermer le menu" : "Ouvrir le menu");
       body.style.overflow = open ? "hidden" : "";
+      body.classList.toggle("menu-open", open);
     };
     toggle.addEventListener("click", () => setMenu(menu.hidden));
     menu.addEventListener("click", (e) => {
@@ -1710,6 +1711,7 @@
       </div>`);
     body.appendChild(cook);
     body.style.overflow = "hidden";
+    body.classList.add("is-cooking");
 
     const stage = cook.querySelector(".cook-stage");
     const dots = [...cook.querySelectorAll(".cook-dots i")];
@@ -1785,6 +1787,7 @@
       if (wakeLock) wakeLock.release().catch(() => {});
       cook.remove();
       body.style.overflow = "";
+      body.classList.remove("is-cooking");
       if (location.hash === "#cuisine") history.replaceState(null, "", location.pathname + location.search);
     }
 
@@ -1969,6 +1972,17 @@
   if (PAGE === "recipe") initRecipe();
   if (PAGE === "infos") initInfos();
   if (PAGE === "questions") initQuestions();
+  if (PAGE === "avis") {
+    // Si le service des avis ne répond pas (hors connexion, bloqueur…), on le dit.
+    setTimeout(() => {
+      const list = document.getElementById("reviewsList");
+      if (window.__reviewsModuleLoaded || !list) return;
+      list.innerHTML = `<div class="empty-state"><span class="big">📡</span><strong>Le livre d'or ne répond pas</strong>
+        <span>Impossible de joindre le serveur des avis pour le moment. Réessaie un peu plus tard.</span></div>`;
+      const summary = document.getElementById("ratingSummary");
+      if (summary) summary.innerHTML = `<p class="muted">Note indisponible pour le moment.</p>`;
+    }, 6000);
+  }
 
   observeReveal();
   document.dispatchEvent(new CustomEvent("antoine:ready"));
