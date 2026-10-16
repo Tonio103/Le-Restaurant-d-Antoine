@@ -1,334 +1,174 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Le restaurant d’Antoine</title>
-  <link rel="stylesheet" href="site.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le restaurant d'Antoine · Recettes de famille</title>
+  <meta name="description" content="Les recettes de famille d'Antoine : quantités ajustables, mode cuisine pas à pas, minuteurs, liste de courses, assistant du chef et mini-jeux.">
+  <meta name="theme-color" content="#f6efe4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#15100c" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Le restaurant d'Antoine">
+  <meta property="og:title" content="Le restaurant d'Antoine · Recettes de famille">
+  <meta property="og:description" content="Les recettes de famille d'Antoine : quantités ajustables, mode cuisine pas à pas, minuteurs, liste de courses, assistant du chef et mini-jeux.">
+  <meta property="og:image" content="img/accueil.webp">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..700,0..100;1,9..144,400..700,0..100&family=Manrope:wght@400..800&display=swap">
+  <link rel="stylesheet" href="site.css">
+  <script>try{var t=localStorage.getItem("antoine-theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="recettes-data.js" defer></script>
+  <script src="site.js" defer></script>
+  <script src="chatbot.js" defer></script>
+  <script type="module" src="likes-firebase.js"></script>
 </head>
-<body data-theme-page="accueil">
-
-  <div class="page-background"></div>
-  <div class="page-background-overlay"></div>
-  <div class="page-noise"></div>
-
-  <svg width="0" height="0" style="position: absolute; display: none;" aria-hidden="true">
-    <filter id="glass-distortion">
-      <feTurbulence
-        type="turbulence"
-        baseFrequency="0.008"
-        numOctaves="2"
-        result="noise"
-      />
-      <feDisplacementMap
-        id="glassDisplacement"
-        in="SourceGraphic"
-        in2="noise"
-        scale="8"
-      />
-    </filter>
-  </svg>
-
-  <header class="site-header" id="siteHeader">
-    <nav class="navbar">
-      <div class="logo-wrap">
-        <a href="index.html" class="logo-icon" style="text-decoration: none;">🍽️</a>
-        <div class="logo-text">
-          <strong>Le restaurant d’Antoine</strong>
-          <span>Maison gourmande & recettes favorites</span>
-        </div>
-      </div>
-
-      <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
-
-      <div class="nav-center" id="navCenter">
-        <div class="search-wrap">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Rechercher une recette..."
-            autocomplete="off"
-          />
-          <div id="searchSuggestions" class="search-suggestions"></div>
-        </div>
-      </div>
-
-      <div class="nav-links">
-        <a href="questions.html">Questions</a>
-        <a href="avis.html">Avis</a>
-        <a href="infos.html">Infos</a>
-      </div>
-
-      <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
-    </nav>
-  </header>
-
-  <main class="main-layout">
-    <section class="page-section active" id="accueil">
-
-      <section class="hero" id="homeHero">
-        <div class="hero-copy">
-          <p class="badge">10 recettes • design premium • outils interactifs • ambiance maison</p>
-          <h1>Bienvenue au restaurant d’Antoine</h1>
-          <h2>Des recettes gourmandes, séparées et mieux organisées</h2>
-          <p class="hero-text">
-            Chaque recette possède son propre univers : ingrédients ajustables, étapes détaillées,
-            idées d’associations, checklist, minuteurs, galerie photo et assistant cuisine.
-            Le tout dans une ambiance plus élégante, plus lisible et plus agréable à utiliser.
-            Découvrez les classiques de la maison, les recettes fraîches et les nouvelles assiettes
-            gourmandes du restaurant.
-          </p>
-        </div>
-
-        <div class="hero-side">
-          <div class="hero-top-liked-wrap">
-            <div class="hero-top-liked">
-              <div id="topRecipe" class="top-recipe-box"></div>
-            </div>
+<body data-page="home">
+  <main id="main">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="hero-kicker"><span class="dot" aria-hidden="true">👨‍🍳</span> La cuisine de famille d'Antoine</p>
+          <h1 class="hero-title" data-split>Des recettes de famille, <em>servies avec amour.</em></h1>
+          <p class="hero-text">Des plats testés et approuvés à la maison : des quantités qui s'adaptent au nombre de convives, un mode cuisine pas à pas, des minuteurs intégrés, une liste de courses et un assistant pour t'aider à choisir.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#recettes">Découvrir la carte <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <button class="btn" type="button" data-open-chat>👨‍🍳 Demander au chef</button>
           </div>
+          <div class="hero-stats" id="heroStats"></div>
         </div>
-      </section>
+        <div class="hero-visual">
+          <svg class="plate-ring" viewBox="0 0 400 400" aria-hidden="true">
+            <defs><path id="ringPath" d="M200,200 m-182,0 a182,182 0 1,1 364,0 a182,182 0 1,1 -364,0"/></defs>
+            <text><textPath href="#ringPath">Fait maison ✦ Servi avec amour ✦ Recettes de famille ✦ Bon appétit ✦ </textPath></text>
+          </svg>
+          <svg class="steam" viewBox="0 0 120 90" aria-hidden="true">
+            <path d="M30 88c-14-18 14-26 0-44S30 14 30 4"/>
+            <path d="M60 88c-14-18 14-26 0-44S60 14 60 4"/>
+            <path d="M90 88c-14-18 14-26 0-44S90 14 90 4"/>
+          </svg>
+          <div class="plate"><div class="plate-inner" id="plateImages"></div></div>
+          <a class="plate-label" id="plateLabel" href="#recettes">À la carte</a>
+          <span class="floaty f1" aria-hidden="true">🌿</span>
+          <span class="floaty f2" aria-hidden="true">🍋</span>
+          <span class="floaty f3" aria-hidden="true">🧄</span>
+          <span class="floaty f4" aria-hidden="true">🍅</span>
+        </div>
+      </div>
+    </section>
 
-      <div class="glass-card intro-card tilt-card top-gap liquid-glass-card">
-        <div class="glass-filter"></div>
-        <div class="glass-distortion-overlay"></div>
-        <div class="glass-overlay"></div>
-        <div class="glass-specular"></div>
+    <div class="marquee-wrap" aria-hidden="true"><div class="marquee"><div class="marquee-track" id="marqueeTrack"></div></div></div>
 
-        <div class="glass-content intro-content">
+    <section class="section" id="recettes" aria-labelledby="recettes-title">
+      <div class="container">
+        <div class="section-head">
           <div>
-            <h3>Le menu signature d’Antoine</h3>
-            <p>
-              Le restaurant d’Antoine rassemble des recettes gourmandes dans un site travaillé avec
-              une interface plus claire, plus élégante et interactive. Tout est séparé proprement
-              pour rendre le site agréable à utiliser, pratique au quotidien et joli à regarder.
-            </p>
+            <p class="eyebrow">La carte</p>
+            <h2 class="section-title" id="recettes-title">Toutes nos <em>recettes</em></h2>
           </div>
-          <div class="intro-emoji">👨‍🍳</div>
+          <p class="muted" id="recipeCount" aria-live="polite"></p>
+        </div>
+        <div class="toolbar">
+          <div class="chip-row" id="recipeFilters" role="group" aria-label="Filtrer les recettes"></div>
+          <label class="inline-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input class="input" id="recipeSearch" type="search" placeholder="Filtrer : chocolat, saumon, œufs…" aria-label="Filtrer les recettes par mot-clé">
+          </label>
+        </div>
+        <div class="recipe-grid" id="recipeGrid"></div>
+        <div class="empty-state" id="recipeEmpty" hidden>
+          <span class="big" aria-hidden="true">🍽️</span>
+          <strong>Aucune recette ne correspond</strong>
+          <span>Essaie un autre mot, ou demande une idée au chef.</span>
+          <button class="btn btn-sm" type="button" data-open-chat>Demander au chef</button>
         </div>
       </div>
+    </section>
 
-      <br>
-
-      <div class="universe-grid">
-
-        <article class="glass-card universe-card tilt-card">
-          <span class="recipe-badge special">⭐ Spécialité</span>
-          <img src="cailles.png" alt="Cailles aux petits pois" class="universe-image" />
-          <div class="universe-content">
-            <div class="universe-icon"></div>
-            <h3>Cailles & Petits pois</h3>
-            <p>
-              Un classique de la gastronomie française, délicat et savoureux,
-              parfait pour les repas de fête ou du dimanche.
-            </p>
-            <a class="primary-btn" href="cailles.html">Explorer la recette</a>
+    <section class="section" style="padding-top:0" aria-label="Idées du jour">
+      <div class="container feature-split">
+        <div class="panel" data-reveal>
+          <p class="eyebrow">Pas d'idée ?</p>
+          <h3>La roulette du chef</h3>
+          <p class="muted">Laisse le hasard choisir le menu du jour.</p>
+          <div class="roulette">
+            <div class="roulette-window" id="rouletteWindow"><img src="img/accueil-640.webp" alt="" width="120" height="120"></div>
+            <div class="roulette-name" id="rouletteName" aria-live="polite">Qu'est-ce qu'on mange aujourd'hui ?</div>
           </div>
-        </article>
-
-        <article class="glass-card universe-card tilt-card">
-          <span class="recipe-badge new">🍊 Nouveauté fraîche</span>
-          <img src="jusorange.png" alt="Jus d’orange bio pressé maison" class="universe-image" />
-          <div class="universe-content">
-            <div class="universe-icon"></div>
-            <h3>Jus d’orange bio pressé maison</h3>
-            <p>
-              Une boisson fraîche, simple et naturelle, parfaite pour le petit-déjeuner
-              ou une pause vitaminée.
-            </p>
-            <a class="primary-btn" href="jusorange.html">Explorer la recette</a>
+          <div class="chip-row">
+            <button class="btn btn-primary" type="button" id="rouletteBtn">🎲 Lancer la roulette</button>
+            <a class="btn" id="rouletteGo" href="#recettes" hidden>Voir la recette →</a>
           </div>
-        </article>
-
-        <article class="glass-card universe-card tilt-card">
-          <img src="Crêpes dorées sur plateaux rustique.png" alt="Crêpes classiques" class="universe-image" />
-          <div class="universe-content">
-            <div class="universe-icon"></div>
-            <h3>Crêpes gourmandes</h3>
-            <p>
-              Douces, moelleuses, avec un léger parfum de vanille ou de rhum,
-              faciles à personnaliser à l’infini.
-            </p>
-            <a class="primary-btn" href="crepes.html">Explorer la recette</a>
-          </div>
-        </article>
-
-        <article class="glass-card universe-card tilt-card">
-          <img src="Burger appétissant sur surface en bois.png" alt="Hamburger maison" class="universe-image" />
-          <div class="universe-content">
-            <div class="universe-icon"></div>
-            <h3>Burgers garnis</h3>
-            <p>
-              Chauds, généreux et très gourmands, avec un pain brioché moelleux
-              et une viande fondante.
-            </p>
-            <a class="primary-btn" href="burger.html">Explorer la recette</a>
-          </div>
-        </article>
-
-        <article class="glass-card universe-card tilt-card">
-          <img src="Fondant au chocolat fondants.png" alt="Fondant au chocolat" class="universe-image" />
-          <div class="universe-content">
-            <div class="universe-icon"></div>
-            <h3>Fondants intenses</h3>
-            <p>
-              Au cœur coulant et intense, ce dessert fera chavirer tous les amateurs
-              de chocolat.
-            </p>
-            <a class="primary-btn" href="fondant.html">Explorer la recette</a>
-          </div>
-        </article>
-
-        <article class="glass-card universe-card tilt-card">
-          <img src="Gâteau marbré au chocolat et vanille.png" alt="Gâteau marbré" class="universe-image" />
-          <div class="universe-content">
-            <div class="universe-icon"></div>
-            <h3>Gâteau marbré</h3>
-            <p>
-              Moelleux à souhait, ce grand classique est aussi superbe à la découpe
-              qu’en bouche.
-            </p>
-            <a class="primary-btn" href="gateau-marbre.html">Explorer la recette</a>
-          </div>
-        </article>
-
-        <article class="glass-card universe-card tilt-card">
-          <img src="Bol poke coloré et frais.png" alt="Poké bowl hawaïen" class="universe-image" />
-          <div class="universe-content">
-            <div class="universe-icon"></div>
-            <h3>Poké bowl hawaïen</h3>
-            <p>
-              Frais, coloré, sain et équilibré. Une explosion de saveurs pour
-              un repas léger et nutritif.
-            </p>
-            <a class="primary-btn" href="poke-bowl.html">Explorer la recette</a>
-          </div>
-        </article>
-
-        <article class="glass-card universe-card tilt-card">
-          <span class="recipe-badge">🥗 Frais</span>
-          <img src="saladecesar.png" alt="Salade César" class="universe-image" />
-          <div class="universe-content">
-            <div class="universe-icon"></div>
-            <h3>Salade César</h3>
-            <p>
-              Une recette fraîche, légère et gourmande, parfaite pour un repas simple,
-              équilibré et plein de goût.
-            </p>
-            <a class="primary-btn" href="salade-cesar.html">Explorer la recette</a>
-          </div>
-        </article>
-
-        <article class="glass-card universe-card tilt-card">
-          <span class="recipe-badge new">🥑 Brunch</span>
-          <img src="toast-avocat.png" alt="Avocado toast gourmand" class="universe-image" />
-          <div class="universe-content">
-            <div class="universe-icon"></div>
-            <h3>Avocado toast</h3>
-            <p>
-              Un toast croustillant, frais et gourmand, avec avocat fondant,
-              œuf coulant et finitions élégantes.
-            </p>
-            <a class="primary-btn" href="avocado-toast.html">Explorer la recette</a>
-          </div>
-        </article>
-
-        <article class="glass-card universe-card tilt-card">
-          <span class="recipe-badge">🍜 Réconfort</span>
-          <img src="ramen-bol-realiste.png" alt="Ramen maison" class="universe-image" />
-          <div class="universe-content">
-            <div class="universe-icon"></div>
-            <h3>Ramen maison</h3>
-            <p>
-              Un grand bol chaud et généreux, avec bouillon parfumé,
-              nouilles fondantes et garnitures très gourmandes.
-            </p>
-            <a class="primary-btn" href="ramen.html">Explorer la recette</a>
-          </div>
-        </article>
-
+        </div>
+        <div class="panel panel-dark" data-reveal style="--i:1">
+          <p class="eyebrow">Coup de cœur</p>
+          <h3>La préférée des visiteurs</h3>
+          <div id="topRecipe"><p class="muted">Chargement des likes…</p></div>
+          <p class="muted" style="margin-top:18px">Classement en direct, d'après les ❤️ laissés sur chaque recette.</p>
+        </div>
       </div>
-<div class="glass-card intro-card tilt-card top-gap liquid-glass-card">
-  <div class="glass-content intro-content">
-    <div>
-      <h3>Le mini-jeu du restaurant</h3>
-      <p>
-        Aide le chef à courir dans le restaurant, éviter les obstacles
-        et récupérer un maximum de bonus.
-      </p>
-      <br>
-      <a class="primary-btn" href="index2.html">Jouer maintenant</a>
-    </div>
-    <div class="intro-emoji">🎮</div>
-  </div>
-</div>
+    </section>
 
+    <section class="section" style="padding-top:0" aria-labelledby="jeux-title">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Pause gourmande</p>
+            <h2 class="section-title" id="jeux-title">Les <em>mini-jeux</em> du restaurant</h2>
+          </div>
+          <a class="btn" href="jeux.html">Tous les jeux</a>
+        </div>
+        <div class="games-grid">
+        <a class="game-card" href="index2.html" data-reveal style="--i:0; --tint:var(--accent-soft)">
+          <span class="game-icon" aria-hidden="true">🏃</span>
+          <h3>Service infini</h3>
+          <p>Le chef traverse le restaurant en courant : saute, glisse et ramasse les pièces.</p>
+          <span class="game-best" data-best="service-infini-premium-best" data-suffix=" pts">Pas encore de record</span>
+        </a>
+        <a class="game-card" href="memory.html" data-reveal style="--i:1; --tint:var(--saffron-soft)">
+          <span class="game-icon" aria-hidden="true">🃏</span>
+          <h3>Memory du chef</h3>
+          <p>Retrouve les paires de plats de la maison en un minimum de coups.</p>
+          <span class="game-best" data-best="antoine-memory-record">Pas encore de record</span>
+        </a>
+        <a class="game-card" href="quiz.html" data-reveal style="--i:2; --tint:var(--sage-soft)">
+          <span class="game-icon" aria-hidden="true">🧠</span>
+          <h3>Quiz du chef</h3>
+          <p>10 questions sur les recettes, les techniques et l'histoire des plats.</p>
+          <span class="game-best" data-best="antoine-quiz-record">Pas encore de record</span>
+        </a>
+        <a class="game-card" href="commandes.html" data-reveal style="--i:3; --tint:rgba(161,54,82,.14)">
+          <span class="game-icon" aria-hidden="true">🛎️</span>
+          <h3>Coup de feu</h3>
+          <p>Les commandes s'enchaînent : assemble chaque plat dans le bon ordre, vite !</p>
+          <span class="game-best" data-best="antoine-commandes-record">Pas encore de record</span>
+        </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0" aria-labelledby="ask-title">
+      <div class="container ask-grid">
+        <div data-reveal>
+          <p class="eyebrow">Ton commis virtuel</p>
+          <h2 class="section-title" id="ask-title">Demande au <em>chef</em></h2>
+          <p class="lead" style="margin-top:16px">Une envie, une contrainte, un frigo à vider ? L'assistant connaît toutes les recettes de la maison : il propose une idée, adapte les quantités, remplace un ingrédient, convertit les unités et lance tes minuteurs.</p>
+          <div class="chip-row" style="margin-top:24px">
+            <button class="chip" type="button" data-chat-prompt="Une idée de dîner léger en moins de 30 min">⚡ Dîner léger et rapide</button>
+            <button class="chip" type="button" data-chat-prompt="J'ai des œufs, du lait et de la farine">🥚 J'ai des œufs et du lait</button>
+            <button class="chip" type="button" data-chat-prompt="Par quoi remplacer le beurre ?">🧈 Remplacer le beurre</button>
+            <button class="chip" type="button" data-chat-prompt="Un dessert au chocolat pour recevoir">🍫 Dessert pour recevoir</button>
+            <button class="chip" type="button" data-chat-prompt="350 °F en °C">🌡️ 350 °F en °C</button>
+          </div>
+        </div>
+        <div class="chat-preview" data-reveal="zoom" aria-hidden="true">
+          <div class="bubble user">J'ai des œufs, du lait et de la farine 🥚</div>
+          <div class="bubble bot" style="animation-delay:.3s">Avec ce que tu as, la recette la plus proche : les <strong>crêpes</strong> ! Il te manque juste du beurre et du sucre.</div>
+          <div class="bubble user" style="animation-delay:.6s">Ingrédients pour 6 personnes</div>
+          <div class="bubble bot" style="animation-delay:.9s">Pour 6 : 375 g de farine, 6 œufs, 750 ml de lait, 75 g de beurre… 🧺 Je peux tout ajouter à ta liste de courses.</div>
+        </div>
+      </div>
     </section>
   </main>
-
-  <footer class="site-footer">
-    <div class="footer-content">
-      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
-    </div>
-  </footer>
-
-  <div id="secretToast"></div>
-
-  <button id="scrollTopBtn" title="Retourner en haut de la page">↑</button>
-
-  <div id="lightbox">
-    <div class="lightbox-backdrop"></div>
-    <img src="" alt="" class="lightbox-image" id="lightboxImage" />
-    <button class="lightbox-close" id="lightboxClose">×</button>
-  </div>
-
-  <button class="ai-fab" id="aiFab" type="button" aria-label="Ouvrir l'assistant cuisine">
-    💬
-  </button>
-
-  <div class="ai-widget hidden" id="aiWidget">
-    <div class="ai-widget-header">
-      <strong>Assistant cuisine</strong>
-
-      <div class="ai-widget-header-actions">
-        <button
-          class="ai-widget-expand"
-          id="aiWidgetExpand"
-          type="button"
-          aria-label="Agrandir l'assistant"
-        >
-          ⤢
-        </button>
-        <button
-          class="ai-widget-close"
-          id="aiWidgetClose"
-          type="button"
-          aria-label="Fermer l'assistant"
-        >
-          ×
-        </button>
-      </div>
-    </div>
-
-    <div class="ai-widget-body">
-      <div id="aiChefResult" class="ai-chef-result">
-        <strong>Bonjour 👋</strong><br>
-        Je peux t’aider à trouver la recette idéale.
-      </div>
-
-      <div class="ai-widget-input-row">
-        <input
-          type="text"
-          id="aiChefInput"
-          placeholder="Que cherchez-vous ?"
-          autocomplete="off"
-        />
-        <button id="aiChefBtn" class="ai-send-btn" type="button" aria-label="Envoyer">➤</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="site.js"></script>
-  <script type="module" src="likes-firebase.js"></script>
 </body>
 </html>

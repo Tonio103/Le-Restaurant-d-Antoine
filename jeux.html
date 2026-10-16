@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Les mini-jeux · Le restaurant d'Antoine</title>
+  <meta name="description" content="Quatre mini-jeux gourmands : la course du chef, le memory des plats, le quiz du chef et le coup de feu en cuisine.">
+  <meta name="theme-color" content="#f6efe4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#15100c" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Le restaurant d'Antoine">
+  <meta property="og:title" content="Les mini-jeux · Le restaurant d'Antoine">
+  <meta property="og:description" content="Quatre mini-jeux gourmands : la course du chef, le memory des plats, le quiz du chef et le coup de feu en cuisine.">
+  <meta property="og:image" content="img/accueil.webp">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..700,0..100;1,9..144,400..700,0..100&family=Manrope:wght@400..800&display=swap">
+  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="jeux.css">
+  <script>try{var t=localStorage.getItem("antoine-theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="recettes-data.js" defer></script>
+  <script src="site.js" defer></script>
+  <script src="chatbot.js" defer></script>
+</head>
+<body data-page="games">
+  <main id="main" class="container">
+    <section class="page-hero">
+      <p class="eyebrow">Pause gourmande</p>
+      <h1>Les <em style="color:var(--accent)">mini-jeux</em> du restaurant</h1>
+      <p class="lead">Entre deux recettes, défie ta mémoire, tes réflexes et ta culture culinaire. Tes records sont gardés sur cet appareil.</p>
+    </section>
+    <div class="games-grid games-hub">
+      <a class="game-card featured" href="index2.html" data-reveal>
+        <span class="game-icon" aria-hidden="true">🏃</span>
+        <h3>Service infini</h3>
+        <p>Le chef traverse le restaurant, la terrasse, la cuisine, la cave et l'usine. Saute par-dessus les tables, glisse sous les lustres, ramasse les pièces… et trouve la table secrète !</p>
+        <div class="game-tags"><span class="pill">Réflexes</span><span class="pill">Clavier ou tactile</span></div>
+        <span class="game-best" data-best="service-infini-premium-best" data-suffix=" pts">Pas encore de record</span>
+      </a>
+      <a class="game-card" href="memory.html" data-reveal style="--i:1; --tint:var(--saffron-soft)">
+          <span class="game-icon" aria-hidden="true">🃏</span>
+          <h3>Memory du chef</h3>
+          <p>Retrouve les paires de plats de la maison en un minimum de coups.</p>
+          <div class="game-tags"><span class="pill">Mémoire</span><span class="pill">3 niveaux</span></div>
+          <span class="game-best" data-best="antoine-memory-record">Pas encore de record</span>
+        </a>
+      <a class="game-card" href="quiz.html" data-reveal style="--i:2; --tint:var(--sage-soft)">
+          <span class="game-icon" aria-hidden="true">🧠</span>
+          <h3>Quiz du chef</h3>
+          <p>10 questions sur les recettes, les techniques et l'histoire des plats.</p>
+          <div class="game-tags"><span class="pill">Culture</span><span class="pill">10 questions</span></div>
+          <span class="game-best" data-best="antoine-quiz-record">Pas encore de record</span>
+        </a>
+      <a class="game-card" href="commandes.html" data-reveal style="--i:3; --tint:rgba(161,54,82,.14)">
+          <span class="game-icon" aria-hidden="true">🛎️</span>
+          <h3>Coup de feu</h3>
+          <p>Les commandes s'enchaînent : assemble chaque plat dans le bon ordre, vite !</p>
+          <div class="game-tags"><span class="pill">Rapidité</span><span class="pill">90 secondes</span></div>
+          <span class="game-best" data-best="antoine-commandes-record">Pas encore de record</span>
+        </a>
+    </div>
+  </main>
+</body>
+</html>

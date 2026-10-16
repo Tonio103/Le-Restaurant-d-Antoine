@@ -1,1640 +1,1989 @@
 /**
- * LE RESTAURANT D'ANTOINE - SCRIPT PRINCIPAL
- * Version complète pour site multi-pages
+ * LE RESTAURANT D'ANTOINE — SCRIPT PRINCIPAL
+ * En-tête et pied de page partagés, accueil, pages recettes générées
+ * depuis recettes-data.js, mode cuisine, minuteurs, liste de courses,
+ * recherche, lightbox et animations.
  */
-
-document.addEventListener("DOMContentLoaded", () => {
+(function () {
   "use strict";
 
-  /* ==========================================================================
-     DOM REFERENCES
-     ========================================================================== */
+  const RECETTES = window.RECETTES || [];
+  const META = window.RECETTES_META || { CATEGORIES: {}, ALLERGENES: {}, tempsTotal: () => 0 };
+  const BY_KEY = Object.fromEntries(RECETTES.map((r) => [r.key, r]));
   const body = document.body;
-  const loader = document.getElementById("loader");
-  const menuToggle = document.getElementById("menuToggle");
-  const navCenter = document.getElementById("navCenter");
-  const themeToggle = document.getElementById("themeToggle");
-  const scrollTopBtn = document.getElementById("scrollTopBtn");
-  const toast = document.getElementById("secretToast");
-  const searchInput = document.getElementById("searchInput");
+  const PAGE = body.dataset.page || "";
+  const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.documentElement.classList.add("js");
 
   /* ==========================================================================
-     STORAGE KEYS
+     STOCKAGE (toujours protégé : navigation privée, stockage bloqué…)
      ========================================================================== */
-  const STORAGE_KEYS = {
-    theme: "antoine-theme",
-    aiWidgetOpen: "antoine-ai-widget-open"
-  };
-
-  /* ==========================================================================
-     RECIPE DATA
-     ========================================================================== */
-  const recipeData = {
-    cailles: {
-      base: 4,
-      label: "PERSONNES",
-      targetId: "caillesIngredients",
-      labelId: "caillesCountLabel",
-      items: [
-        { emoji: "", name: "Cuisses de caille fraîches", amount: 8, unit: "pièces" },
-        { emoji: "", name: "Petits pois (frais ou surgelés)", amount: 500, unit: "g" },
-        { emoji: "", name: "Lardons allumettes fumés", amount: 150, unit: "g" },
-        { emoji: "", name: "Petits oignons grelots", amount: 15, unit: "pièces" },
-        { emoji: "", name: "Carottes fanes", amount: 2, unit: "pièces" },
-        { emoji: "", name: "Beurre doux", amount: 30, unit: "g" },
-        { emoji: "", name: "Bouillon de volaille chaud", amount: 200, unit: "ml" },
-        { emoji: "", name: "Bouquet garni (thym, laurier)", amount: 1, unit: "bouquet" }
-      ]
+  const store = {
+    get(key, fallback = null) {
+      try {
+        const value = localStorage.getItem(key);
+        return value === null ? fallback : value;
+      } catch {
+        return fallback;
+      }
     },
-
-    saladecesar: {
-      base: 4,
-      label: "PERSONNES",
-      targetId: "saladecesarIngredients",
-      labelId: "saladecesarCountLabel",
-      items: [
-        { emoji: "", name: "Pain de campagne", amount: 140, unit: "g" },
-        { emoji: "", name: "Beurre", amount: 30, unit: "g" },
-        { emoji: "", name: "Câpres", amount: 30, unit: "g" },
-        { emoji: "", name: "Jaunes d’œufs", amount: 2, unit: "pièces" },
-        { emoji: "", name: "Jus de citron", amount: 30, unit: "ml" },
-        { emoji: "", name: "Filets d’anchois hachés", amount: 4, unit: "pièces" },
-        { emoji: "", name: "Gousse d’ail", amount: 1, unit: "pièce" },
-        { emoji: "", name: "Huile végétale", amount: 125, unit: "ml" },
-        { emoji: "", name: "Huile d’olive", amount: 30, unit: "ml" },
-        { emoji: "", name: "Laitues romaines", amount: 2, unit: "pièces" },
-        { emoji: "", name: "Parmesan râpé", amount: 40, unit: "g" },
-        { emoji: "", name: "Parmesan en copeaux", amount: 40, unit: "g" },
-        { emoji: "", name: "Bacon cuit croustillant", amount: 8, unit: "tranches" }
-      ]
+    set(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch {
+        /* stockage indisponible */
+      }
     },
-
-    crepes: {
-      base: 4,
-      label: "PERSONNES",
-      targetId: "crepesIngredients",
-      labelId: "crepesCountLabel",
-      items: [
-        { emoji: "", name: "Farine de blé type 45", amount: 250, unit: "g" },
-        { emoji: "", name: "Œufs frais", amount: 4, unit: "pièces" },
-        { emoji: "", name: "Lait demi-écrémé", amount: 500, unit: "ml" },
-        { emoji: "", name: "Beurre fondu", amount: 50, unit: "g" },
-        { emoji: "", name: "Sucre en poudre", amount: 30, unit: "g" },
-        { emoji: "", name: "Huile de tournesol", amount: 1, unit: "c. à soupe" },
-        { emoji: "", name: "Pincée de sel fin", amount: 1, unit: "pincée" },
-        { emoji: "", name: "Rhum ambré (optionnel)", amount: 1, unit: "bouchon" }
-      ]
+    remove(key) {
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        /* stockage indisponible */
+      }
     },
-
-    burgers: {
-      base: 4,
-      label: "BURGERS",
-      targetId: "burgersIngredients",
-      labelId: "burgersCountLabel",
-      items: [
-        { emoji: "", name: "Pains burger briochés (buns)", amount: 4, unit: "pièces" },
-        { emoji: "", name: "Steaks hachés de bœuf (15% MG)", amount: 4, unit: "pièces" },
-        { emoji: "", name: "Tranches de cheddar affiné", amount: 4, unit: "tranches" },
-        { emoji: "", name: "Tomates charnues", amount: 2, unit: "pièces" },
-        { emoji: "", name: "Salade iceberg", amount: 4, unit: "feuilles" },
-        { emoji: "", name: "Oignon rouge", amount: 1, unit: "pièce" },
-        { emoji: "", name: "Sauce spéciale burger", amount: 4, unit: "c. à soupe" },
-        { emoji: "", name: "Beurre pour toaster", amount: 20, unit: "g" }
-      ]
+    json(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
     },
-
-    jusorange: {
-      base: 4,
-      label: "VERRES",
-      targetId: "jusorangeIngredients",
-      labelId: "jusorangeCountLabel",
-      items: [
-        { emoji: "", name: "Oranges bio", amount: 8, unit: "pièces" },
-        { emoji: "", name: "Glaçons", amount: 8, unit: "pièces" },
-        { emoji: "", name: "Feuilles de menthe", amount: 4, unit: "feuilles" },
-        { emoji: "", name: "Citron (optionnel)", amount: 1, unit: "pièce" }
-      ]
-    },
-
-    fondants: {
-      base: 4,
-      label: "PERSONNES",
-      targetId: "fondantsIngredients",
-      labelId: "fondantsCountLabel",
-      items: [
-        { emoji: "", name: "Chocolat noir (70% cacao)", amount: 200, unit: "g" },
-        { emoji: "", name: "Beurre doux coupé en dés", amount: 100, unit: "g" },
-        { emoji: "", name: "Œufs entiers", amount: 3, unit: "pièces" },
-        { emoji: "", name: "Sucre en poudre", amount: 100, unit: "g" },
-        { emoji: "", name: "Farine tamisée", amount: 50, unit: "g" },
-        { emoji: "", name: "Beurre pour les moules", amount: 10, unit: "g" }
-      ]
-    },
-
-    marbre: {
-      base: 4,
-      label: "PERSONNES",
-      targetId: "marbreIngredients",
-      labelId: "marbreCountLabel",
-      items: [
-        { emoji: "", name: "Farine blanche", amount: 250, unit: "g" },
-        { emoji: "", name: "Œufs frais", amount: 3, unit: "pièces" },
-        { emoji: "", name: "Beurre mou (pommade)", amount: 125, unit: "g" },
-        { emoji: "", name: "Sucre blanc", amount: 125, unit: "g" },
-        { emoji: "", name: "Chocolat", amount: 100, unit: "g" },
-        { emoji: "", name: "Lait entier", amount: 80, unit: "ml" },
-        { emoji: "", name: "Levure chimique", amount: 1, unit: "sachet" },
-        { emoji: "", name: "Extrait de vanille", amount: 1, unit: "c. à café" }
-      ]
-    },
-
-    pokebowl: {
-      base: 2,
-      label: "BOLS",
-      targetId: "pokeIngredients",
-      labelId: "pokebowlCountLabel",
-      items: [
-        { emoji: "", name: "Riz japonais rond", amount: 200, unit: "g" },
-        { emoji: "", name: "Dos de saumon cru", amount: 250, unit: "g" },
-        { emoji: "", name: "Avocat mûr à point", amount: 1, unit: "pièce" },
-        { emoji: "", name: "Concombre Noa", amount: 0.5, unit: "pièce" },
-        { emoji: "", name: "Mangue fraîche", amount: 0.5, unit: "pièce" },
-        { emoji: "", name: "Carotte", amount: 1, unit: "pièce" },
-        { emoji: "", name: "Fèves edamame", amount: 100, unit: "g" },
-        { emoji: "", name: "Sauce soja", amount: 3, unit: "c. à soupe" }
-      ]
-    },
-
-    avocadotoast: {
-      base: 2,
-      label: "PERSONNES",
-      targetId: "avocadoIngredients",
-      labelId: "avocadoCountLabel",
-      items: [
-        { emoji: "", name: "Grandes tranches de pain de campagne", amount: 2, unit: "tranches" },
-        { emoji: "", name: "Avocats mûrs", amount: 2, unit: "pièces" },
-        { emoji: "", name: "Œufs", amount: 2, unit: "pièces" },
-        { emoji: "", name: "Citron jaune", amount: 1, unit: "pièce" },
-        { emoji: "", name: "Huile d’olive", amount: 2, unit: "c. à soupe" },
-        { emoji: "", name: "Tomates cerises", amount: 120, unit: "g" },
-        { emoji: "", name: "Feta émiettée", amount: 60, unit: "g" },
-        { emoji: "", name: "Graines de sésame", amount: 1, unit: "c. à soupe" },
-        { emoji: "", name: "Fleur de sel", amount: 1, unit: "pincée" },
-        { emoji: "", name: "Poivre noir", amount: 1, unit: "pincée" }
-      ]
-    },
-
-    ramen: {
-      base: 2,
-      label: "BOLS",
-      targetId: "ramenIngredients",
-      labelId: "ramenCountLabel",
-      items: [
-        { emoji: "", name: "Nouilles ramen", amount: 2, unit: "paquets" },
-        { emoji: "", name: "Bouillon de volaille ou de légumes", amount: 1000, unit: "ml" },
-        { emoji: "", name: "Œufs", amount: 2, unit: "pièces" },
-        { emoji: "", name: "Filets de poulet ou tofu ferme", amount: 200, unit: "g" },
-        { emoji: "", name: "Champignons", amount: 150, unit: "g" },
-        { emoji: "", name: "Carottes", amount: 1, unit: "pièce" },
-        { emoji: "", name: "Ciboule", amount: 2, unit: "tiges" },
-        { emoji: "", name: "Sauce soja", amount: 3, unit: "c. à soupe" },
-        { emoji: "", name: "Huile de sésame", amount: 1, unit: "c. à soupe" },
-        { emoji: "", name: "Ail", amount: 2, unit: "gousses" },
-        { emoji: "", name: "Gingembre frais", amount: 20, unit: "g" },
-        { emoji: "", name: "Miso (optionnel)", amount: 1, unit: "c. à soupe" }
-      ]
+    setJson(key, value) {
+      this.set(key, JSON.stringify(value));
     }
   };
 
   /* ==========================================================================
-     STATE
+     ICÔNES
      ========================================================================== */
-  const portions = {
-    cailles: 4,
-    saladecesar: 4,
-    crepes: 4,
-    burgers: 4,
-    jusorange: 4,
-    fondants: 4,
-    marbre: 4,
-    pokebowl: 2,
-    avocadotoast: 2,
-    ramen: 2
+  const ICON_PATHS = {
+    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+    basket: '<path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8Z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/>',
+    x: '<path d="M6 6l12 12M18 6 6 18"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M21.5 20a6.5 6.5 0 0 0-4-6"/>',
+    flame: '<path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2-5 .8 1.5 1.5 2 2.5 2.5C11 8 11 5.5 12 3Z"/>',
+    heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/>',
+    printer: '<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/>',
+    share: '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.4M8.2 13.2l7.6 4.4"/>',
+    play: '<path d="M8 5v14l11-7L8 5Z" fill="currentColor"/>',
+    pause: '<path d="M9 5v14M15 5v14"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    minus: '<path d="M5 12h14"/>',
+    check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+    left: '<path d="m15 18-6-6 6-6"/>',
+    right: '<path d="m9 18 6-6-6-6"/>',
+    arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+    timer: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M10 2h4"/>',
+    chef: '<path d="M7 18h10v3H7z"/><path d="M7 18v-4.5A4 4 0 0 1 6 6a4.5 4.5 0 0 1 6-2 4.5 4.5 0 0 1 6 2 4 4 0 0 1-1 7.5V18"/>',
+    send: '<path d="M4 12 20 4l-6 16-3-7-7-1Z"/>',
+    expand: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+    shrink: '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>',
+    trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+    copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+    reset: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+    book: '<path d="M3 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H3z"/><path d="M21 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7z"/>',
+    sparkles: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+    message: '<path d="M4 5h16v11H9l-5 4V5Z"/>',
+    dice: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.1" fill="currentColor"/><circle cx="15" cy="15" r="1.1" fill="currentColor"/><circle cx="15" cy="9" r="1.1" fill="currentColor"/><circle cx="9" cy="15" r="1.1" fill="currentColor"/>',
+    list: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>',
+    bell: '<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4l2-2Z"/><path d="M10 21h4"/>'
   };
 
-  const timers = {};
-  let toastTimeout = null;
-  let revealObserver = null;
-  let countersObserver = null;
+  function icon(name, extraClass = "") {
+    const paths = ICON_PATHS[name] || "";
+    return `<svg class="${extraClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths}</svg>`;
+  }
+
+  const LOGO = `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true">
+      <path class="steam-line" d="M17 9c-2-2.5 2-3.5 0-6" stroke-width="2.4"/>
+      <path class="steam-line" d="M24 8c-2-2.5 2-3.5 0-6" stroke-width="2.4"/>
+      <path class="steam-line" d="M31 9c-2-2.5 2-3.5 0-6" stroke-width="2.4"/>
+      <path d="M8 36a16 16 0 0 1 32 0" stroke-width="3.2" fill="currentColor" fill-opacity=".15"/>
+      <path d="M5 37h38" stroke-width="3.6"/>
+      <circle cx="24" cy="17.5" r="2.4" fill="currentColor" stroke="none"/>
+      <path d="M15 31a10 10 0 0 1 6-8" stroke-width="2.4" opacity=".7"/>
+    </svg>`;
 
   /* ==========================================================================
-     HELPERS
+     OUTILS
      ========================================================================== */
-  function safeGetStorage(key, fallback) {
-    try {
-      const value = localStorage.getItem(key);
-      return value ?? fallback;
-    } catch (error) {
-      return fallback;
-    }
+  function esc(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
-  function safeSetStorage(key, value) {
-    try {
-      localStorage.setItem(key, value);
-    } catch (error) {
-      /* ignore */
-    }
-  }
-
-  function safeRemoveStorage(key) {
-    try {
-      localStorage.removeItem(key);
-    } catch (error) {
-      /* ignore */
-    }
-  }
-
-  function showToast(message) {
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.classList.add("show");
-
-    clearTimeout(toastTimeout);
-    toastTimeout = window.setTimeout(() => {
-      toast.classList.remove("show");
-    }, 3000);
-  }
-
-  function hideLoader() {
-    if (!loader) return;
-    loader.classList.add("hidden");
-  }
-
-  function formatAmount(value) {
-    if (Number.isInteger(value)) return String(value);
-    return value.toFixed(1).replace(/\.0$/, "").replace(".", ",");
-  }
-
-  function formatTime(totalSeconds) {
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-  }
-
-  function normalizeText(text) {
+  function normalize(text) {
     return String(text || "")
       .toLowerCase()
+      .replace(/œ/g, "oe")
+      .replace(/æ/g, "ae")
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .trim();
-  }
-
-  function normalizeAi(text) {
-    return String(text || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^\w\s-]/g, " ")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/[’']/g, " ")
       .replace(/\s+/g, " ")
       .trim();
   }
 
-  function debounce(callback, delay = 200) {
-    let timeoutId = null;
+  function duree(minutes) {
+    const m = Math.round(minutes);
+    if (m < 60) return `${m} min`;
+    const h = Math.floor(m / 60);
+    const rest = m % 60;
+    return rest ? `${h} h ${String(rest).padStart(2, "0")}` : `${h} h`;
+  }
 
+  function dureeSecondes(seconds) {
+    const s = Math.round(seconds);
+    if (s < 60) return `${s} s`;
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    if (m >= 60) return duree(m);
+    return r ? `${m} min ${String(r).padStart(2, "0")}` : `${m} min`;
+  }
+
+  function clock(totalSeconds) {
+    const s = Math.max(0, Math.ceil(totalSeconds));
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    const mm = String(m).padStart(2, "0");
+    const ss = String(sec).padStart(2, "0");
+    return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+  }
+
+  const PLURALISABLES = new Set(["tranche", "feuille", "gousse", "pincée", "bouquet", "sachet", "portion", "tige", "brin", "bol", "verre", "part"]);
+  const FRACTIONS = { 0.25: "¼", 0.5: "½", 0.75: "¾" };
+
+  function formatNombre(value) {
+    const whole = Math.floor(value);
+    const frac = Math.round((value - whole) * 100) / 100;
+    if (FRACTIONS[frac]) return whole ? `${whole} ${FRACTIONS[frac]}` : FRACTIONS[frac];
+    if (Number.isInteger(value)) return String(value);
+    return String(Math.round(value * 10) / 10).replace(".", ",");
+  }
+
+  function arrondir(value, unite) {
+    if (unite === "g" || unite === "ml") {
+      if (value >= 100) return Math.round(value / 5) * 5;
+      if (value >= 10) return Math.round(value);
+      return Math.max(0.5, Math.round(value * 2) / 2);
+    }
+    if (value >= 10) return Math.round(value);
+    if (value >= 3) return Math.max(1, Math.round(value * 2) / 2);
+    return Math.max(0.25, Math.round(value * 4) / 4);
+  }
+
+  function formatQuantite(qte, unite) {
+    if (qte === null || qte === undefined) return "";
+    const v = arrondir(qte, unite);
+    if (unite === "g" && v >= 1000) return `${formatNombre(Math.round(v / 50) / 20)} kg`;
+    if (unite === "ml" && v >= 1000) return `${formatNombre(Math.round(v / 50) / 20)} l`;
+    if (!unite || unite === "pièce") return formatNombre(v);
+    const u = PLURALISABLES.has(unite) && v >= 2 ? `${unite}s` : unite;
+    return `${formatNombre(v)} ${u}`;
+  }
+
+  function quantiteIngredient(item, recette, portions) {
+    if (item.qte === null || item.qte === undefined) return item.note || "";
+    const factor = item.fixe ? 1 : portions / recette.portions.base;
+    return formatQuantite(item.qte * factor, item.unite);
+  }
+
+  function tousIngredients(recette) {
+    return recette.ingredients.flatMap((g) => g.items.map((i) => ({ ...i, groupe: g.groupe })));
+  }
+
+  function portionsLabel(recette, n) {
+    return `${n} ${n > 1 ? recette.portions.pluriel : recette.portions.unite}`;
+  }
+
+  function imageDe(recette, index = 0) {
+    return recette.images[index] || recette.images[0] || { src: "", thumb: "", alt: recette.titre };
+  }
+
+  function debounce(fn, delay = 150) {
+    let t = null;
     return (...args) => {
-      clearTimeout(timeoutId);
-      timeoutId = window.setTimeout(() => {
-        callback(...args);
-      }, delay);
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), delay);
     };
   }
 
-  /* ==========================================================================
-     THEME
-     ========================================================================== */
-  function applyTheme(theme) {
-    const isDark = theme === "dark";
-    body.classList.toggle("dark-mode", isDark);
-
-    if (themeToggle) {
-      themeToggle.textContent = isDark ? "☀️" : "🌙";
-      themeToggle.setAttribute(
-        "aria-label",
-        isDark ? "Activer le thème clair" : "Activer le thème sombre"
-      );
-    }
-  }
-
-  function initTheme() {
-    const savedTheme = safeGetStorage(STORAGE_KEYS.theme, "light");
-    applyTheme(savedTheme);
-
-    if (!themeToggle) return;
-
-    themeToggle.addEventListener("click", () => {
-      const nextTheme = body.classList.contains("dark-mode") ? "light" : "dark";
-      safeSetStorage(STORAGE_KEYS.theme, nextTheme);
-      applyTheme(nextTheme);
-      showToast(nextTheme === "dark" ? "Thème sombre activé" : "Thème clair activé");
-    });
+  function el(html) {
+    const tpl = document.createElement("template");
+    tpl.innerHTML = html.trim();
+    return tpl.content.firstElementChild;
   }
 
   /* ==========================================================================
-     NAVIGATION
+     TOASTS
      ========================================================================== */
-  function initNavigation() {
-    if (menuToggle && navCenter) {
-      menuToggle.addEventListener("click", () => {
-        navCenter.classList.toggle("open");
-        menuToggle.classList.toggle("active");
-      });
+  let toastZone = null;
 
-      document.addEventListener("click", (event) => {
-        const target = event.target;
-        const clickedInsideNav = navCenter.contains(target);
-        const clickedToggle = menuToggle.contains(target);
-
-        if (!clickedInsideNav && !clickedToggle) {
-          navCenter.classList.remove("open");
-          menuToggle.classList.remove("active");
-        }
-      });
+  function toast(message, duration = 3200) {
+    if (!toastZone) {
+      toastZone = el('<div class="toast-zone" role="status" aria-live="polite"></div>');
+      body.appendChild(toastZone);
     }
+    const t = el(`<div class="toast"></div>`);
+    t.textContent = message;
+    toastZone.appendChild(t);
+    setTimeout(() => {
+      t.classList.add("out");
+      setTimeout(() => t.remove(), 320);
+    }, duration);
   }
 
   /* ==========================================================================
-     SEARCH
+     SON (Web Audio : aucun fichier externe)
      ========================================================================== */
-  function initSearch() {
-    if (!searchInput) return;
+  let audioCtx = null;
 
-    const suggestionsBox = document.getElementById("searchSuggestions");
-    if (!suggestionsBox) return;
-
-    const recipeRoutes = [
-      { label: "Cailles", keywords: ["caille", "cailles", "petits pois"], url: "cailles.html" },
-      { label: "Salade César", keywords: ["salade", "cesar", "césar", "salade cesar", "salade césar", "poulet"], url: "salade-cesar.html" },
-      { label: "Crêpes", keywords: ["crepe", "crepes", "crêpe", "crêpes", "pancake"], url: "crepes.html" },
-      { label: "Burgers", keywords: ["burger", "burgers", "hamburger"], url: "burger.html" },
-      { label: "Jus d’orange", keywords: ["jus", "orange", "jus d orange", "jus d'orange", "boisson", "frais"], url: "jusorange.html" },
-      { label: "Fondants", keywords: ["fondant", "fondants", "chocolat", "coulant"], url: "fondant.html" },
-      { label: "Marbré", keywords: ["marbre", "marbré", "gateau marbre", "gâteau marbré", "cake"], url: "gateau-marbre.html" },
-      { label: "Poké bowl", keywords: ["poke", "pokebowl", "poké", "poké bowl", "poke bowl", "saumon"], url: "poke-bowl.html" },
-      { label: "Avocado toast", keywords: ["avocado", "toast", "avocat", "avocado toast", "toast avocat", "oeuf"], url: "avocado-toast.html" },
-      { label: "Ramen", keywords: ["ramen", "nouilles", "bouillon", "soupe", "japonais"], url: "ramen.html" }
-    ];
-
-    let activeIndex = -1;
-
-    function hideSuggestions() {
-      suggestionsBox.style.display = "none";
-      suggestionsBox.innerHTML = "";
-      activeIndex = -1;
-    }
-
-    function getButtons() {
-      return Array.from(suggestionsBox.querySelectorAll(".search-suggestion-item"));
-    }
-
-    function setActiveButton(index) {
-      const buttons = getButtons();
-
-      buttons.forEach((button, buttonIndex) => {
-        button.classList.toggle("active", buttonIndex === index);
-      });
-
-      activeIndex = index;
-    }
-
-    function showSuggestions(results) {
-      suggestionsBox.innerHTML = "";
-
-      if (!results.length) {
-        hideSuggestions();
-        return;
-      }
-
-      results.forEach((recipe) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "search-suggestion-item";
-        button.innerHTML = `🍽️ ${recipe.label}`;
-
-        button.addEventListener("click", () => {
-          window.location.href = recipe.url;
-        });
-
-        suggestionsBox.appendChild(button);
-      });
-
-      suggestionsBox.style.display = "block";
-      activeIndex = -1;
-    }
-
-    const handleInput = debounce(() => {
-      const value = normalizeText(searchInput.value);
-
-      if (!value) {
-        hideSuggestions();
-        return;
-      }
-
-      const results = recipeRoutes.filter((recipe) => {
-        return (
-          normalizeText(recipe.label).includes(value) ||
-          recipe.keywords.some((keyword) => normalizeText(keyword).includes(value))
-        );
-      });
-
-      showSuggestions(results);
-    }, 120);
-
-    searchInput.addEventListener("input", handleInput);
-
-    searchInput.addEventListener("focus", () => {
-      if (searchInput.value.trim()) {
-        handleInput();
-      }
-    });
-
-    searchInput.addEventListener("keydown", (event) => {
-      const buttons = getButtons();
-
-      if (event.key === "Escape") {
-        hideSuggestions();
-        return;
-      }
-
-      if (!buttons.length) return;
-
-      if (event.key === "ArrowDown") {
-        event.preventDefault();
-        const nextIndex = activeIndex < buttons.length - 1 ? activeIndex + 1 : 0;
-        setActiveButton(nextIndex);
-      }
-
-      if (event.key === "ArrowUp") {
-        event.preventDefault();
-        const nextIndex = activeIndex > 0 ? activeIndex - 1 : buttons.length - 1;
-        setActiveButton(nextIndex);
-      }
-
-      if (event.key === "Enter" && activeIndex >= 0 && buttons[activeIndex]) {
-        event.preventDefault();
-        buttons[activeIndex].click();
-      }
-    });
-
-    document.addEventListener("click", (event) => {
-      const target = event.target;
-      if (target !== searchInput && !suggestionsBox.contains(target)) {
-        hideSuggestions();
-      }
-    });
-  }
-
-  /* ==========================================================================
-     PLANE ANIMATION
-     ========================================================================== */
-  function initPlaneAnimation() {
-    const plane = document.getElementById("plane");
-    const trail = document.getElementById("planeTrail");
-    if (!plane) return;
-
-    let startTime = null;
-    const duration = 10000;
-
-    function animatePlane(timestamp) {
-      if (!startTime) startTime = timestamp;
-
-      const elapsed = timestamp - startTime;
-      const progress = elapsed / duration;
-
-      if (progress >= 1) {
-        plane.style.opacity = "0";
-        if (trail) trail.style.opacity = "0";
-        return;
-      }
-
-      const x = progress * (window.innerWidth + 140) - 70;
-      const y = window.innerHeight * 0.30 + Math.sin(progress * Math.PI * 1.4) * 70;
-
-      const nextX = (progress + 0.001) * (window.innerWidth + 140) - 70;
-      const nextY = window.innerHeight * 0.30 + Math.sin((progress + 0.001) * Math.PI * 1.4) * 70;
-
-      const angleRad = Math.atan2(nextY - y, nextX - x);
-      const trailOffset = 34;
-
-      plane.style.opacity = "1";
-      plane.style.left = `${x}px`;
-      plane.style.top = `${y}px`;
-      plane.style.transform = `translate(-50%, -50%) rotate(${angleRad}rad)`;
-
-      if (trail) {
-        const trailX = x - Math.cos(angleRad) * trailOffset;
-        const trailY = y - Math.sin(angleRad) * trailOffset;
-        trail.style.opacity = "1";
-        trail.style.left = `${trailX}px`;
-        trail.style.top = `${trailY}px`;
-      }
-
-      requestAnimationFrame(animatePlane);
-    }
-
-    requestAnimationFrame(animatePlane);
-  }
-
-  /* ==========================================================================
-     INGREDIENTS / PORTIONS
-     ========================================================================== */
-  function renderIngredients(recipeKey) {
-    const recipe = recipeData[recipeKey];
-    if (!recipe) return;
-
-    const container = document.getElementById(recipe.targetId);
-    const label = document.getElementById(recipe.labelId);
-    if (!container || !label) return;
-
-    const currentPortion = portions[recipeKey];
-    label.textContent = `${currentPortion} ${recipe.label}`;
-    container.innerHTML = "";
-
-    recipe.items.forEach((item) => {
-      const scaledAmount = (item.amount / recipe.base) * currentPortion;
-
-      const card = document.createElement("div");
-      card.className = "ingredient-card";
-
-      const left = document.createElement("div");
-      left.className = "ingredient-left";
-
-      if (item.emoji) {
-        const emoji = document.createElement("span");
-        emoji.className = "ingredient-emoji";
-        emoji.textContent = item.emoji;
-        left.appendChild(emoji);
-      }
-
-      const name = document.createElement("div");
-      name.className = "ingredient-name";
-      name.textContent = item.name;
-
-      const amount = document.createElement("div");
-      amount.className = "ingredient-amount";
-      amount.textContent = item.unit
-        ? `${formatAmount(scaledAmount)} ${item.unit}`
-        : `${formatAmount(scaledAmount)}`;
-
-      left.appendChild(name);
-      card.appendChild(left);
-      card.appendChild(amount);
-      container.appendChild(card);
-    });
-  }
-
-  function initIngredientCardsHover() {
-    const cards = document.querySelectorAll(".ingredient-card");
-
-    cards.forEach((card) => {
-      if (card.dataset.hoverBound === "true") return;
-      card.dataset.hoverBound = "true";
-
-      card.addEventListener("mouseenter", () => {
-        card.classList.add("is-hovered");
-      });
-
-      card.addEventListener("mouseleave", () => {
-        card.classList.remove("is-hovered");
-      });
-    });
-  }
-
-  /* ==========================================================================
-     TIMERS
-     ========================================================================== */
-  function updateTimerDisplay(displayId) {
-    const display = document.getElementById(displayId);
-    if (!display) return;
-
-    const timer = timers[displayId];
-    display.textContent = formatTime(timer ? timer.seconds : 0);
-  }
-
-  function playTimerSound() {
+  function ensureAudio() {
     try {
-      const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
-      audio.volume = 0.4;
-      void audio.play();
-    } catch (error) {
-      /* ignore */
+      if (!audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return null;
+        audioCtx = new Ctx();
+      }
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      return audioCtx;
+    } catch {
+      return null;
     }
   }
 
-  function initTimerDisplays() {
-    const ids = [
-      "timerDisplayBurgers",
-      "timerDisplayAvocado",
-      "timerDisplayRamen"
-    ];
+  function bip(freq = 880, duration = 0.18, delay = 0, type = "sine", gain = 0.18) {
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    const start = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, start);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(gain, start + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+    osc.connect(g).connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + duration + 0.05);
+  }
 
-    ids.forEach((id) => {
-      const display = document.getElementById(id);
-      if (!display) return;
-
-      if (!timers[id]) {
-        timers[id] = { seconds: 0, interval: null };
-      }
-
-      updateTimerDisplay(id);
-    });
+  function sonnerie() {
+    [0, 0.25, 0.5, 1.1, 1.35, 1.6].forEach((d, i) => bip(i % 3 === 2 ? 1320 : 988, 0.2, d, "triangle", 0.22));
   }
 
   /* ==========================================================================
-     CHECKLISTS
+     CONFETTIS
      ========================================================================== */
-  function initChecklists() {
-    const checklists = document.querySelectorAll(".checklist");
-
-    checklists.forEach((checklist) => {
-      const fillId = checklist.dataset.fill;
-      const textId = checklist.dataset.text;
-      const checkboxes = checklist.querySelectorAll('input[type="checkbox"]');
-      const fill = fillId ? document.getElementById(fillId) : null;
-      const text = textId ? document.getElementById(textId) : null;
-
-      const updateChecklist = () => {
-        const checked = Array.from(checkboxes).filter((checkbox) => checkbox.checked).length;
-        const total = checkboxes.length;
-        const percent = total > 0 ? (checked / total) * 100 : 0;
-
-        if (fill) fill.style.width = `${percent}%`;
-        if (text) text.textContent = `${checked} / ${total}`;
-
-        if (total > 0 && checked === total) {
-          showToast("🎉 Étapes terminées ! Bravo chef.");
-        }
-      };
-
-      checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener("change", updateChecklist);
+  function confetti(amount = 140) {
+    if (REDUCED_MOTION) return;
+    const canvas = document.createElement("canvas");
+    canvas.className = "confetti-canvas";
+    body.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = innerWidth * dpr;
+    canvas.height = innerHeight * dpr;
+    ctx.scale(dpr, dpr);
+    const colors = ["#c0502e", "#e0a030", "#5d7a54", "#a13652", "#f6efe4", "#ea7651"];
+    const parts = Array.from({ length: amount }, () => ({
+      x: innerWidth / 2 + (Math.random() - 0.5) * innerWidth * 0.4,
+      y: innerHeight * 0.35,
+      vx: (Math.random() - 0.5) * 14,
+      vy: -Math.random() * 14 - 4,
+      w: 6 + Math.random() * 6,
+      h: 8 + Math.random() * 8,
+      r: Math.random() * Math.PI,
+      vr: (Math.random() - 0.5) * 0.3,
+      c: colors[Math.floor(Math.random() * colors.length)]
+    }));
+    const start = performance.now();
+    function frame(now) {
+      const t = now - start;
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      parts.forEach((p) => {
+        p.vy += 0.35;
+        p.vx *= 0.99;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.r += p.vr;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.r);
+        ctx.globalAlpha = Math.max(0, 1 - t / 2600);
+        ctx.fillStyle = p.c;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2)));
+        ctx.restore();
       });
+      if (t < 2600) requestAnimationFrame(frame);
+      else canvas.remove();
+    }
+    requestAnimationFrame(frame);
+  }
 
-      updateChecklist();
-    });
+  function burst(target, emojis = ["❤️", "✨", "💛", "🧡"]) {
+    if (REDUCED_MOTION || !target) return;
+    const rect = target.getBoundingClientRect();
+    for (let i = 0; i < 10; i++) {
+      const p = document.createElement("span");
+      p.className = "burst-particle";
+      p.textContent = emojis[i % emojis.length];
+      const angle = (Math.PI * 2 * i) / 10 + Math.random() * 0.4;
+      const dist = 50 + Math.random() * 40;
+      p.style.left = `${rect.left + rect.width / 2 - 9}px`;
+      p.style.top = `${rect.top + rect.height / 2 - 12}px`;
+      p.style.setProperty("--dx", `${Math.cos(angle) * dist}px`);
+      p.style.setProperty("--dy", `${Math.sin(angle) * dist}px`);
+      p.style.setProperty("--rot", `${(Math.random() - 0.5) * 120}deg`);
+      body.appendChild(p);
+      setTimeout(() => p.remove(), 950);
+    }
   }
 
   /* ==========================================================================
-     COUNTERS
+     THÈME CLAIR / SOMBRE
      ========================================================================== */
-  function initCounters() {
-    const counters = document.querySelectorAll(".counter");
-    if (!counters.length) return;
+  const THEME_KEY = "antoine-theme";
 
-    const runCounter = (counter) => {
-      const target = Number(counter.dataset.target || 0);
-      if (target <= 0 || counter.dataset.counted === "true") return;
+  function themeActuel() {
+    const forced = document.documentElement.dataset.theme;
+    if (forced) return forced;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
 
-      counter.dataset.counted = "true";
-
-      const duration = 1500;
-      const steps = Math.min(target, 120);
-      const increment = target / steps;
-      const stepTime = Math.max(16, Math.floor(duration / steps));
-      let current = 0;
-
-      const interval = window.setInterval(() => {
-        current += increment;
-
-        if (current >= target) {
-          counter.textContent = String(target);
-          window.clearInterval(interval);
-          return;
-        }
-
-        counter.textContent = String(Math.floor(current));
-      }, stepTime);
+  function basculerTheme() {
+    const next = themeActuel() === "dark" ? "light" : "dark";
+    const apply = () => {
+      document.documentElement.dataset.theme = next;
+      store.set(THEME_KEY, next);
     };
-
-    countersObserver = new IntersectionObserver(
-      (entries, observer) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            runCounter(entry.target);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.45 }
-    );
-
-    counters.forEach((counter) => {
-      countersObserver.observe(counter);
-    });
+    if (document.startViewTransition && !REDUCED_MOTION) document.startViewTransition(apply);
+    else apply();
+    toast(next === "dark" ? "Ambiance tamisée activée 🌙" : "Lumière du jour activée ☀️", 1800);
   }
 
   /* ==========================================================================
-     SCROLL REVEAL
+     EN-TÊTE, MENU MOBILE, PIED DE PAGE
      ========================================================================== */
-  function revealOnScrollFallback() {
-    const elements = document.querySelectorAll(
-      ".glass-card, .universe-card, .feature-box, .recipe-banner, .recipe-gallery-grid img, .ingredient-card, .hero-card, .bento-card"
-    );
+  const NAV = [
+    { href: "index.html#recettes", label: "Recettes", page: "recipe" },
+    { href: "jeux.html", label: "Jeux", page: "games" },
+    { href: "infos.html", label: "Origines", page: "infos" },
+    { href: "avis.html", label: "Avis", page: "avis" },
+    { href: "questions.html", label: "Questions", page: "questions" }
+  ];
 
-    const triggerBottom = window.innerHeight * 0.9;
+  function renderHeader() {
+    const isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
+    const links = NAV.map(
+      (n) => `<a href="${n.href}"${n.page === PAGE ? ' aria-current="page"' : ""}>${n.label}</a>`
+    ).join("");
 
-    elements.forEach((element) => {
-      if (element.getBoundingClientRect().top < triggerBottom) {
-        element.classList.add("revealed");
-      }
+    const header = el(`
+      <header class="site-header" data-header>
+        <div class="container header-inner">
+          <a class="brand" href="index.html" aria-label="Le restaurant d'Antoine, accueil">
+            <span class="brand-mark">${LOGO}</span>
+            <span class="brand-text"><strong>Le restaurant</strong><em>d'Antoine</em></span>
+          </a>
+          <nav class="main-nav" aria-label="Navigation principale">${links}</nav>
+          <div class="header-actions">
+            <button class="icon-btn search-trigger" type="button" data-open-search aria-label="Rechercher une recette">
+              ${icon("search")}<span class="label">Rechercher</span><span class="kbd">${isMac ? "⌘" : "Ctrl"} K</span>
+            </button>
+            <button class="icon-btn" type="button" data-open-list aria-label="Ma liste de courses">
+              ${icon("basket")}<span class="badge-count" data-list-count hidden>0</span>
+            </button>
+            <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Changer de thème">
+              ${icon("sun", "icon-sun")}${icon("moon", "icon-moon")}
+            </button>
+            <button class="icon-btn menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu" aria-label="Ouvrir le menu"><span></span></button>
+          </div>
+        </div>
+      </header>`);
+
+    const skip = el('<a class="skip-link" href="#main">Aller au contenu</a>');
+    const menu = el(`<nav class="mobile-menu" id="mobile-menu" hidden aria-label="Menu mobile">
+        <a href="index.html" style="--i:0">Accueil</a>
+        ${NAV.map((n, i) => `<a href="${n.href}" style="--i:${i + 1}"${n.page === PAGE ? ' aria-current="page"' : ""}>${n.label}</a>`).join("")}
+      </nav>`);
+
+    body.prepend(skip, header, menu);
+
+    const toggle = header.querySelector("[data-menu-toggle]");
+    const setMenu = (open) => {
+      menu.hidden = !open;
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Fermer le menu" : "Ouvrir le menu");
+      body.style.overflow = open ? "hidden" : "";
+      body.classList.toggle("menu-open", open);
+    };
+    toggle.addEventListener("click", () => setMenu(menu.hidden));
+    menu.addEventListener("click", (e) => {
+      if (e.target.closest("a")) setMenu(false);
     });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !menu.hidden) setMenu(false);
+    });
+
+    header.querySelector("[data-theme-toggle]").addEventListener("click", basculerTheme);
+
+    // En-tête qui se cache en descendant et réapparaît en remontant.
+    let lastY = scrollY;
+    const onScroll = () => {
+      const y = scrollY;
+      header.classList.toggle("is-scrolled", y > 8);
+      const goingDown = y > lastY + 4;
+      const goingUp = y < lastY - 4;
+      if (goingDown && y > 320 && menu.hidden) header.classList.add("is-hidden");
+      if (goingUp || y < 120) header.classList.remove("is-hidden");
+      lastY = y;
+    };
+    addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
   }
 
-  function initReveal() {
-    const elements = document.querySelectorAll(
-      ".glass-card, .universe-card, .feature-box, .recipe-banner, .recipe-gallery-grid img, .ingredient-card, .hero-card, .bento-card"
-    );
+  function renderFooter() {
+    const cats = Object.entries(META.CATEGORIES)
+      .map(([key, c]) => `<li><a href="index.html?cat=${key}#recettes">${c.label}</a></li>`)
+      .join("");
+    const footer = el(`
+      <footer class="site-footer">
+        <div class="container">
+          <div class="footer-grid">
+            <div>
+              <a class="brand" href="index.html" aria-label="Accueil">
+                <span class="brand-mark">${LOGO}</span>
+                <span class="brand-text"><strong>Le restaurant</strong><em>d'Antoine</em></span>
+              </a>
+              <p class="footer-tagline">Les recettes de la famille, à cuisiner ensemble, à partager et à refaire encore.</p>
+            </div>
+            <div>
+              <h4>Recettes</h4>
+              <ul>${cats}</ul>
+            </div>
+            <div>
+              <h4>Le restaurant</h4>
+              <ul>
+                <li><a href="jeux.html">Mini-jeux</a></li>
+                <li><a href="infos.html">Origines des plats</a></li>
+                <li><a href="avis.html">Livre d'or</a></li>
+                <li><a href="questions.html">Poser une question</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4>Outils</h4>
+              <ul>
+                <li><a href="#" data-open-search>Rechercher</a></li>
+                <li><a href="#" data-open-list>Liste de courses</a></li>
+                <li><a href="#" data-open-chat>Assistant du chef</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <span>© ${new Date().getFullYear()} Le restaurant d'Antoine · Codé avec passion pour la famille.</span>
+            <span>Fait maison, servi avec amour.</span>
+          </div>
+        </div>
+      </footer>`);
+    body.appendChild(footer);
+  }
 
-    if (!elements.length) return;
+  /* ==========================================================================
+     RÉVÉLATIONS AU DÉFILEMENT
+     ========================================================================== */
+  let revealObserver = null;
 
-    if ("IntersectionObserver" in window) {
+  function observeReveal(root = document) {
+    const items = root.querySelectorAll("[data-reveal]:not(.is-visible)");
+    if (!("IntersectionObserver" in window) || REDUCED_MOTION) {
+      items.forEach((i) => i.classList.add("is-visible"));
+      return;
+    }
+    if (!revealObserver) {
       revealObserver = new IntersectionObserver(
-        (entries, observer) => {
+        (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              entry.target.classList.add("revealed");
-              observer.unobserve(entry.target);
+              entry.target.classList.add("is-visible");
+              revealObserver.unobserve(entry.target);
             }
           });
         },
-        { threshold: 0.12 }
+        { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
       );
+    }
+    items.forEach((i) => revealObserver.observe(i));
+  }
 
-      elements.forEach((element) => {
-        revealObserver.observe(element);
+  /* ==========================================================================
+     LIKES (le comptage est géré par likes-firebase.js)
+     ========================================================================== */
+  const likeCounts = {};
+
+  function likeButton(key) {
+    return `<button class="btn like-btn" type="button" data-like="${esc(key)}" aria-pressed="false" title="Liker cette recette">
+        ${icon("heart")}<span data-like-count="${esc(key)}">${likeCounts[key] ?? "–"}</span>
+      </button>`;
+  }
+
+  document.addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-like]");
+    if (!btn) return;
+    const key = btn.dataset.like;
+    if (typeof window.toggleLike !== "function") {
+      toast("Les likes ne sont pas disponibles pour le moment (connexion au serveur impossible).");
+      return;
+    }
+    const willLike = btn.getAttribute("aria-pressed") !== "true";
+    btn.classList.remove("pop");
+    void btn.offsetWidth;
+    btn.classList.add("pop");
+    if (willLike) burst(btn);
+    window.toggleLike(key);
+  });
+
+  document.addEventListener("antoine:likes", (event) => {
+    Object.assign(likeCounts, event.detail?.counts || {});
+    renderTopRecipe();
+    document.querySelectorAll("[data-card-likes]").forEach((node) => {
+      const n = likeCounts[node.dataset.cardLikes];
+      node.textContent = n ?? "–";
+    });
+  });
+
+  /* ==========================================================================
+     LISTE DE COURSES
+     ========================================================================== */
+  const LIST_KEY = "antoine-liste-courses";
+  let listDrawer = null;
+  let overlay = null;
+
+  function getList() {
+    const data = store.json(LIST_KEY, []);
+    return Array.isArray(data) ? data : [];
+  }
+
+  function saveList(list) {
+    store.setJson(LIST_KEY, list);
+    updateListBadge(true);
+    if (listDrawer && !listDrawer.hidden) renderListDrawer();
+  }
+
+  function updateListBadge(bump = false) {
+    const count = getList().filter((i) => !i.checked).length;
+    document.querySelectorAll("[data-list-count]").forEach((badge) => {
+      badge.hidden = count === 0;
+      badge.textContent = String(count);
+      if (bump && count) {
+        badge.classList.remove("bump");
+        void badge.offsetWidth;
+        badge.classList.add("bump");
+      }
+    });
+  }
+
+  function addRecipeToList(recette, portions) {
+    const list = getList().filter((i) => i.recette !== recette.key);
+    tousIngredients(recette).forEach((item, idx) => {
+      list.push({
+        id: `${recette.key}-${idx}`,
+        recette: recette.key,
+        nom: item.nom,
+        qte: quantiteIngredient(item, recette, portions),
+        optionnel: !!item.optionnel,
+        checked: false
       });
-    } else {
-      revealOnScrollFallback();
-      window.addEventListener("scroll", revealOnScrollFallback);
+    });
+    saveList(list);
+    toast(`🧺 Ingrédients des ${recette.titreCourt.toLowerCase()} ajoutés à ta liste (${portionsLabel(recette, portions)}).`);
+  }
+
+  function listAsText() {
+    const list = getList();
+    const groups = {};
+    list.forEach((i) => (groups[i.recette] ||= []).push(i));
+    return Object.entries(groups)
+      .map(([key, items]) => {
+        const titre = BY_KEY[key]?.titreCourt || key;
+        return `${titre}\n${items.map((i) => `${i.checked ? "✓" : "•"} ${i.nom}${i.qte ? ` : ${i.qte}` : ""}`).join("\n")}`;
+      })
+      .join("\n\n");
+  }
+
+  function ensureOverlay() {
+    if (overlay) return overlay;
+    overlay = el('<div class="overlay" hidden></div>');
+    overlay.addEventListener("click", closePanels);
+    body.appendChild(overlay);
+    return overlay;
+  }
+
+  function closePanels() {
+    if (listDrawer) listDrawer.hidden = true;
+    if (palette) palette.hidden = true;
+    if (overlay) overlay.hidden = true;
+    body.style.overflow = "";
+  }
+
+  function renderListDrawer() {
+    const list = getList();
+    const bodyEl = listDrawer.querySelector(".drawer-body");
+    if (!list.length) {
+      bodyEl.innerHTML = `<div class="empty-state"><span class="big">🧺</span><strong>Ta liste est vide</strong>
+        <span>Sur une recette, clique sur « Ajouter à ma liste » : les quantités suivent le nombre de portions.</span></div>`;
+      return;
+    }
+    const groups = {};
+    list.forEach((i) => (groups[i.recette] ||= []).push(i));
+    bodyEl.innerHTML = Object.entries(groups)
+      .map(([key, items]) => {
+        const r = BY_KEY[key];
+        return `<div class="list-group">
+          <div class="list-group-head">
+            <h3>${r ? `${r.emoji} ${esc(r.titreCourt)}` : esc(key)}</h3>
+            <button class="icon-btn" type="button" data-remove-group="${esc(key)}" aria-label="Retirer cette recette">${icon("trash")}</button>
+          </div>
+          ${items
+            .map(
+              (i) => `<label class="list-item${i.checked ? " is-checked" : ""}">
+                <input class="check-input" type="checkbox" data-list-item="${esc(i.id)}"${i.checked ? " checked" : ""}>
+                <span class="ing-name">${esc(i.nom)}${i.optionnel ? '<span class="opt-tag">option</span>' : ""}</span>
+                <span class="ing-qty">${esc(i.qte)}</span>
+              </label>`
+            )
+            .join("")}
+        </div>`;
+      })
+      .join("");
+  }
+
+  function openList() {
+    if (!listDrawer) {
+      listDrawer = el(`<aside class="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="list-title">
+          <div class="drawer-head">
+            <h2 id="list-title">🧺 Ma liste de courses</h2>
+            <button class="icon-btn" type="button" data-close aria-label="Fermer">${icon("x")}</button>
+          </div>
+          <div class="drawer-body"></div>
+          <div class="drawer-foot">
+            <button class="btn btn-sm" type="button" data-copy-list>${icon("copy")} Copier</button>
+            <button class="btn btn-sm" type="button" data-clear-list>${icon("trash")} Vider</button>
+          </div>
+        </aside>`);
+      body.appendChild(listDrawer);
+      listDrawer.querySelector("[data-close]").addEventListener("click", closePanels);
+      listDrawer.addEventListener("change", (e) => {
+        const id = e.target.dataset.listItem;
+        if (!id) return;
+        const list = getList().map((i) => (i.id === id ? { ...i, checked: e.target.checked } : i));
+        saveList(list);
+      });
+      listDrawer.addEventListener("click", (e) => {
+        const group = e.target.closest("[data-remove-group]");
+        if (group) saveList(getList().filter((i) => i.recette !== group.dataset.removeGroup));
+        if (e.target.closest("[data-clear-list]")) {
+          if (!getList().length) return;
+          saveList([]);
+          toast("Liste vidée.");
+        }
+        if (e.target.closest("[data-copy-list]")) {
+          const text = listAsText();
+          if (!text) return toast("Ta liste est vide.");
+          copyText(`Ma liste de courses — Le restaurant d'Antoine\n\n${text}`, "Liste copiée : colle-la dans tes notes ou un message 📋");
+        }
+      });
+    }
+    renderListDrawer();
+    ensureOverlay().hidden = false;
+    listDrawer.hidden = false;
+    body.style.overflow = "hidden";
+    listDrawer.querySelector("[data-close]").focus();
+  }
+
+  function copyText(text, okMessage) {
+    const done = () => toast(okMessage);
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text) && done());
+    } else if (fallbackCopy(text)) {
+      done();
+    }
+  }
+
+  function fallbackCopy(text) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      ta.remove();
+      if (!ok) toast("Copie impossible sur ce navigateur.");
+      return ok;
+    } catch {
+      toast("Copie impossible sur ce navigateur.");
+      return false;
     }
   }
 
   /* ==========================================================================
-     TILT EFFECT
+     RECHERCHE (palette Ctrl/⌘ + K)
      ========================================================================== */
-  function initTilt() {
-    return;
+  let palette = null;
+  const EXTRA_PAGES = [
+    { titre: "Mini-jeux du restaurant", url: "jeux.html", emoji: "🎮", mots: "jeux jeu jouer memory quiz commandes course runner" },
+    { titre: "Memory du chef", url: "memory.html", emoji: "🃏", mots: "memory paires cartes jeu" },
+    { titre: "Quiz du chef", url: "quiz.html", emoji: "🧠", mots: "quiz questions jeu culture" },
+    { titre: "Coup de feu en cuisine", url: "commandes.html", emoji: "🛎️", mots: "commandes service burger assembler jeu" },
+    { titre: "Service infini (course)", url: "index2.html", emoji: "🏃", mots: "course runner chef jeu sauter" },
+    { titre: "Origines des plats", url: "infos.html", emoji: "🌍", mots: "origines histoire culture pays infos" },
+    { titre: "Livre d'or", url: "avis.html", emoji: "⭐", mots: "avis note livre d or commentaires" },
+    { titre: "Poser une question", url: "questions.html", emoji: "✉️", mots: "question contact message chef" }
+  ];
+
+  function searchIndex(query) {
+    const q = normalize(query);
+    const tokens = q.split(" ").filter(Boolean);
+    if (!tokens.length) {
+      return RECETTES.map((r) => ({ type: "recette", r, score: 1 }));
+    }
+    const results = [];
+    RECETTES.forEach((r) => {
+      const titre = normalize(`${r.titre} ${r.titreCourt}`);
+      const cat = normalize(META.CATEGORIES[r.categorie]?.label || "");
+      const tags = normalize(r.tags.join(" "));
+      const ings = normalize(tousIngredients(r).map((i) => i.nom).join(" "));
+      let score = 0;
+      let matchedIng = "";
+      const ok = tokens.every((t) => {
+        let s = 0;
+        if (titre.includes(t)) s += titre.startsWith(t) ? 8 : 5;
+        if (cat.includes(t)) s += 3;
+        if (tags.includes(t)) s += 2;
+        if (ings.includes(t)) {
+          s += 1.5;
+          matchedIng ||= tousIngredients(r).find((i) => normalize(i.nom).includes(t))?.nom || "";
+        }
+        score += s;
+        return s > 0;
+      });
+      if (ok) results.push({ type: "recette", r, score, matchedIng });
+    });
+    EXTRA_PAGES.forEach((p) => {
+      const hay = normalize(`${p.titre} ${p.mots}`);
+      if (tokens.every((t) => hay.includes(t))) results.push({ type: "page", p, score: 2 });
+    });
+    return results.sort((a, b) => b.score - a.score);
   }
+
+  function highlight(text, query) {
+    const tokens = normalize(query).split(" ").filter((t) => t.length > 1);
+    let out = esc(text);
+    if (!tokens.length) return out;
+    const norm = normalize(text);
+    // Surligne seulement la première occurrence du premier mot trouvé (texte court).
+    for (const t of tokens) {
+      const idx = norm.indexOf(t);
+      if (idx >= 0 && norm.length === text.length) {
+        out = `${esc(text.slice(0, idx))}<mark>${esc(text.slice(idx, idx + t.length))}</mark>${esc(text.slice(idx + t.length))}`;
+        break;
+      }
+    }
+    return out;
+  }
+
+  function openSearch(initial = "") {
+    if (!palette) {
+      palette = el(`<div class="palette" hidden role="dialog" aria-modal="true" aria-label="Rechercher">
+          <div class="palette-input">
+            ${icon("search")}
+            <input type="search" placeholder="Une recette, un ingrédient (chocolat, œufs…)" aria-label="Rechercher" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="palette-results">
+            <button class="icon-btn" type="button" data-close aria-label="Fermer">${icon("x")}</button>
+          </div>
+          <ul class="palette-results" id="palette-results" role="listbox"></ul>
+          <div class="palette-foot"><span>↑ ↓ pour naviguer</span><span>Entrée pour ouvrir</span><span>Échap pour fermer</span></div>
+        </div>`);
+      body.appendChild(palette);
+      const input = palette.querySelector("input");
+      const list = palette.querySelector(".palette-results");
+      let active = 0;
+
+      const render = () => {
+        const results = searchIndex(input.value).slice(0, 8);
+        active = 0;
+        if (!results.length) {
+          list.innerHTML = `<li class="palette-empty">Aucun résultat pour « ${esc(input.value)} ».<br>Essaie un ingrédient, ou demande à l'assistant du chef !</li>`;
+          return;
+        }
+        list.innerHTML = results
+          .map((res, i) => {
+            if (res.type === "page") {
+              return `<li><a href="${res.p.url}" role="option" aria-selected="${i === 0}">
+                  <span class="emoji-tile">${res.p.emoji}</span>
+                  <span><strong>${highlight(res.p.titre, input.value)}</strong><small>Page du site</small></span>
+                  ${icon("right")}
+                </a></li>`;
+            }
+            const r = res.r;
+            const sub = res.matchedIng
+              ? `Contient : ${esc(res.matchedIng)}`
+              : `${esc(META.CATEGORIES[r.categorie]?.singulier || "")} · ${duree(META.tempsTotal(r))}`;
+            return `<li><a href="${r.url}" role="option" aria-selected="${i === 0}">
+                <img src="${imageDe(r).thumb}" alt="" loading="lazy">
+                <span><strong>${highlight(r.titre, input.value)}</strong><small>${sub}</small></span>
+                ${icon("right")}
+              </a></li>`;
+          })
+          .join("");
+      };
+
+      const setActive = (i) => {
+        const links = [...list.querySelectorAll("a")];
+        if (!links.length) return;
+        active = (i + links.length) % links.length;
+        links.forEach((a, idx) => a.setAttribute("aria-selected", String(idx === active)));
+        links[active].scrollIntoView({ block: "nearest" });
+      };
+
+      input.addEventListener("input", debounce(render, 60));
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          setActive(active + 1);
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          setActive(active - 1);
+        } else if (e.key === "Enter") {
+          const link = list.querySelectorAll("a")[active];
+          if (link) {
+            e.preventDefault();
+            location.href = link.getAttribute("href");
+          }
+        }
+      });
+      palette.querySelector("[data-close]").addEventListener("click", closePanels);
+      palette.render = render;
+    }
+    const input = palette.querySelector("input");
+    input.value = initial;
+    palette.render();
+    ensureOverlay().hidden = false;
+    palette.hidden = false;
+    setTimeout(() => input.focus(), 30);
+  }
+
+  document.addEventListener("keydown", (e) => {
+    const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || "") || document.activeElement?.isContentEditable;
+    if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      openSearch();
+    } else if (e.key === "/" && !typing) {
+      e.preventDefault();
+      openSearch();
+    } else if (e.key === "Escape") {
+      if ((palette && !palette.hidden) || (listDrawer && !listDrawer.hidden)) closePanels();
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-open-search]")) {
+      e.preventDefault();
+      openSearch();
+    } else if (e.target.closest("[data-open-list]")) {
+      e.preventDefault();
+      openList();
+    }
+  });
+
+  /* ==========================================================================
+     MINUTEURS (plusieurs en parallèle, conservés d'une page à l'autre)
+     ========================================================================== */
+  const TIMERS_KEY = "antoine-minuteurs";
+  let timers = store.json(TIMERS_KEY, []);
+  if (!Array.isArray(timers)) timers = [];
+  let dock = null;
+  let tickHandle = null;
+  const originalTitle = document.title;
+
+  function saveTimers() {
+    store.setJson(TIMERS_KEY, timers);
+  }
+
+  function remaining(t) {
+    if (t.done) return 0;
+    if (t.paused) return t.left;
+    return Math.max(0, (t.endAt - Date.now()) / 1000);
+  }
+
+  function startTimer(seconds, label = "Minuteur", recette = "") {
+    ensureAudio();
+    const s = Math.max(1, Math.round(Number(seconds) || 0));
+    const t = { id: `t${Date.now()}${Math.random().toString(16).slice(2, 6)}`, label, recette, total: s, endAt: Date.now() + s * 1000, paused: false, left: s, done: false };
+    timers.push(t);
+    saveTimers();
+    renderDock();
+    toast(`⏱ Minuteur lancé : ${label} (${dureeSecondes(s)})`, 2200);
+    return t;
+  }
+
+  function renderDock() {
+    if (!dock) {
+      dock = el('<div class="timer-dock" aria-live="polite" aria-label="Minuteurs"></div>');
+      body.appendChild(dock);
+      dock.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-timer-action]");
+        if (!btn) return;
+        const t = timers.find((x) => x.id === btn.dataset.id);
+        if (!t) return;
+        const action = btn.dataset.timerAction;
+        if (action === "toggle") {
+          if (t.paused) {
+            t.paused = false;
+            t.endAt = Date.now() + t.left * 1000;
+          } else {
+            t.left = remaining(t);
+            t.paused = true;
+          }
+        } else if (action === "add") {
+          if (t.done) {
+            t.done = false;
+            t.paused = false;
+            t.endAt = Date.now() + 60000;
+            t.total = 60;
+          } else if (t.paused) {
+            t.left += 60;
+            t.total += 60;
+          } else {
+            t.endAt += 60000;
+            t.total += 60;
+          }
+        } else if (action === "close") {
+          timers = timers.filter((x) => x.id !== t.id);
+        }
+        saveTimers();
+        renderDock();
+      });
+    }
+    dock.innerHTML = timers
+      .map((t) => {
+        const r = BY_KEY[t.recette];
+        return `<div class="timer${t.paused ? " is-paused" : ""}${t.done ? " is-done" : ""}" data-timer="${t.id}">
+          <div class="timer-ring">
+            <svg viewBox="0 0 44 44"><circle class="track" cx="22" cy="22" r="18"/><circle class="bar" cx="22" cy="22" r="18" stroke-dasharray="113.1" stroke-dashoffset="0"/></svg>
+            <span>${t.done ? "🔔" : r ? r.emoji : "⏱"}</span>
+          </div>
+          <div class="timer-info"><small>${esc(t.label)}${r ? ` · ${esc(r.titreCourt)}` : ""}</small><strong>${t.done ? "C'est prêt !" : clock(remaining(t))}</strong></div>
+          <div class="timer-btns">
+            ${t.done ? "" : `<button class="icon-btn" type="button" data-timer-action="toggle" data-id="${t.id}" aria-label="${t.paused ? "Reprendre" : "Pause"}">${icon(t.paused ? "play" : "pause")}</button>`}
+            <button class="icon-btn" type="button" data-timer-action="add" data-id="${t.id}" aria-label="Ajouter une minute">${icon("plus")}</button>
+            <button class="icon-btn" type="button" data-timer-action="close" data-id="${t.id}" aria-label="${t.done ? "Arrêter" : "Annuler"}">${icon("x")}</button>
+          </div>
+        </div>`;
+      })
+      .join("");
+    tickTimers();
+    if (timers.length && !tickHandle) tickHandle = setInterval(tickTimers, 250);
+    if (!timers.length && tickHandle) {
+      clearInterval(tickHandle);
+      tickHandle = null;
+      document.title = originalTitle;
+    }
+  }
+
+  function tickTimers() {
+    let changed = false;
+    let ringing = false;
+    timers.forEach((t) => {
+      const node = dock?.querySelector(`[data-timer="${t.id}"]`);
+      const left = remaining(t);
+      if (!t.done && !t.paused && left <= 0) {
+        t.done = true;
+        changed = true;
+        sonnerie();
+        try {
+          navigator.vibrate?.([300, 150, 300, 150, 300]);
+        } catch {
+          /* vibration non disponible */
+        }
+        toast(`🔔 ${t.label} : c'est prêt !`, 6000);
+      }
+      if (t.done) ringing = true;
+      if (node && !changed) {
+        const strong = node.querySelector(".timer-info strong");
+        if (strong && !t.done) strong.textContent = clock(left);
+        const bar = node.querySelector(".bar");
+        if (bar) bar.style.strokeDashoffset = String(113.1 * (1 - left / t.total));
+      }
+    });
+    if (changed) {
+      saveTimers();
+      renderDock();
+      return;
+    }
+    if (ringing) {
+      document.title = document.title === originalTitle ? "🔔 C'est prêt !" : originalTitle;
+    } else if (document.title !== originalTitle) {
+      document.title = originalTitle;
+    }
+  }
+
+  document.addEventListener("click", (e) => {
+    const chip = e.target.closest("[data-start-timer]");
+    if (!chip) return;
+    startTimer(Number(chip.dataset.startTimer), chip.dataset.label || "Minuteur", chip.dataset.recette || "");
+  });
 
   /* ==========================================================================
      LIGHTBOX
      ========================================================================== */
-  function initLightbox() {
-    const images = document.querySelectorAll(".lightboxable");
-    const lightbox = document.getElementById("lightbox");
-    const lightboxImage = document.getElementById("lightboxImage");
-    const lightboxClose = document.getElementById("lightboxClose");
-    const lightboxBackdrop = document.querySelector(".lightbox-backdrop");
+  let lightbox = null;
 
-    if (!lightbox || !lightboxImage || !images.length) return;
-
-    const closeLightbox = () => {
-      lightbox.classList.remove("open");
-      body.style.overflow = "";
-
-      window.setTimeout(() => {
-        lightboxImage.src = "";
-        lightboxImage.alt = "";
-      }, 250);
-    };
-
-    images.forEach((image) => {
-      image.addEventListener("click", () => {
-        lightboxImage.src = image.src;
-        lightboxImage.alt = image.alt || "";
-        lightbox.classList.add("open");
-        body.style.overflow = "hidden";
+  function openLightbox(images, index = 0) {
+    if (!images.length) return;
+    if (!lightbox) {
+      lightbox = el(`<div class="lightbox" hidden role="dialog" aria-modal="true" aria-label="Photo agrandie">
+          <img alt="">
+          <button class="icon-btn lb-close" type="button" aria-label="Fermer">${icon("x")}</button>
+          <button class="icon-btn lb-prev" type="button" aria-label="Photo précédente">${icon("left")}</button>
+          <button class="icon-btn lb-next" type="button" aria-label="Photo suivante">${icon("right")}</button>
+          <p class="lb-caption"></p>
+        </div>`);
+      body.appendChild(lightbox);
+      lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox || e.target.closest(".lb-close")) closeLightbox();
+        if (e.target.closest(".lb-prev")) showLb(lightbox.index - 1);
+        if (e.target.closest(".lb-next")) showLb(lightbox.index + 1);
       });
-    });
+      document.addEventListener("keydown", (e) => {
+        if (lightbox.hidden) return;
+        if (e.key === "Escape") closeLightbox();
+        if (e.key === "ArrowLeft") showLb(lightbox.index - 1);
+        if (e.key === "ArrowRight") showLb(lightbox.index + 1);
+      });
+    }
+    lightbox.images = images;
+    lightbox.hidden = false;
+    body.style.overflow = "hidden";
+    const multi = images.length > 1;
+    lightbox.querySelector(".lb-prev").hidden = !multi;
+    lightbox.querySelector(".lb-next").hidden = !multi;
+    showLb(index);
+    lightbox.querySelector(".lb-close").focus();
+  }
 
-    lightboxClose?.addEventListener("click", closeLightbox);
-    lightboxBackdrop?.addEventListener("click", closeLightbox);
+  function showLb(i) {
+    const imgs = lightbox.images;
+    lightbox.index = (i + imgs.length) % imgs.length;
+    const img = lightbox.querySelector("img");
+    img.src = imgs[lightbox.index].src;
+    img.alt = imgs[lightbox.index].alt;
+    lightbox.querySelector(".lb-caption").textContent = `${imgs[lightbox.index].alt}${imgs.length > 1 ? ` · ${lightbox.index + 1}/${imgs.length}` : ""}`;
+  }
 
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && lightbox.classList.contains("open")) {
-        closeLightbox();
-      }
-    });
+  function closeLightbox() {
+    lightbox.hidden = true;
+    body.style.overflow = "";
   }
 
   /* ==========================================================================
-     LIQUID GLASS
+     CARTE RECETTE (accueil, suggestions)
      ========================================================================== */
-  function initLiquidGlass() {
-    const glassCards = document.querySelectorAll(".liquid-glass-card");
-    if (!glassCards.length) return;
+  function recipeCard(r, { transition = false, index = 0 } = {}) {
+    const img = imageDe(r);
+    const cat = META.CATEGORIES[r.categorie];
+    return `<a class="recipe-card" href="${r.url}" data-reveal style="--i:${index % 6}" data-key="${r.key}">
+        <div class="recipe-card-media">
+          <img src="${img.thumb}" alt="${esc(img.alt)}" loading="lazy" width="640" height="480"${transition ? ` style="view-transition-name: photo-${r.key}"` : ""}>
+          <div class="card-badges">
+            <span class="pill">${cat ? `${cat.emoji} ${cat.singulier}` : ""}</span>
+            ${r.badge ? `<span class="pill pill-saffron">${esc(r.badge)}</span>` : ""}
+          </div>
+          <span class="card-like" aria-label="Likes">${icon("heart")}<span data-card-likes="${r.key}">${likeCounts[r.key] ?? "–"}</span></span>
+        </div>
+        <div class="recipe-card-body">
+          <h3>${esc(r.titreCourt)}</h3>
+          <p>${esc(r.accroche)}</p>
+          <div class="recipe-card-meta">
+            <span>${icon("clock")} ${duree(META.tempsTotal(r))}</span>
+            <span>${icon("flame")} ${esc(r.difficulte)}</span>
+            <span>${icon("users")} ${portionsLabel(r, r.portions.base)}</span>
+          </div>
+        </div>
+        <span class="card-arrow">${icon("arrow")}</span>
+      </a>`;
+  }
 
-    glassCards.forEach((card) => {
-      const specular = card.querySelector(".glass-specular");
-
-      if (specular) {
-        specular.style.transition = "background 0.25s ease";
-        specular.style.background = `
-          linear-gradient(
-            145deg,
-            rgba(255,255,255,0.30) 0%,
-            rgba(255,255,255,0.12) 18%,
-            rgba(255,255,255,0.03) 40%,
-            transparent 60%
-          )
-        `;
-      }
-
-      card.addEventListener("mousemove", (event) => {
-        const rect = card.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-
-        if (specular) {
-          specular.style.background = `radial-gradient(
-            circle at ${x}px ${y}px,
-            rgba(255,255,255,0.22) 0%,
-            rgba(255,255,255,0.10) 20%,
-            rgba(255,255,255,0.02) 45%,
-            transparent 65%
-          )`;
-        }
-      });
-
-      card.addEventListener("mouseleave", () => {
-        if (specular) {
-          specular.style.background = `
-            linear-gradient(
-              145deg,
-              rgba(255,255,255,0.30) 0%,
-              rgba(255,255,255,0.12) 18%,
-              rgba(255,255,255,0.03) 40%,
-              transparent 60%
-            )
-          `;
-        }
-      });
+  /* ==========================================================================
+     ACCUEIL
+     ========================================================================== */
+  function renderTopRecipe() {
+    const box = document.getElementById("topRecipe");
+    if (!box) return;
+    let best = null;
+    RECETTES.forEach((r) => {
+      const n = likeCounts[r.key] || 0;
+      if (n > 0 && (!best || n > (likeCounts[best.key] || 0))) best = r;
     });
-  }
-
-  /* ==========================================================================
-     HERO PARALLAX
-     ========================================================================== */
-  function initHeroParallax() {
-    const cards = document.querySelectorAll(".bento-card, .bento-badge");
-    if (!cards.length) return;
-
-    const onMouseMove = debounce((event) => {
-      const x = (window.innerWidth / 2 - event.clientX) / 30;
-      const y = (window.innerHeight / 2 - event.clientY) / 30;
-
-      cards.forEach((card) => {
-        const speed = Number(card.getAttribute("data-speed")) || 1;
-        card.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
-      });
-    }, 10);
-
-    window.addEventListener("mousemove", onMouseMove);
-  }
-
-  /* ==========================================================================
-     SCROLL TOP BUTTON
-     ========================================================================== */
-  function initScrollTopButton() {
-    if (!scrollTopBtn) return;
-
-    const toggleVisibility = () => {
-      scrollTopBtn.classList.toggle("show", window.scrollY > 400);
-    };
-
-    window.addEventListener("scroll", toggleVisibility);
-    toggleVisibility();
-
-    scrollTopBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-  }
-
-  /* ==========================================================================
-     CARD IMAGE ZOOM ONLY
-     ========================================================================== */
-  function initRecipeCardsZoom() {
-    const cards = document.querySelectorAll(".recipe-card, .glass-card, .recipe-preview-card");
-
-    cards.forEach((card) => {
-      if (card.dataset.zoomBound === "true") return;
-      card.dataset.zoomBound = "true";
-
-      const media =
-        card.querySelector("img") ||
-        card.querySelector(".card-image") ||
-        card.querySelector(".recipe-card-image");
-
-      if (!media) return;
-
-      card.addEventListener("mouseenter", () => {
-        media.style.transform = "scale(1.06)";
-      });
-
-      card.addEventListener("mouseleave", () => {
-        media.style.transform = "";
-      });
-    });
-  }
-
-  /* ==========================================================================
-     GLOBAL WINDOW FUNCTIONS
-     ========================================================================== */
-  window.changePortions = (recipeKey, delta) => {
-    if (!(recipeKey in portions)) return;
-
-    const nextValue = portions[recipeKey] + delta;
-
-    if (nextValue < 1) {
-      showToast("La portion minimum est de 1.");
+    if (!best) {
+      box.innerHTML = `<p class="muted">Les likes des visiteurs feront apparaître ici la recette préférée de la maison. Donne ton cœur à ta recette favorite !</p>`;
       return;
     }
-
-    if (nextValue > 24) {
-      showToast("Maximum 24 portions pour garder une recette fiable.");
-      return;
-    }
-
-    portions[recipeKey] = nextValue;
-    renderIngredients(recipeKey);
-    initIngredientCardsHover();
-  };
-
-  window.resetPortions = (recipeKey) => {
-    if (!recipeData[recipeKey]) return;
-
-    portions[recipeKey] = recipeData[recipeKey].base;
-    renderIngredients(recipeKey);
-    initIngredientCardsHover();
-    showToast("Portions réinitialisées.");
-  };
-
-  window.toggleChoice = (button, outputId) => {
-    if (!(button instanceof HTMLElement)) return;
-
-    const group = button.parentElement;
-    const output = document.getElementById(outputId);
-    if (!group || !output) return;
-
-    const buttons = group.querySelectorAll("button");
-    const wasActive = button.classList.contains("active");
-
-    buttons.forEach((btn) => btn.classList.remove("active"));
-
-    if (!wasActive) {
-      button.classList.add("active");
-      output.textContent = button.textContent?.trim() || "Aucune";
-    } else {
-      output.textContent = "Aucune";
-    }
-  };
-
-  window.toggleMultiChoice = (button, outputId) => {
-    if (!(button instanceof HTMLElement)) return;
-
-    const group = button.parentElement;
-    const output = document.getElementById(outputId);
-    if (!group || !output) return;
-
-    button.classList.toggle("active");
-
-    const activeButtons = group.querySelectorAll("button.active");
-    const values = Array.from(activeButtons)
-      .map((btn) => btn.textContent?.trim())
-      .filter(Boolean);
-
-    output.textContent = values.length ? values.join(", ") : "Aucune";
-  };
-
-  window.startTimer = (seconds, displayId) => {
-    const safeSeconds = Math.max(0, Number(seconds) || 0);
-
-    if (!timers[displayId]) {
-      timers[displayId] = { seconds: 0, interval: null };
-    }
-
-    if (timers[displayId].interval) {
-      window.clearInterval(timers[displayId].interval);
-    }
-
-    timers[displayId].seconds = safeSeconds;
-    updateTimerDisplay(displayId);
-
-    timers[displayId].interval = window.setInterval(() => {
-      timers[displayId].seconds -= 1;
-
-      if (timers[displayId].seconds <= 0) {
-        timers[displayId].seconds = 0;
-        updateTimerDisplay(displayId);
-        window.clearInterval(timers[displayId].interval);
-        timers[displayId].interval = null;
-        showToast("⏰ Dring ! C'est prêt.");
-        playTimerSound();
-        return;
-      }
-
-      updateTimerDisplay(displayId);
-    }, 1000);
-  };
-
-  window.resetTimer = (displayId) => {
-    if (timers[displayId]?.interval) {
-      window.clearInterval(timers[displayId].interval);
-    }
-
-    timers[displayId] = { seconds: 0, interval: null };
-    updateTimerDisplay(displayId);
-  };
-
-  window.showToast = showToast;
-
-  /* ==========================================================================
-     AI CHEF RECOMMENDER
-     ========================================================================== */
-  function initAiChef() {
-    const input = document.getElementById("aiChefInput");
-    const button = document.getElementById("aiChefBtn");
-    const result = document.getElementById("aiChefResult");
-
-    if (!input || !button || !result) return;
-
-    const recipeBrain = [
-      {
-        key: "cailles",
-        name: "Cailles & Petits pois",
-        url: "cailles.html",
-        tags: ["viande", "raffine", "traditionnel", "francais", "sale", "plat", "familial", "moyen", "dimanche", "chaud"],
-        aliases: ["caille", "cailles", "petits pois", "cailles petits pois", "cailles et petits pois"]
-      },
-      {
-        key: "jusorange",
-        name: "Jus d'orange frais",
-        url: "jusorange.html",
-        tags: ["boisson", "frais", "orange", "bio", "rapide", "facile", "ete", "froid"],
-        aliases: ["jus", "jus orange", "orange", "jus d orange", "jus d'orange", "boisson"]
-      },
-      {
-        key: "saladecesar",
-        name: "Salade César",
-        url: "salade-cesar.html",
-        tags: ["leger", "frais", "gourmand", "sale", "plat", "familial", "healthy", "froid", "rapide"],
-        aliases: ["salade cesar", "salade césar", "cesar", "césar", "romaine", "parmesan", "bacon"]
-      },
-      {
-        key: "crepes",
-        name: "Crêpes gourmandes",
-        url: "crepes.html",
-        tags: ["dessert", "gouter", "rapide", "facile", "leger", "familial", "simple", "convivial", "sucre", "plaisir", "reconfort"],
-        aliases: ["crepe", "crepes", "crêpe", "crêpes", "pancake", "pancakes"]
-      },
-      {
-        key: "burgers",
-        name: "Burgers garnis",
-        url: "burger.html",
-        tags: ["viande", "copieux", "gourmand", "rapide", "sale", "plat", "familial", "lourd", "convivial", "plaisir", "chaud", "enfant"],
-        aliases: ["burger", "burgers", "hamburger", "hamburgers", "cheeseburger"]
-      },
-      {
-        key: "fondants",
-        name: "Fondants intenses",
-        url: "fondant.html",
-        tags: ["dessert", "chocolat", "gourmand", "lourd", "plaisir", "sucre", "reconfort"],
-        aliases: ["fondant", "fondants", "fondant chocolat", "fondants chocolat", "coulant", "coulant chocolat"]
-      },
-      {
-        key: "marbre",
-        name: "Gâteau marbré",
-        url: "gateau-marbre.html",
-        tags: ["dessert", "gouter", "familial", "simple", "leger", "sucre", "plaisir", "enfant"],
-        aliases: ["marbre", "gateau marbre", "gâteau marbré", "cake marbre", "cake marbré"]
-      },
-      {
-        key: "pokebowl",
-        name: "Poké bowl hawaïen",
-        url: "poke-bowl.html",
-        tags: ["leger", "frais", "healthy", "equilibre", "rapide", "poisson", "sale", "plat", "sain", "familial", "froid", "ete"],
-        aliases: ["poke", "pokebowl", "poke bowl", "poké", "poké bowl", "bowl saumon"]
-      },
-      {
-        key: "avocadotoast",
-        name: "Avocado toast gourmand",
-        url: "avocado-toast.html",
-        tags: ["leger", "frais", "healthy", "rapide", "gourmand", "sale", "plat", "brunch", "equilibre", "familial"],
-        aliases: ["avocado toast", "toast avocat", "avocat", "toast", "oeuf coulant", "œuf"]
-      },
-      {
-        key: "ramen",
-        name: "Ramen maison généreux",
-        url: "ramen.html",
-        tags: ["chaud", "reconfort", "gourmand", "sale", "plat", "familial", "japonais", "nouilles", "bouillon", "moyen"],
-        aliases: ["ramen", "nouilles", "bouillon", "soupe japonaise", "ramen maison"]
-      }
-    ];
-
-    const lexicon = {
-      leger: ["leger", "léger", "light", "digeste"],
-      pas_trop_lourd: ["pas trop lourd", "pas lourd", "pas trop copieux", "assez leger", "assez léger"],
-      lourd: ["lourd", "copieux", "gras", "qui cale", "consistant"],
-      familial: ["famille", "familial", "convivial", "a plusieurs", "à plusieurs", "partager"],
-      frais: ["frais", "froid", "rafraichissant", "rafraîchissant"],
-      rapide: ["rapide", "vite", "express", "simple", "ce soir"],
-      gourmand: ["gourmand", "gourmande", "plaisir", "reconfortant", "réconfortant"],
-      chocolat: ["chocolat", "choco", "cacao"],
-      viande: ["viande", "boeuf", "bœuf", "carne", "poulet"],
-      poisson: ["poisson", "saumon"],
-      dessert: ["dessert", "sucre", "sucré", "gouter", "goûter", "gateau", "gâteau"],
-      sale: ["sale", "salé", "repas", "plat"],
-      raffine: ["raffine", "raffiné", "chic", "elegant", "élégant"],
-      bonjour: ["bonjour", "salut", "coucou", "hello", "hey"],
-      merci: ["merci", "thanks", "merci beaucoup"],
-      faim: ["faim", "j ai faim", "j'ai faim", "affame", "affamé"],
-      soif: ["soif", "j ai soif", "j'ai soif"],
-      triste: ["triste", "deprime", "déprime", "pas bien", "cafard"],
-      fatigue: ["fatigue", "fatigué", "fatiguee", "fatiguée", "creve", "crevé"],
-      fete: ["fete", "fête", "anniversaire", "occasion"],
-      dimanche: ["dimanche", "repas du dimanche"],
-      hiver: ["hiver", "jour froid", "temps froid"],
-      ete: ["ete", "été", "soleil", "estival"],
-      romantique: ["romantique", "amoureux", "date", "diner a deux", "dîner à deux"],
-      enfant: ["enfant", "enfants", "petits", "petit", "kids"],
-      invite: ["invite", "invites", "invité", "invités", "recevoir", "du monde"],
-      reconfort: ["reconfort", "réconfort", "comfort", "remonter le moral"],
-      healthy: ["healthy", "sain", "saine", "equilibre", "équilibré", "équilibrée", "fit"],
-      plaisir: ["plaisir", "envie", "gourmand", "gourmande"],
-      sucre: ["sucre", "sucré", "dessert", "gouter", "goûter"],
-      chaud: ["chaud", "chaude", "rechauffant", "réchauffant"],
-      froid: ["froid", "frais", "rafraichissant", "rafraîchissant"],
-      aide: ["aide", "aider", "help", "besoin d aide", "besoin d'aide"],
-      amour: ["amour", "love", "coeur", "cœur"],
-      antoine: ["antoine", "chef antoine", "restaurant d antoine", "restaurant d'antoine"],
-      brunch: ["brunch", "matin", "petit dej", "petit-déj", "dejeuner leger", "déjeuner léger"],
-      japonais: ["japonais", "asie", "asiatique", "nouilles", "ramen", "bouillon"]
-    };
-
-    function findRecipeMentions(text) {
-      const normalized = normalizeAi(text);
-      const mentioned = new Set();
-
-      recipeBrain.forEach((recipe) => {
-        const allNames = [recipe.name, ...(recipe.aliases || [])];
-        const match = allNames.some((name) => normalized.includes(normalizeAi(name)));
-        if (match) {
-          mentioned.add(recipe.key);
-        }
-      });
-
-      return [...mentioned];
-    }
-
-    function detectNegations(text) {
-      const normalized = normalizeAi(text);
-      const negatives = new Set();
-
-      const patterns = [
-        /sans ([a-z0-9\s-]+)/g,
-        /pas de ([a-z0-9\s-]+)/g,
-        /pas d ([a-z0-9\s-]+)/g,
-        /je ne veux pas de ([a-z0-9\s-]+)/g,
-        /je veux pas de ([a-z0-9\s-]+)/g,
-        /pas trop ([a-z0-9\s-]+)/g
-      ];
-
-      patterns.forEach((pattern) => {
-        let match;
-        while ((match = pattern.exec(normalized)) !== null) {
-          negatives.add(match[1].trim());
-        }
-      });
-
-      if (normalized.includes("pas lourd") || normalized.includes("pas trop lourd")) {
-        negatives.add("lourd");
-      }
-
-      return [...negatives];
-    }
-
-    function extractConcepts(text) {
-      const normalized = normalizeAi(text);
-      const found = new Set();
-
-      Object.entries(lexicon).forEach(([concept, words]) => {
-        const matched = words.some((word) => normalized.includes(normalizeAi(word)));
-        if (matched) found.add(concept);
-      });
-
-      return [...found];
-    }
-
-    function detectSpecialIntent(text, recipeMentions) {
-      const normalized = normalizeAi(text);
-
-      if (!normalized) return null;
-      if (recipeMentions.length > 0) return null;
-
-      if (normalized.includes("bonjour") || normalized.includes("salut") || normalized.includes("coucou") || normalized.includes("hello")) return "bonjour";
-      if (normalized.includes("merci")) return "merci";
-      if (normalized.includes("aide") || normalized.includes("aider") || normalized.includes("help")) return "aide";
-      if (normalized.includes("amour") || normalized.includes("love") || normalized.includes("coeur") || normalized.includes("cœur")) return "amour";
-      if (normalized.includes("antoine")) return "antoine";
-      if (normalized.includes("faim")) return "faim";
-      if (normalized.includes("soif")) return "soif";
-      if (normalized.includes("triste") || normalized.includes("deprime") || normalized.includes("cafard")) return "triste";
-      if (normalized.includes("fatigue") || normalized.includes("fatiguee") || normalized.includes("fatigué") || normalized.includes("fatiguée")) return "fatigue";
-
-      return null;
-    }
-
-    function scoreRecipes(query) {
-      const normalized = normalizeAi(query);
-      const concepts = extractConcepts(normalized);
-      const negatives = detectNegations(normalized);
-      const recipeMentions = findRecipeMentions(normalized);
-
-      const scored = recipeBrain.map((recipe) => {
-        let score = 0;
-        const reasons = [];
-
-        concepts.forEach((concept) => {
-          if (recipe.tags.includes(concept)) {
-            score += 3;
-            reasons.push(concept);
-          }
-        });
-
-        if (recipeMentions.includes(recipe.key)) {
-          score += 10;
-          reasons.push("recette citée");
-        }
-
-        if (concepts.includes("frais")) {
-          if (recipe.key === "saladecesar") score += 4;
-          if (recipe.key === "avocadotoast") score += 5;
-        }
-
-        if (concepts.includes("ete") || concepts.includes("healthy")) {
-          if (recipe.key === "saladecesar") score += 4;
-          if (recipe.key === "avocadotoast") score += 5;
-          if (recipe.key === "pokebowl") score += 4;
-          if (recipe.key === "jusorange") score += 5;
-        }
-
-        if (concepts.includes("familial")) {
-          if (recipe.tags.includes("familial")) score += 4;
-          if (recipe.tags.includes("convivial")) score += 2;
-        }
-
-        if (concepts.includes("leger")) {
-          if (recipe.tags.includes("leger")) score += 5;
-          if (recipe.tags.includes("lourd")) score -= 5;
-          if (recipe.tags.includes("moyen")) score -= 1;
-        }
-
-        if (concepts.includes("pas_trop_lourd")) {
-          if (recipe.tags.includes("leger")) score += 6;
-          if (recipe.tags.includes("moyen")) score += 1;
-          if (recipe.tags.includes("lourd")) score -= 8;
-          if (recipe.tags.includes("raffine")) score -= 1;
-        }
-
-        if (concepts.includes("lourd")) {
-          if (recipe.tags.includes("lourd")) score += 5;
-          if (recipe.tags.includes("leger")) score -= 4;
-        }
-
-        if (concepts.includes("brunch")) {
-          if (recipe.key === "avocadotoast") score += 7;
-          if (recipe.key === "crepes") score += 2;
-          if (recipe.key === "jusorange") score += 2;
-        }
-
-        if (concepts.includes("japonais")) {
-          if (recipe.key === "ramen") score += 8;
-          if (recipe.key === "pokebowl") score += 3;
-        }
-
-        if (normalized.includes("repas")) {
-          if (recipe.tags.includes("plat")) score += 2;
-          if (recipe.tags.includes("dessert")) score -= 2;
-        }
-
-        if (normalized.includes("ce soir") || normalized.includes("soir")) {
-          if (recipe.tags.includes("rapide")) score += 2;
-          if (recipe.tags.includes("leger")) score += 2;
-          if (recipe.tags.includes("froid")) score += 1;
-          if (recipe.key === "ramen") score += 2;
-        }
-
-        if (concepts.includes("fete")) {
-          if (recipe.key === "cailles") score += 4;
-          if (recipe.key === "fondants") score += 2;
-        }
-
-        if (concepts.includes("dimanche")) {
-          if (recipe.key === "cailles") score += 4;
-        }
-
-        if (concepts.includes("hiver") || concepts.includes("reconfort")) {
-          if (recipe.key === "fondants") score += 3;
-          if (recipe.key === "crepes") score += 2;
-          if (recipe.key === "cailles") score += 2;
-          if (recipe.key === "ramen") score += 6;
-        }
-
-        if (concepts.includes("romantique")) {
-          if (recipe.key === "cailles") score += 4;
-          if (recipe.key === "fondants") score += 2;
-          if (recipe.key === "avocadotoast") score += 1;
-        }
-
-        if (concepts.includes("enfant")) {
-          if (recipe.key === "burgers") score += 3;
-          if (recipe.key === "crepes") score += 3;
-          if (recipe.key === "marbre") score += 2;
-          if (recipe.key === "jusorange") score += 2;
-        }
-
-        if (concepts.includes("invite")) {
-          if (recipe.key === "cailles") score += 3;
-          if (recipe.key === "burgers") score += 2;
-          if (recipe.key === "jusorange") score += 1;
-          if (recipe.key === "ramen") score += 2;
-        }
-
-        if (normalized.includes("famille") && concepts.includes("pas_trop_lourd")) {
-          if (recipe.key === "crepes") score += 4;
-          if (recipe.key === "pokebowl") score += 4;
-          if (recipe.key === "jusorange") score += 3;
-          if (recipe.key === "marbre") score += 1;
-          if (recipe.key === "avocadotoast") score += 4;
-          if (recipe.key === "burgers") score -= 3;
-          if (recipe.key === "cailles") score -= 4;
-          if (recipe.key === "fondants") score -= 3;
-        }
-
-        negatives.forEach((negative) => {
-          const neg = normalizeAi(negative);
-
-          if (neg.includes("lourd") && recipe.tags.includes("lourd")) score -= 12;
-          if ((neg.includes("burger") || neg.includes("hamburger")) && recipe.key === "burgers") score -= 30;
-          if ((neg.includes("chocolat") || neg.includes("choco") || neg.includes("cacao")) && recipe.tags.includes("chocolat")) score -= 25;
-          if ((neg.includes("poisson") || neg.includes("saumon")) && recipe.tags.includes("poisson")) score -= 25;
-          if ((neg.includes("viande") || neg.includes("boeuf") || neg.includes("bœuf") || neg.includes("poulet")) && recipe.tags.includes("viande")) score -= 25;
-          if ((neg.includes("dessert") || neg.includes("sucre") || neg.includes("gouter")) && recipe.tags.includes("dessert")) score -= 15;
-          if ((neg.includes("sale") || neg.includes("plat") || neg.includes("repas")) && recipe.tags.includes("sale")) score -= 15;
-
-          const recipeNameBlocked = (recipe.aliases || []).some((alias) => neg.includes(normalizeAi(alias)));
-          if (recipeNameBlocked || neg.includes(normalizeAi(recipe.name))) {
-            score -= 35;
-          }
-        });
-
-        return {
-          ...recipe,
-          score,
-          reasons: [...new Set(reasons)]
-        };
-      });
-
-      scored.sort((a, b) => b.score - a.score);
-      return { negatives, recipeMentions, scored };
-    }
-
-    function labelConcept(concept) {
-      const labels = {
-        leger: "léger",
-        pas_trop_lourd: "pas trop lourd",
-        lourd: "copieux",
-        familial: "familial",
-        frais: "frais",
-        rapide: "rapide",
-        gourmand: "gourmand",
-        chocolat: "chocolat",
-        viande: "viande",
-        poisson: "poisson",
-        dessert: "dessert",
-        sale: "salé",
-        raffine: "raffiné",
-        reconfort: "réconfortant",
-        healthy: "sain",
-        chaud: "chaud",
-        froid: "froid",
-        brunch: "brunch",
-        japonais: "japonais"
+    const n = likeCounts[best.key];
+    box.innerHTML = `<a class="top-recipe" href="${best.url}">
+        <img src="${imageDe(best).thumb}" alt="">
+        <span><small class="muted">❤️ ${n} like${n > 1 ? "s" : ""}</small><strong>${esc(best.titreCourt)}</strong></span>
+      </a>`;
+  }
+
+  function initHome() {
+    // Assiette tournante du héros
+    const plate = document.getElementById("plateImages");
+    const label = document.getElementById("plateLabel");
+    if (plate && label && RECETTES.length) {
+      plate.innerHTML = RECETTES.map(
+        (r, i) => `<img src="${imageDe(r).thumb}" alt="${esc(imageDe(r).alt)}"${i === 0 ? ' class="is-active"' : ' loading="lazy"'} width="640" height="640">`
+      ).join("");
+      const imgs = [...plate.querySelectorAll("img")];
+      let current = 0;
+      const show = (i) => {
+        imgs[current].classList.remove("is-active");
+        current = (i + imgs.length) % imgs.length;
+        imgs[current].classList.add("is-active");
+        const r = RECETTES[current];
+        label.href = r.url;
+        label.innerHTML = `<span class="emoji">${r.emoji}</span><span><small>À la carte</small><strong>${esc(r.titreCourt)}</strong></span>`;
       };
-      return labels[concept] || concept;
-    }
-
-    function renderSpecialResponse(intent) {
-      if (intent === "bonjour") {
-        result.innerHTML = `<strong>Bonjour 👋</strong><br>Dis-moi ce que tu veux manger ou boire et je t’aide à trouver la meilleure recette.`;
-        return;
-      }
-
-      if (intent === "merci") {
-        result.innerHTML = `<strong>Avec plaisir ✨</strong><br>Je suis là pour t’aider à choisir la bonne recette.`;
-        return;
-      }
-
-      if (intent === "aide") {
-        result.innerHTML = `
-          <strong>Bien sûr 👋</strong><br>
-          Je peux t’aider à choisir une recette selon ce que tu veux.<br><br>
-          <strong>Exemples :</strong><br>
-          • un truc pas trop lourd<br>
-          • un repas familial<br>
-          • sans burger et sans chocolat<br>
-          • je veux un truc frais<br>
-          • je veux un brunch léger<br>
-          • je veux un truc japonais chaud<br>
-          • j’ai soif
-        `;
-        return;
-      }
-
-      if (intent === "amour") {
-        result.innerHTML = `<strong>Oh 🫶</strong><br>Moi je peux surtout t’aider côté cuisine et ambiance gourmande.`;
-        return;
-      }
-
-      if (intent === "antoine") {
-        result.innerHTML = `<strong>Antoine ?</strong><br>C’est le chef du restaurant 😌 Je peux t’aider à choisir parmi ses recettes.`;
-        return;
-      }
-
-      if (intent === "faim") {
-        result.innerHTML = `<strong>On va régler ça 😌</strong><br>Dis-moi juste : léger, gourmand, familial, rapide, sucré, salé, brunch ou japonais.`;
-        return;
-      }
-
-      if (intent === "soif") {
-        result.innerHTML = `<strong>Je peux aussi t’aider 👌</strong><br>Si tu veux quelque chose de frais, le jus d’orange est une très bonne option.`;
-        return;
-      }
-
-      if (intent === "triste") {
-        result.innerHTML = `<strong>Oh 💛</strong><br>On peut partir sur une recette réconfortante. Par exemple : crêpes, fondants, ramen ou gâteau marbré.`;
-        return;
-      }
-
-      if (intent === "fatigue") {
-        result.innerHTML = `<strong>Je vois 😴</strong><br>Dans ce cas, on peut viser un truc simple et rapide. Par exemple : crêpes, jus d’orange, poké bowl ou avocado toast.`;
+      show(0);
+      if (!REDUCED_MOTION) {
+        let timer = setInterval(() => show(current + 1), 3800);
+        document.addEventListener("visibilitychange", () => {
+          clearInterval(timer);
+          if (!document.hidden) timer = setInterval(() => show(current + 1), 3800);
+        });
       }
     }
 
-    function renderRecommendation(query) {
-      const normalized = normalizeAi(query);
-      const { negatives, recipeMentions, scored } = scoreRecipes(normalized);
-      const specialIntent = detectSpecialIntent(normalized, recipeMentions);
+    // Titre animé mot à mot
+    const title = document.querySelector("[data-split]");
+    if (title && !REDUCED_MOTION) {
+      let i = 0;
+      const wrap = (node) => {
+        [...node.childNodes].forEach((child) => {
+          if (child.nodeType === Node.TEXT_NODE) {
+            const frag = document.createDocumentFragment();
+            child.textContent.split(/(\s+)/).forEach((part) => {
+              if (!part) return;
+              if (/^\s+$/.test(part)) {
+                frag.appendChild(document.createTextNode(part));
+              } else {
+                const w = document.createElement("span");
+                w.className = "word";
+                w.innerHTML = `<span style="--i:${i++}">${esc(part)}</span>`;
+                frag.appendChild(w);
+              }
+            });
+            child.replaceWith(frag);
+          } else if (child.nodeType === Node.ELEMENT_NODE && !child.classList.contains("squiggle-svg")) {
+            wrap(child);
+          }
+        });
+      };
+      wrap(title);
+    }
 
-      if (specialIntent) {
-        renderSpecialResponse(specialIntent);
-        return;
+    // Statistiques calculées depuis les données
+    const stats = document.getElementById("heroStats");
+    if (stats) {
+      const etapes = RECETTES.reduce((n, r) => n + r.etapes.length, 0);
+      const minuteurs = RECETTES.reduce((n, r) => n + r.etapes.reduce((m, e) => m + (e.minuteurs?.length || 0), 0), 0);
+      stats.innerHTML = `
+        <div><strong>${RECETTES.length}</strong><span>recettes de famille</span></div>
+        <div><strong>${etapes}</strong><span>étapes guidées</span></div>
+        <div><strong>${minuteurs}</strong><span>minuteurs intégrés</span></div>
+        <div><strong>4</strong><span>mini-jeux</span></div>`;
+    }
+
+    // Bandeau défilant
+    const marquee = document.getElementById("marqueeTrack");
+    if (marquee) {
+      const items = RECETTES.map((r) => `<span>${esc(r.titreCourt)}</span>`).join("");
+      marquee.innerHTML = items + items;
+    }
+
+    // Grille + filtres
+    const grid = document.getElementById("recipeGrid");
+    const filters = document.getElementById("recipeFilters");
+    const search = document.getElementById("recipeSearch");
+    const empty = document.getElementById("recipeEmpty");
+    const count = document.getElementById("recipeCount");
+    if (grid) {
+      grid.innerHTML = RECETTES.map((r, i) => recipeCard(r, { transition: true, index: i })).join("");
+      const FILTRES = [
+        { id: "tout", label: "Tout", test: () => true },
+        ...Object.entries(META.CATEGORIES).map(([key, c]) => ({ id: key, label: `${c.emoji} ${c.label}`, test: (r) => r.categorie === key })),
+        { id: "rapide", label: "⚡ 30 min max", test: (r) => META.tempsTotal(r) <= 30 },
+        { id: "sansviande", label: "🌱 Sans viande", test: (r) => r.regime?.sansViande }
+      ];
+      const params = new URLSearchParams(location.search);
+      let active = FILTRES.some((f) => f.id === params.get("cat")) ? params.get("cat") : "tout";
+      filters.innerHTML = FILTRES.map(
+        (f) => `<button class="chip" type="button" data-filter="${f.id}" aria-pressed="${f.id === active}">${f.label}</button>`
+      ).join("");
+
+      const apply = () => {
+        const f = FILTRES.find((x) => x.id === active);
+        const q = normalize(search.value);
+        let visible = 0;
+        grid.querySelectorAll(".recipe-card").forEach((card) => {
+          const r = BY_KEY[card.dataset.key];
+          const hay = normalize(`${r.titre} ${r.accroche} ${r.tags.join(" ")} ${tousIngredients(r).map((i) => i.nom).join(" ")}`);
+          const show = f.test(r) && (!q || q.split(" ").every((t) => hay.includes(t)));
+          card.classList.toggle("is-hidden", !show);
+          if (show) visible++;
+        });
+        empty.hidden = visible > 0;
+        count.textContent = `${visible} recette${visible > 1 ? "s" : ""}`;
+      };
+
+      filters.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-filter]");
+        if (!b) return;
+        active = b.dataset.filter;
+        filters.querySelectorAll("[data-filter]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+        apply();
+      });
+      search.addEventListener("input", debounce(apply, 80));
+      apply();
+    }
+
+    // Roulette « Je ne sais pas quoi cuisiner »
+    const spin = document.getElementById("rouletteBtn");
+    if (spin) {
+      const win = document.getElementById("rouletteWindow");
+      const name = document.getElementById("rouletteName");
+      const go = document.getElementById("rouletteGo");
+      let last = -1;
+      spin.addEventListener("click", () => {
+        ensureAudio();
+        spin.disabled = true;
+        win.classList.add("is-spinning");
+        let target;
+        do {
+          target = Math.floor(Math.random() * RECETTES.length);
+        } while (target === last && RECETTES.length > 1);
+        last = target;
+        let n = 0;
+        const total = REDUCED_MOTION ? 1 : 16;
+        const step = () => {
+          const r = n >= total - 1 ? RECETTES[target] : RECETTES[Math.floor(Math.random() * RECETTES.length)];
+          win.innerHTML = `<img src="${imageDe(r).thumb}" alt="">`;
+          name.textContent = r.titreCourt;
+          bip(500 + n * 30, 0.05, 0, "square", 0.05);
+          n++;
+          if (n < total) {
+            setTimeout(step, 40 + n * n * 1.2);
+          } else {
+            win.classList.remove("is-spinning");
+            spin.disabled = false;
+            go.href = r.url;
+            go.hidden = false;
+            bip(1046, 0.25, 0, "triangle", 0.15);
+            burst(win, ["✨", "🍽️", "⭐"]);
+          }
+        };
+        step();
+      });
+    }
+
+    renderTopRecipe();
+  }
+
+  /* ==========================================================================
+     PAGE RECETTE
+     ========================================================================== */
+  function initRecipe() {
+    const key = body.dataset.recipe;
+    const r = BY_KEY[key];
+    const main = document.getElementById("main");
+    if (!r || !main) return;
+
+    const PROGRESS_KEY = `antoine-progression-${r.key}`;
+    const saved = store.json(PROGRESS_KEY, {});
+    const state = {
+      portions: Number(saved.portions) || r.portions.base,
+      etapes: new Set(saved.etapes || []),
+      ings: new Set(saved.ings || []),
+      choix: new Set(saved.choix || [])
+    };
+    const persist = () =>
+      store.setJson(PROGRESS_KEY, {
+        portions: state.portions,
+        etapes: [...state.etapes],
+        ings: [...state.ings],
+        choix: [...state.choix]
+      });
+
+    const idx = RECETTES.indexOf(r);
+    const prev = RECETTES[(idx - 1 + RECETTES.length) % RECETTES.length];
+    const next = RECETTES[(idx + 1) % RECETTES.length];
+    const cat = META.CATEGORIES[r.categorie] || { label: "", singulier: "" };
+    const total = META.tempsTotal(r);
+    const related = RECETTES.filter((x) => x.key !== r.key)
+      .map((x) => ({ x, s: x.tags.filter((t) => r.tags.includes(t)).length + (x.categorie === r.categorie ? 2 : 0) }))
+      .sort((a, b) => b.s - a.s)
+      .slice(0, 3)
+      .map((o) => o.x);
+
+    const factsTemps = [
+      { label: "Préparation", value: duree(r.temps.preparation), icon: "clock" },
+      r.temps.cuisson ? { label: "Cuisson", value: duree(r.temps.cuisson), icon: "flame" } : null,
+      r.temps.repos ? { label: "Repos", value: duree(r.temps.repos), icon: "timer" } : null,
+      { label: "Total", value: duree(total), icon: "clock" },
+      { label: "Niveau", value: r.difficulte, icon: "chef" }
+    ].filter(Boolean).slice(0, 4);
+
+    const allergenes = (r.allergenes || []).map((a) => `<span class="pill">${esc(META.ALLERGENES[a] || a)}</span>`).join("");
+
+    main.innerHTML = `
+      <div class="container">
+        <section class="r-hero">
+          <div data-reveal>
+            <nav class="breadcrumb" aria-label="Fil d'Ariane">
+              <a href="index.html">Accueil</a><span>/</span>
+              <a href="index.html?cat=${r.categorie}#recettes">${esc(cat.label)}</a><span>/</span>
+              <span aria-current="page">${esc(r.titreCourt)}</span>
+            </nav>
+            <p class="eyebrow">${esc(r.badge || cat.singulier)}</p>
+            <h1 class="r-title">${esc(r.titre)} <span class="emoji" aria-hidden="true">${r.emoji}</span></h1>
+            <p class="r-intro">${esc(r.intro)}</p>
+            <div class="r-facts">
+              ${factsTemps.map((f) => `<div class="r-fact"><span>${icon(f.icon)} ${f.label}</span><strong>${esc(f.value)}</strong></div>`).join("")}
+            </div>
+            <div class="r-actions">
+              <button class="btn btn-primary" type="button" data-cook>${icon("book")} Mode cuisine</button>
+              ${likeButton(r.key)}
+              <button class="btn" type="button" data-share>${icon("share")} Partager</button>
+              <button class="btn" type="button" data-print>${icon("printer")} Imprimer</button>
+            </div>
+          </div>
+          <div class="gallery" data-reveal="zoom">
+            <div class="gallery-main" data-gallery-main role="button" tabindex="0" aria-label="Agrandir la photo">
+              <img src="${imageDe(r).src}" alt="${esc(imageDe(r).alt)}" width="1600" height="1200" style="view-transition-name: photo-${r.key}" fetchpriority="high">
+              <span class="pill pill-accent">${cat.emoji || ""} ${esc(cat.singulier)}</span>
+            </div>
+            ${
+              r.images.length > 1
+                ? `<div class="gallery-thumbs">${r.images
+                    .map((im, i) => `<button type="button" data-thumb="${i}" aria-current="${i === 0}" aria-label="Voir : ${esc(im.alt)}"><img src="${im.thumb}" alt="" loading="lazy"></button>`)
+                    .join("")}</div>`
+                : ""
+            }
+          </div>
+        </section>
+
+        <section class="r-layout" id="recette">
+          <aside class="card ingredients-card" data-reveal="left" aria-labelledby="ing-title">
+            <div class="card-title"><h2 id="ing-title">Ingrédients</h2><span class="pill" data-ing-count></span></div>
+            <div class="stepper">
+              <button type="button" data-portions="-1" aria-label="Moins de portions">${icon("minus")}</button>
+              <output aria-live="polite"><strong data-portions-n>${state.portions}</strong> <span data-portions-unit></span></output>
+              <button type="button" data-portions="1" aria-label="Plus de portions">${icon("plus")}</button>
+            </div>
+            <div data-ingredients></div>
+            <div class="ing-actions">
+              <button class="btn btn-dark btn-block" type="button" data-add-list>${icon("basket")} Ajouter à ma liste</button>
+              <button class="btn btn-ghost btn-sm" type="button" data-reset-portions>${icon("reset")} Revenir à ${portionsLabel(r, r.portions.base)}</button>
+            </div>
+          </aside>
+
+          <div>
+            <section class="card" aria-labelledby="steps-title" data-reveal>
+              <div class="steps-head">
+                <h2 id="steps-title" class="section-title" style="font-size:var(--fs-2xl)">Préparation</h2>
+                <button class="btn btn-sm" type="button" data-reset-steps>${icon("reset")} Recommencer</button>
+              </div>
+              <div class="progress" aria-hidden="true"><i data-progress></i></div>
+              <p class="progress-label" data-progress-label></p>
+              <ol class="steps">
+                ${r.etapes
+                  .map(
+                    (e, i) => `<li class="step" data-step="${i}">
+                      <button class="step-num" type="button" data-toggle-step="${i}" aria-pressed="false" aria-label="Marquer l'étape ${i + 1} comme faite">
+                        ${i + 1}<span class="check">${icon("check")}</span>
+                      </button>
+                      <div class="step-body">
+                        <h3>${esc(e.titre)}</h3>
+                        <p>${esc(e.texte)}</p>
+                        ${timerChips(e, r)}
+                      </div>
+                    </li>`
+                  )
+                  .join("")}
+              </ol>
+            </section>
+
+            ${
+              r.securite
+                ? `<div class="notice" style="margin-top:20px" data-reveal>
+                    <span class="notice-icon" aria-hidden="true">⚠️</span>
+                    <div><strong>Bon à savoir</strong><p>${esc(r.securite)}</p>
+                    ${r.sourcesSecurite?.length ? `<p class="sources">Sources : ${r.sourcesSecurite.map((s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.titre)}</a>`).join(" · ")}</p>` : ""}
+                    </div>
+                  </div>`
+                : ""
+            }
+
+            <div class="info-grid">
+              <section class="card" data-reveal style="--i:0">
+                <div class="card-title"><h3>✦ Les astuces du chef</h3></div>
+                <ul class="tips-list">${r.astuces.map((a) => `<li>${esc(a)}</li>`).join("")}</ul>
+              </section>
+              <section class="card choices-card" data-reveal style="--i:1">
+                <div class="card-title"><h3>${esc(r.choix.titre)}</h3></div>
+                <div class="chip-row" data-choices>
+                  ${r.choix.options.map((o) => `<button class="chip" type="button" data-choice="${esc(o)}" aria-pressed="${state.choix.has(o)}">${esc(o)}</button>`).join("")}
+                </div>
+                <p class="selection-line">${esc(r.choix.label)} : <strong data-choice-out>Aucune</strong></p>
+                <div class="accords">${r.accords.map((a) => `<div class="accord"><strong>${esc(a.titre)}</strong><span>${esc(a.texte)}</span></div>`).join("")}</div>
+              </section>
+              <section class="card" data-reveal style="--i:2">
+                <div class="card-title"><h3>🧊 Conservation</h3></div>
+                <p class="muted">${esc(r.conservation)}</p>
+                <div class="card-title" style="margin:22px 0 10px"><h3>Allergènes</h3></div>
+                ${allergenes ? `<div class="allergens">${allergenes}</div>` : `<p class="muted">Aucun des 14 allergènes majeurs dans les ingrédients listés.</p>`}
+                <p class="field-hint" style="margin-top:10px">${esc(r.noteAllergenes || "")} Liste établie d'après les ingrédients de la recette : vérifie toujours les étiquettes de tes produits.</p>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section class="section related" aria-labelledby="related-title">
+          <div class="section-head">
+            <div><p class="eyebrow">À la même table</p><h2 class="section-title" id="related-title">Tu aimeras <em>aussi</em></h2></div>
+            <a class="btn" href="index.html#recettes">Toutes les recettes ${icon("arrow")}</a>
+          </div>
+          <div class="related-grid">${related.map((x, i) => recipeCard(x, { index: i })).join("")}</div>
+          <nav class="prevnext" aria-label="Recettes voisines">
+            <a href="${prev.url}"><img src="${imageDe(prev).thumb}" alt=""><span><small>← Précédente</small><strong>${esc(prev.titreCourt)}</strong></span></a>
+            <a class="next" href="${next.url}"><span><small>Suivante →</small><strong>${esc(next.titreCourt)}</strong></span><img src="${imageDe(next).thumb}" alt=""></a>
+          </nav>
+        </section>
+      </div>`;
+
+    // --- Ingrédients ---
+    const ingBox = main.querySelector("[data-ingredients]");
+    const nOut = main.querySelector("[data-portions-n]");
+    const unitOut = main.querySelector("[data-portions-unit]");
+    const ingCount = main.querySelector("[data-ing-count]");
+    const step = r.portions.pas || 1;
+
+    function renderIngredients(flash = false) {
+      nOut.textContent = String(state.portions);
+      unitOut.textContent = state.portions > 1 ? r.portions.pluriel : r.portions.unite;
+      if (flash) {
+        nOut.classList.remove("tick");
+        void nOut.offsetWidth;
+        nOut.classList.add("tick");
       }
+      main.querySelector('[data-portions="-1"]').disabled = state.portions - step < (r.portions.min || 1);
+      main.querySelector('[data-portions="1"]').disabled = state.portions + step > (r.portions.max || 24);
+      let n = 0;
+      ingBox.innerHTML = r.ingredients
+        .map(
+          (g, gi) => `<div class="ing-group">
+            ${r.ingredients.length > 1 ? `<h4>${esc(g.groupe)}</h4>` : ""}
+            <ul class="ing-list">
+              ${g.items
+                .map((item, ii) => {
+                  const id = `${gi}-${ii}`;
+                  n++;
+                  return `<li class="ing-item"><label>
+                    <input type="checkbox" data-ing="${id}"${state.ings.has(id) ? " checked" : ""}>
+                    <span class="ing-name">${esc(item.nom)}${item.optionnel ? '<span class="opt-tag">option</span>' : ""}</span>
+                    <span class="ing-qty${flash && !item.fixe && item.qte ? " flash" : ""}">${esc(quantiteIngredient(item, r, state.portions))}</span>
+                  </label></li>`;
+                })
+                .join("")}
+            </ul>
+          </div>`
+        )
+        .join("");
+      ingCount.textContent = `${state.ings.size}/${n} prêts`;
+    }
 
-      const available = scored.filter((recipe) => recipe.score > -15);
-      const best = available[0] || scored[0];
-      const second = available[1] || scored[1];
+    main.querySelectorAll("[data-portions]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const next = state.portions + Number(b.dataset.portions) * step;
+        if (next < (r.portions.min || 1) || next > (r.portions.max || 24)) return;
+        state.portions = next;
+        persist();
+        renderIngredients(true);
+      })
+    );
+    main.querySelector("[data-reset-portions]").addEventListener("click", () => {
+      state.portions = r.portions.base;
+      persist();
+      renderIngredients(true);
+      toast(`Quantités remises pour ${portionsLabel(r, r.portions.base)}.`);
+    });
+    ingBox.addEventListener("change", (e) => {
+      const id = e.target.dataset.ing;
+      if (!id) return;
+      if (e.target.checked) state.ings.add(id);
+      else state.ings.delete(id);
+      persist();
+      const total = tousIngredients(r).length;
+      ingCount.textContent = `${state.ings.size}/${total} prêts`;
+      if (state.ings.size === total) toast("🧺 Tous les ingrédients sont prêts. En cuisine !");
+    });
+    main.querySelector("[data-add-list]").addEventListener("click", () => addRecipeToList(r, state.portions));
+    renderIngredients();
 
-      if (!best) {
-        result.innerHTML = `<strong>Aucune recommandation disponible.</strong>`;
-        return;
+    // --- Étapes ---
+    const progress = main.querySelector("[data-progress]");
+    const progressLabel = main.querySelector("[data-progress-label]");
+
+    function renderSteps(celebrate = false) {
+      main.querySelectorAll(".step").forEach((li) => {
+        const i = Number(li.dataset.step);
+        const done = state.etapes.has(i);
+        li.classList.toggle("is-done", done);
+        li.querySelector(".step-num").setAttribute("aria-pressed", String(done));
+      });
+      const n = state.etapes.size;
+      const tot = r.etapes.length;
+      progress.style.setProperty("--p", String(n / tot));
+      progressLabel.textContent =
+        n === 0 ? `${tot} étapes · clique sur un numéro quand l'étape est faite` : n === tot ? "Tout est prêt : bon appétit ! 🎉" : `${n} étape${n > 1 ? "s" : ""} sur ${tot} terminée${n > 1 ? "s" : ""}`;
+      if (celebrate && n === tot) {
+        confetti();
+        toast("🎉 Bravo chef ! Il ne reste plus qu'à déguster.");
       }
+    }
 
-      const readableReasons = best.reasons
-        .filter((reason) => reason !== "recette citée")
-        .map(labelConcept);
+    main.querySelector(".steps").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-toggle-step]");
+      if (!b) return;
+      const i = Number(b.dataset.toggleStep);
+      if (state.etapes.has(i)) state.etapes.delete(i);
+      else state.etapes.add(i);
+      persist();
+      renderSteps(true);
+    });
+    main.querySelector("[data-reset-steps]").addEventListener("click", () => {
+      state.etapes.clear();
+      state.ings.clear();
+      persist();
+      renderSteps();
+      renderIngredients();
+      toast("C'est reparti de zéro !");
+    });
+    renderSteps();
 
-      let html = `<strong>Je te conseille : ${best.name}</strong><br>`;
-
-      if (recipeMentions.includes(best.key)) {
-        html += `Oui bien sûr ! J'ai ce qu'il te faut.<br>`;
-      }
-
-      if (readableReasons.length) {
-        html += `Ça correspond bien à : ${readableReasons.join(", ")}.<br>`;
+    // --- Choix (garnitures, accompagnements…) ---
+    const choiceOut = main.querySelector("[data-choice-out]");
+    const renderChoices = () => {
+      main.querySelectorAll("[data-choice]").forEach((c) => c.setAttribute("aria-pressed", String(state.choix.has(c.dataset.choice))));
+      choiceOut.textContent = state.choix.size ? [...state.choix].join(", ") : "Aucune";
+    };
+    main.querySelector("[data-choices]").addEventListener("click", (e) => {
+      const c = e.target.closest("[data-choice]");
+      if (!c) return;
+      const v = c.dataset.choice;
+      if (r.choix.mode === "single") {
+        const had = state.choix.has(v);
+        state.choix.clear();
+        if (!had) state.choix.add(v);
+      } else if (state.choix.has(v)) {
+        state.choix.delete(v);
       } else {
-        html += `Je pense que cela pourrait te plaire.<br>`;
+        state.choix.add(v);
       }
+      persist();
+      renderChoices();
+    });
+    renderChoices();
 
-      if (negatives.length) {
-        html += `J’ai évité : ${negatives.join(", ")}.<br>`;
+    // --- Galerie ---
+    const mainImg = main.querySelector("[data-gallery-main] img");
+    let galleryIndex = 0;
+    main.querySelectorAll("[data-thumb]").forEach((t) =>
+      t.addEventListener("click", () => {
+        galleryIndex = Number(t.dataset.thumb);
+        const im = r.images[galleryIndex];
+        mainImg.style.viewTransitionName = "none";
+        mainImg.src = im.src;
+        mainImg.alt = im.alt;
+        main.querySelectorAll("[data-thumb]").forEach((x) => x.setAttribute("aria-current", String(x === t)));
+      })
+    );
+    const galleryMain = main.querySelector("[data-gallery-main]");
+    galleryMain.addEventListener("click", () => openLightbox(r.images, galleryIndex));
+    galleryMain.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openLightbox(r.images, galleryIndex);
       }
+    });
 
-      if (second && second.key !== best.key) {
-        html += `Deuxième option : ${second.name}.<br>`;
+    // --- Actions ---
+    main.querySelector("[data-print]").addEventListener("click", () => window.print());
+    main.querySelector("[data-share]").addEventListener("click", async () => {
+      const data = { title: `${r.titre} — Le restaurant d'Antoine`, text: r.accroche, url: location.href };
+      if (navigator.share) {
+        try {
+          await navigator.share(data);
+        } catch {
+          /* partage annulé */
+        }
+      } else {
+        copyText(location.href, "Lien de la recette copié 🔗");
       }
+    });
+    main.querySelector("[data-cook]").addEventListener("click", () => openCookMode(r, state, persist, renderSteps));
 
-      html += `<br><a class="primary-btn" href="${best.url}">Voir cette recette</a>`;
-      result.innerHTML = html;
+    // Barre de progression de lecture
+    const bar = el('<div class="scroll-progress" aria-hidden="true"></div>');
+    body.appendChild(bar);
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      bar.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`;
+    };
+    addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    if (location.hash === "#cuisine") openCookMode(r, state, persist, renderSteps);
+  }
+
+  function timerChips(etape, r) {
+    if (!etape.minuteurs?.length) return "";
+    return `<div class="step-timers">${etape.minuteurs
+      .map(
+        (m) => `<button class="timer-chip" type="button" data-start-timer="${m.secondes}" data-label="${esc(m.label)}" data-recette="${r.key}">
+          ${icon("timer")} ${esc(m.label)} · ${dureeSecondes(m.secondes)}
+        </button>`
+      )
+      .join("")}</div>`;
+  }
+
+  /* ==========================================================================
+     MODE CUISINE (plein écran, écran maintenu allumé)
+     ========================================================================== */
+  function openCookMode(r, state, persist, renderSteps) {
+    let current = Math.min(r.etapes.length - 1, [...Array(r.etapes.length).keys()].find((i) => !state.etapes.has(i)) ?? 0);
+    let wakeLock = null;
+
+    const cook = el(`<div class="cook" role="dialog" aria-modal="true" aria-label="Mode cuisine : ${esc(r.titre)}">
+        <div>
+          <div class="cook-top">
+            <span class="avatar" aria-hidden="true">${r.emoji}</span>
+            <div class="cook-title"><small>Mode cuisine</small><strong>${esc(r.titre)}</strong></div>
+            <button class="btn btn-sm" type="button" data-show-ings>${icon("list")} <span>Ingrédients</span></button>
+            <button class="icon-btn bordered" type="button" data-close-cook aria-label="Quitter le mode cuisine">${icon("x")}</button>
+          </div>
+          <div class="cook-dots" aria-hidden="true">${r.etapes.map(() => "<i></i>").join("")}</div>
+        </div>
+        <div class="cook-stage" aria-live="polite"></div>
+        <div class="cook-bottom">
+          <button class="btn" type="button" data-cook-prev>${icon("left")} Précédente</button>
+          <span class="muted" data-cook-pos></span>
+          <button class="btn btn-primary" type="button" data-cook-next>Étape suivante ${icon("right")}</button>
+        </div>
+        <aside class="cook-ings" hidden>
+          <div class="card-title"><h3>Ingrédients · ${esc(portionsLabel(r, state.portions))}</h3>
+            <button class="icon-btn" type="button" data-hide-ings aria-label="Fermer">${icon("x")}</button></div>
+          <ul class="ing-list">${tousIngredients(r)
+            .map((i) => `<li class="ing-item"><label><span></span><span class="ing-name">${esc(i.nom)}</span><span class="ing-qty">${esc(quantiteIngredient(i, r, state.portions))}</span></label></li>`)
+            .join("")}</ul>
+        </aside>
+      </div>`);
+    body.appendChild(cook);
+    body.style.overflow = "hidden";
+    body.classList.add("is-cooking");
+
+    const stage = cook.querySelector(".cook-stage");
+    const dots = [...cook.querySelectorAll(".cook-dots i")];
+    const pos = cook.querySelector("[data-cook-pos]");
+    const nextBtn = cook.querySelector("[data-cook-next]");
+    const prevBtn = cook.querySelector("[data-cook-prev]");
+    let finished = false;
+
+    function render(direction = "") {
+      finished = false;
+      const e = r.etapes[current];
+      stage.innerHTML = `<div class="cook-step ${direction ? `anim-${direction}` : ""}">
+          <span class="cook-num">${current + 1}</span>
+          <h2>${esc(e.titre)}</h2>
+          <p>${esc(e.texte)}</p>
+          ${timerChips(e, r)}
+        </div>`;
+      dots.forEach((d, i) => {
+        d.classList.toggle("is-current", i === current);
+        d.classList.toggle("is-done", state.etapes.has(i) && i !== current);
+      });
+      pos.textContent = `Étape ${current + 1} / ${r.etapes.length}`;
+      prevBtn.disabled = current === 0;
+      nextBtn.innerHTML = current === r.etapes.length - 1 ? `Terminer ${icon("check")}` : `Étape suivante ${icon("right")}`;
     }
 
-    button.addEventListener("click", () => {
-      const value = input.value.trim();
+    function finish() {
+      finished = true;
+      r.etapes.forEach((_, i) => state.etapes.add(i));
+      persist();
+      renderSteps();
+      dots.forEach((d) => {
+        d.classList.remove("is-current");
+        d.classList.add("is-done");
+      });
+      stage.innerHTML = `<div class="cook-step cook-finish anim-next">
+          <div class="big" aria-hidden="true">🍽️</div>
+          <h2>Bon appétit !</h2>
+          <p>Toutes les étapes sont faites. Tu peux être fier·e de toi, chef.</p>
+          <div class="step-timers">${likeButton(r.key)}<button class="btn" type="button" data-close-cook>Retour à la recette</button></div>
+        </div>`;
+      pos.textContent = "Terminé";
+      nextBtn.innerHTML = `Fermer ${icon("x")}`;
+      confetti(180);
+      bip(784, 0.15, 0, "triangle");
+      bip(988, 0.15, 0.15, "triangle");
+      bip(1318, 0.3, 0.3, "triangle");
+    }
 
-      if (!value) {
-        result.innerHTML = `<strong>Bonjour 👋</strong><br>Dis-moi ce que tu cherches, et je te proposerai la recette la plus adaptée.`;
+    function go(delta) {
+      if (finished) {
+        if (delta > 0) close();
+        else {
+          current = r.etapes.length - 1;
+          render("prev");
+        }
         return;
       }
+      if (delta > 0) {
+        state.etapes.add(current);
+        persist();
+        renderSteps();
+        if (current === r.etapes.length - 1) return finish();
+      }
+      const target = current + delta;
+      if (target < 0 || target >= r.etapes.length) return;
+      current = target;
+      render(delta > 0 ? "next" : "prev");
+    }
 
-      result.innerHTML = `<strong>Recherche en cours...</strong>`;
-      window.setTimeout(() => renderRecommendation(value), 300);
+    function close() {
+      document.removeEventListener("keydown", onKey);
+      if (wakeLock) wakeLock.release().catch(() => {});
+      cook.remove();
+      body.style.overflow = "";
+      body.classList.remove("is-cooking");
+      if (location.hash === "#cuisine") history.replaceState(null, "", location.pathname + location.search);
+    }
+
+    function onKey(e) {
+      if (e.key === "ArrowRight" || e.key === " ") {
+        if (e.target.closest?.("button") && e.key === " ") return;
+        e.preventDefault();
+        go(1);
+      } else if (e.key === "ArrowLeft") {
+        go(-1);
+      } else if (e.key === "Escape") {
+        const ings = cook.querySelector(".cook-ings");
+        if (!ings.hidden) ings.hidden = true;
+        else close();
+      }
+    }
+
+    cook.addEventListener("click", (e) => {
+      if (e.target.closest("[data-close-cook]")) close();
+      if (e.target.closest("[data-show-ings]")) cook.querySelector(".cook-ings").hidden = false;
+      if (e.target.closest("[data-hide-ings]")) cook.querySelector(".cook-ings").hidden = true;
     });
+    nextBtn.addEventListener("click", () => go(1));
+    prevBtn.addEventListener("click", () => go(-1));
+    document.addEventListener("keydown", onKey);
 
-    input.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        button.click();
+    // Balayage sur mobile
+    let touchX = null;
+    stage.addEventListener("touchstart", (e) => (touchX = e.touches[0].clientX), { passive: true });
+    stage.addEventListener(
+      "touchend",
+      (e) => {
+        if (touchX === null) return;
+        const dx = e.changedTouches[0].clientX - touchX;
+        if (Math.abs(dx) > 60) go(dx < 0 ? 1 : -1);
+        touchX = null;
+      },
+      { passive: true }
+    );
+
+    // Garde l'écran allumé pendant la cuisine (si le navigateur le permet)
+    if ("wakeLock" in navigator) {
+      navigator.wakeLock
+        .request("screen")
+        .then((lock) => {
+          wakeLock = lock;
+          toast("💡 L'écran restera allumé pendant que tu cuisines.", 2400);
+        })
+        .catch(() => {});
+    }
+
+    render();
+    nextBtn.focus();
+  }
+
+  /* ==========================================================================
+     PAGE ORIGINES
+     ========================================================================== */
+  function initInfos() {
+    const grid = document.getElementById("originGrid");
+    if (!grid) return;
+    grid.innerHTML = RECETTES.filter((r) => r.origine)
+      .map((r, i) => {
+        const o = r.origine;
+        const img = imageDe(r);
+        return `<article class="origin-card" id="${r.key}" data-reveal style="--i:${i % 3}">
+            <div class="media">
+              <img src="${img.thumb}" alt="${esc(img.alt)}" loading="lazy" width="640" height="360">
+              <span class="flag" aria-hidden="true">${o.drapeau}</span>
+            </div>
+            <div class="body">
+              <p class="where">📍 ${esc(o.pays)}</p>
+              <h2>${esc(r.titreCourt)}</h2>
+              <p class="muted">${esc(o.resume)}</p>
+              <ul>${o.faits.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>
+              <div class="sources">
+                <strong>Sources</strong>
+                <ul>${o.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.titre)}</a></li>`).join("")}</ul>
+              </div>
+              <a class="btn btn-sm" href="${r.url}" style="align-self:flex-start">Cuisiner la recette ${icon("arrow")}</a>
+            </div>
+          </article>`;
+      })
+      .join("");
+
+    const banner = document.getElementById("travelPins");
+    if (banner) {
+      const pins = ["🇫🇷", "🇩🇪", "🇲🇽", "🇺🇸", "🌺", "🇯🇵", "🇦🇺"];
+      banner.innerHTML = pins
+        .map((p, i) => `<span class="pin" style="left:${6 + i * 14.5}%;top:${i % 2 ? 58 : 18}%;animation-delay:${0.3 + i * 0.12}s">${p}</span>`)
+        .join("");
+    }
+  }
+
+  /* ==========================================================================
+     PAGE QUESTIONS (formulaire Formspree, envoi sans quitter la page)
+     ========================================================================== */
+  function initQuestions() {
+    const select = document.getElementById("questionCategory");
+    if (select) {
+      const recettes = RECETTES.map((r) => `<option value="${esc(r.key)}">Recette : ${esc(r.titreCourt)}</option>`).join("");
+      select.insertAdjacentHTML("beforeend", `<optgroup label="Une recette">${recettes}</optgroup>`);
+      const pre = new URLSearchParams(location.search).get("recette");
+      if (pre && BY_KEY[pre]) select.value = pre;
+    }
+    const form = document.getElementById("questionForm");
+    const message = form?.querySelector("textarea");
+    const counter = document.getElementById("questionCounter");
+    if (message && counter) {
+      const update = () => (counter.textContent = `${message.value.length}/1500`);
+      message.addEventListener("input", update);
+      update();
+    }
+    form?.addEventListener("submit", async (e) => {
+      if (!window.fetch) return;
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = "Envoi en cours…";
+      try {
+        const res = await fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } });
+        if (!res.ok) throw new Error(String(res.status));
+        form.innerHTML = `<div class="empty-state" style="border-style:solid"><span class="big">📨</span><strong>Message bien reçu, merci !</strong>
+          <span>Le restaurant te répondra par e-mail dès que possible.</span></div>`;
+        confetti(80);
+      } catch {
+        toast("L'envoi n'a pas fonctionné. Vérifie ta connexion et réessaie.");
+        btn.disabled = false;
+        btn.textContent = "Envoyer au restaurant";
       }
     });
   }
 
   /* ==========================================================================
-     AI WIDGET
+     API PUBLIQUE (utilisée par l'assistant et les jeux)
      ========================================================================== */
-  function initAiWidget() {
-    const aiFab = document.getElementById("aiFab");
-    const aiWidget = document.getElementById("aiWidget");
-    const aiWidgetClose = document.getElementById("aiWidgetClose");
-    const aiWidgetExpand = document.getElementById("aiWidgetExpand");
-
-    if (!aiFab || !aiWidget) return;
-
-    function openWidget() {
-      aiWidget.classList.remove("hidden");
-      aiFab.classList.add("hidden");
-      safeSetStorage(STORAGE_KEYS.aiWidgetOpen, "true");
-    }
-
-    function closeWidget() {
-      aiWidget.classList.add("hidden");
-      aiWidget.classList.remove("expanded");
-      aiFab.classList.remove("hidden");
-      safeRemoveStorage(STORAGE_KEYS.aiWidgetOpen);
-    }
-
-    function toggleExpand() {
-      aiWidget.classList.toggle("expanded");
-
-      if (aiWidgetExpand) {
-        aiWidgetExpand.textContent = aiWidget.classList.contains("expanded") ? "⤡" : "⤢";
-      }
-    }
-
-    aiFab.addEventListener("click", openWidget);
-    aiWidgetClose?.addEventListener("click", closeWidget);
-    aiWidgetExpand?.addEventListener("click", toggleExpand);
-
-    const wasOpen = safeGetStorage(STORAGE_KEYS.aiWidgetOpen, "false");
-    if (wasOpen === "true") {
-      openWidget();
-    }
-  }
+  window.Antoine = {
+    recettes: RECETTES,
+    parCle: BY_KEY,
+    meta: META,
+    store,
+    icon,
+    esc,
+    normalize,
+    duree,
+    dureeSecondes,
+    formatQuantite,
+    quantiteIngredient,
+    tousIngredients,
+    portionsLabel,
+    imageDe,
+    toast,
+    confetti,
+    burst,
+    bip,
+    ensureAudio,
+    startTimer,
+    openSearch,
+    openList,
+    addRecipeToList,
+    observeReveal,
+    recipeCard,
+    likeCounts,
+    page: PAGE
+  };
 
   /* ==========================================================================
-     GLOBAL EVENTS
+     DÉMARRAGE
      ========================================================================== */
-  window.addEventListener("resize", debounce(() => {
-    revealOnScrollFallback();
-  }, 120));
+  renderHeader();
+  renderFooter();
 
-  /* ==========================================================================
-     INIT
-     ========================================================================== */
-  initTheme();
-  initNavigation();
-  initSearch();
-  initPlaneAnimation();
-  initChecklists();
-  initCounters();
-  initReveal();
-  initTilt();
-  initLightbox();
-  initHeroParallax();
-  initLiquidGlass();
-  initScrollTopButton();
-  initRecipeCardsZoom();
-  initAiChef();
-  initAiWidget();
-  initTimerDisplays();
-
-  Object.keys(recipeData).forEach((recipeKey) => {
-    renderIngredients(recipeKey);
+  // Meilleurs scores des jeux (accueil et page des jeux)
+  document.querySelectorAll("[data-best]").forEach((node) => {
+    const value = store.get(node.dataset.best);
+    if (value && value !== "0") node.textContent = `🏆 Record : ${value}${node.dataset.suffix || ""}`;
   });
+  updateListBadge();
+  if (timers.length) renderDock();
 
-  initIngredientCardsHover();
-  revealOnScrollFallback();
+  if (PAGE === "home") initHome();
+  if (PAGE === "recipe") initRecipe();
+  if (PAGE === "infos") initInfos();
+  if (PAGE === "questions") initQuestions();
+  if (PAGE === "avis") {
+    // Si le service des avis ne répond pas (hors connexion, bloqueur…), on le dit.
+    setTimeout(() => {
+      const list = document.getElementById("reviewsList");
+      if (window.__reviewsModuleLoaded || !list) return;
+      list.innerHTML = `<div class="empty-state"><span class="big">📡</span><strong>Le livre d'or ne répond pas</strong>
+        <span>Impossible de joindre le serveur des avis pour le moment. Réessaie un peu plus tard.</span></div>`;
+      const summary = document.getElementById("ratingSummary");
+      if (summary) summary.innerHTML = `<p class="muted">Note indisponible pour le moment.</p>`;
+    }, 6000);
+  }
 
-  window.setTimeout(hideLoader, 900);
-});
+  observeReveal();
+  document.dispatchEvent(new CustomEvent("antoine:ready"));
+})();

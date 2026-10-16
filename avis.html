@@ -1,94 +1,75 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Avis | Le restaurant d’Antoine</title>
-  <link rel="stylesheet" href="site.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Livre d'or · Le restaurant d'Antoine</title>
+  <meta name="description" content="Tu as testé une recette du restaurant d'Antoine ? Laisse une note et un petit mot dans le livre d'or.">
+  <meta name="theme-color" content="#f6efe4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#15100c" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Le restaurant d'Antoine">
+  <meta property="og:title" content="Livre d'or · Le restaurant d'Antoine">
+  <meta property="og:description" content="Tu as testé une recette du restaurant d'Antoine ? Laisse une note et un petit mot dans le livre d'or.">
+  <meta property="og:image" content="img/accueil.webp">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..700,0..100;1,9..144,400..700,0..100&family=Manrope:wght@400..800&display=swap">
+  <link rel="stylesheet" href="site.css">
+  <script>try{var t=localStorage.getItem("antoine-theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="recettes-data.js" defer></script>
+  <script src="site.js" defer></script>
+  <script src="chatbot.js" defer></script>
+  <script type="module" src="reviews-firebase.js"></script>
 </head>
-<body data-theme-page="avis">
-
-<header class="site-header">
-  <nav class="navbar">
-
-    <div class="logo-wrap">
-      <a href="index.html" class="logo-icon" style="text-decoration:none;">🍽️</a>
-      <div class="logo-text">
-        <strong>Le restaurant d’Antoine</strong>
-        <span>Maison gourmande & recettes favorites</span>
-      </div>
-    </div>
-
-    <div class="nav-center" id="navCenter">
-      <div style="position:relative; width:100%;">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Rechercher une recette..."
-          autocomplete="off"
-          style="padding:10px; border-radius:10px; border:none; width:100%;"
-        />
-        <div id="searchSuggestions" class="search-suggestions"></div>
-      </div>
-    </div>
-
-    <!-- 🔥 NAV DROITE -->
-    <div class="nav-links">
-      <a href="questions.html">Questions</a>
-      <a href="avis.html" class="active-link">Avis</a>
-      <a href="infos.html">Infos</a>
-    </div>
-
-    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
-
-  </nav>
-</header>
-
-  <main class="main-layout">
-    <section class="page-section active" id="avis">
-      <div class="glass-card">
-        <h3>Livre d'or du restaurant</h3>
-        <p class="muted">Avez-vous testé une de nos recettes ? Partagez votre expérience et donnez une note au site d'Antoine.</p>
-
-        <div class="review-box-container">
-          <div class="review-input-area">
-            <h4>Laisser une évaluation</h4>
-
-            <div class="stars" id="stars">
-              <span onclick="setRating(1)">★</span>
-              <span onclick="setRating(2)">★</span>
-              <span onclick="setRating(3)">★</span>
-              <span onclick="setRating(4)">★</span>
-              <span onclick="setRating(5)">★</span>
-            </div>
-
-            <p class="rating-text">Ta note globale : <strong id="ratingValue">0</strong>/5</p>
-
-            <div class="review-form">
-              <input type="text" id="reviewName" placeholder="Ton prénom (ex: Julien, Marie...)" />
-              <textarea id="reviewMessage" placeholder="Raconte-nous ce que tu as cuisiné, ce que tu as aimé sur le site..."></textarea>
-              <button type="button" id="submitReview" class="primary-btn">Publier mon avis publiquement</button>
-            </div>
-          </div>
-
-          <div class="reviews-display-area">
-            <h4>Avis récents des gourmands</h4>
-            <div id="reviewsList" class="reviews-list"></div>
-          </div>
-        </div>
-      </div>
+<body data-page="avis">
+  <main id="main" class="container">
+    <section class="page-hero">
+      <p class="eyebrow">Livre d'or</p>
+      <h1>Vos petits <em style="color:var(--accent)">mots doux</em></h1>
+      <p class="lead">Tu as testé une recette ? Raconte-nous comment ça s'est passé, ce que tu as aimé, et donne une note au restaurant d'Antoine.</p>
     </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="footer-content">
-      <p>© 2026 Le restaurant d’Antoine. Codé avec passion pour la famille.</p>
+    <div class="two-cols">
+      <div>
+        <section class="card" aria-labelledby="sum-title" data-reveal>
+          <div class="card-title"><h2 id="sum-title">La note des gourmands</h2></div>
+          <div id="ratingSummary"><div class="skeleton"></div></div>
+        </section>
+        <section style="margin-top:24px" aria-labelledby="list-title">
+          <h2 id="list-title" class="visually-hidden">Avis récents</h2>
+          <div class="reviews" id="reviewsList">
+            <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+          </div>
+          <button class="btn" type="button" id="moreReviews" hidden style="margin-top:16px">Voir plus d'avis</button>
+          <noscript><p>Active JavaScript pour lire et publier des avis.</p></noscript>
+        </section>
+      </div>
+      <form class="card form-card" id="reviewForm" style="position:sticky;top:calc(var(--header-h) + 16px)" data-reveal="zoom" novalidate>
+        <div class="card-title" style="margin:0"><h2>Laisser un avis</h2></div>
+        <fieldset class="field" style="border:0;margin:0;padding:0">
+          <legend class="label" style="font-weight:700;color:var(--ink-2);font-size:var(--fs-sm);margin-bottom:6px">Ta note</legend>
+          <div class="star-input">
+            <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 étoiles : excellent">★</label>
+            <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 étoiles : très bien">★</label>
+            <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 étoiles : bien">★</label>
+            <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 étoiles : moyen">★</label>
+            <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 étoile : décevant">★</label>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="reviewName">Ton prénom</label>
+          <input class="input" id="reviewName" name="name" type="text" maxlength="40" autocomplete="given-name" placeholder="Julien, Marie…" required>
+        </div>
+        <div class="field">
+          <label for="reviewMessage">Ton message</label>
+          <textarea class="textarea" id="reviewMessage" name="message" maxlength="600" placeholder="Ce que tu as cuisiné, ce que tu as aimé sur le site…" required></textarea>
+          <span class="field-hint">10 caractères minimum, 600 maximum. Ton avis sera visible par tous les visiteurs.</span>
+        </div>
+        <input type="text" name="site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0">
+        <button class="btn btn-primary btn-block" type="submit">Publier mon avis</button>
+      </form>
     </div>
-  </footer>
-
-  <div id="secretToast"></div>
-  <button id="scrollTopBtn" title="Retourner en haut de la page">↑</button>
-<script src="site.js"></script>
-<script type="module" src="reviews-firebase.js"></script>
+  </main>
 </body>
 </html>

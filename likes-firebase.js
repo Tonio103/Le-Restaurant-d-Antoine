@@ -1,3 +1,8 @@
+/**
+ * Likes des recettes (Firestore : collection "likes", un document par recette
+ * avec un champ "count"). Les likes de chaque visiteur sont mémorisés dans le
+ * navigateur pour qu'il puisse retirer son like.
+ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
 import {
   getFirestore,
@@ -19,226 +24,118 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const RECIPE_KEYS = [
-  "cailles",
-  "crepes",
-  "burgers",
-  "fondants",
-  "marbre",
-  "pokebowl",
-  "jusorange",
-  "saladecesar",
-  "avocadotoast",
-  "ramen"
-];
-
-const recipesMeta = {
-  cailles: { name: "Cailles", url: "cailles.html", emoji: "🍗" },
-  crepes: { name: "Crêpes", url: "crepes.html", emoji: "🥞" },
-  burgers: { name: "Burger maison", url: "burger.html", emoji: "🍔" },
-  fondants: { name: "Fondant au chocolat", url: "fondant.html", emoji: "🍫" },
-  marbre: { name: "Gâteau marbré", url: "gateau-marbre.html", emoji: "🍰" },
-  pokebowl: { name: "Poké Bowl", url: "poke-bowl.html", emoji: "🥗" },
-  jusorange: { name: "Jus d’orange frais", url: "jusorange.html", emoji: "🍊" },
-  saladecesar: { name: "Salade César", url: "salade-cesar.html", emoji: "🥗" },
-  avocadotoast: { name: "Avocado toast", url: "avocado-toast.html", emoji: "🥑" },
-  ramen: { name: "Ramen maison", url: "ramen.html", emoji: "🍜" }
-};
-
+const RECIPE_KEYS = (window.RECETTES || []).map((r) => r.key);
 const STORAGE_KEY = "antoine-user-liked-recipes";
 const liveLikes = {};
-
-function safeGetStorage(key, fallback) {
-  try {
-    const value = localStorage.getItem(key);
-    return value ?? fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function safeSetStorage(key, value) {
-  try {
-    localStorage.setItem(key, value);
-  } catch {}
-}
+const pending = new Set();
 
 function getUserLikedRecipes() {
   try {
-    const raw = safeGetStorage(STORAGE_KEY, "[]");
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
 }
 
-function saveUserLikedRecipes(likedRecipes) {
-  safeSetStorage(STORAGE_KEY, JSON.stringify(likedRecipes));
-}
-
-function hasUserLiked(recipe) {
-  return getUserLikedRecipes().includes(recipe);
-}
-
-function showToast(message) {
-  if (typeof window.showToast === "function") {
-    window.showToast(message);
+function saveUserLikedRecipes(list) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  } catch {
+    /* stockage indisponible */
   }
 }
 
-function updateLikeDisplay(recipe) {
-  const count = liveLikes[recipe] || 0;
-  const isLiked = hasUserLiked(recipe);
+function toast(message) {
+  window.Antoine?.toast?.(message);
+}
 
-  const countEl = document.getElementById(`likes-${recipe}`);
-  if (countEl) {
-    countEl.textContent = count;
-  }
-
-  const likeButtons = document.querySelectorAll(".like-btn");
-
-  likeButtons.forEach((button) => {
-    const onclickValue = button.getAttribute("onclick") || "";
-    const buttonRecipe = button.dataset.recipe || "";
-
-    const matchesRecipe =
-      buttonRecipe === recipe ||
-      onclickValue.includes(`'${recipe}'`) ||
-      onclickValue.includes(`"${recipe}"`);
-
-    if (!matchesRecipe) return;
-
-    button.classList.toggle("liked", isLiked);
-    button.setAttribute("aria-pressed", isLiked ? "true" : "false");
-    button.setAttribute("data-recipe", recipe);
+function applyToDom(root = document) {
+  const liked = getUserLikedRecipes();
+  root.querySelectorAll("[data-like-count]").forEach((node) => {
+    const key = node.dataset.likeCount;
+    const text = String(liveLikes[key] ?? "–");
+    if (key in liveLikes && node.textContent !== text) node.textContent = text;
+  });
+  root.querySelectorAll("[data-like]").forEach((button) => {
+    const isLiked = liked.includes(button.dataset.like);
+    button.classList.toggle("is-liked", isLiked);
+    button.setAttribute("aria-pressed", String(isLiked));
     button.title = isLiked ? "Retirer mon like" : "Liker cette recette";
   });
+  return liked;
 }
 
-function getTopRecipe() {
-  let top = null;
-  let max = 0;
-
-  RECIPE_KEYS.forEach((recipe) => {
-    const score = liveLikes[recipe] || 0;
-    if (score > max) {
-      max = score;
-      top = recipe;
-    }
-  });
-
-  return top;
+function updateDisplay() {
+  const liked = applyToDom();
+  document.dispatchEvent(new CustomEvent("antoine:likes", { detail: { counts: { ...liveLikes }, liked } }));
 }
 
-function renderTopRecipe() {
-  const container = document.getElementById("topRecipe");
-  if (!container) return;
-
-  const top = getTopRecipe();
-
-  if (!top || !recipesMeta[top]) {
-    container.innerHTML = `
-      <div class="top-recipe-card">
-        <div class="top-recipe-left">
-          <div class="top-recipe-emoji">🏆</div>
-          <div class="top-recipe-text">
-            <span class="top-recipe-kicker">Recette mise en avant</span>
-            <h4>Aucune recette favorite pour le moment</h4>
-            <p>Les likes des visiteurs feront apparaître la recette star ici.</p>
-          </div>
-        </div>
-      </div>
-    `;
-    return;
-  }
-
-  const recipe = recipesMeta[top];
-  const count = liveLikes[top] || 0;
-
-  container.innerHTML = `
-    <a href="${recipe.url}" class="top-recipe-card">
-      <div class="top-recipe-left">
-        <div class="top-recipe-emoji">${recipe.emoji}</div>
-        <div class="top-recipe-text">
-          <span class="top-recipe-kicker">Recette mise en avant</span>
-          <h4>${recipe.name}</h4>
-          <p>La favorite actuelle des visiteurs.</p>
-        </div>
-      </div>
-      <div class="top-recipe-badge">❤️ ${count} like${count > 1 ? "s" : ""}</div>
-    </a>
-  `;
-}
-
-function listenLikes(recipe) {
-  const ref = doc(db, "likes", recipe);
-
-  onSnapshot(ref, (snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.data();
-      liveLikes[recipe] = Number(data.count) || 0;
-    } else {
-      liveLikes[recipe] = 0;
-    }
-
-    updateLikeDisplay(recipe);
-    renderTopRecipe();
-  });
+function listen(recipe) {
+  onSnapshot(
+    doc(db, "likes", recipe),
+    (snapshot) => {
+      liveLikes[recipe] = snapshot.exists() ? Number(snapshot.data().count) || 0 : 0;
+      updateDisplay();
+    },
+    (error) => console.warn("Likes indisponibles :", error)
+  );
 }
 
 async function toggleLike(recipe) {
   if (!RECIPE_KEYS.includes(recipe)) {
-    console.warn(`Recette inconnue pour les likes : ${recipe}`);
-    showToast("Cette recette n'est pas reconnue.");
+    toast("Cette recette n'est pas reconnue.");
     return;
   }
+  if (pending.has(recipe)) return;
+  pending.add(recipe);
 
   const ref = doc(db, "likes", recipe);
-  const likedRecipes = getUserLikedRecipes();
-  const alreadyLiked = likedRecipes.includes(recipe);
+  const liked = getUserLikedRecipes();
+  const alreadyLiked = liked.includes(recipe);
 
   try {
     await runTransaction(db, async (transaction) => {
       const snap = await transaction.get(ref);
-
       if (!snap.exists()) {
         transaction.set(ref, { count: alreadyLiked ? 0 : 1 });
         return;
       }
-
       const current = Number(snap.data().count) || 0;
-      const next = alreadyLiked ? Math.max(0, current - 1) : current + 1;
-
-      transaction.update(ref, { count: next });
+      transaction.update(ref, { count: alreadyLiked ? Math.max(0, current - 1) : current + 1 });
     });
 
     if (alreadyLiked) {
-      const nextLiked = likedRecipes.filter((item) => item !== recipe);
-      saveUserLikedRecipes(nextLiked);
-      liveLikes[recipe] = Math.max(0, (liveLikes[recipe] || 0) - 1);
-      showToast("Like retiré.");
+      saveUserLikedRecipes(liked.filter((item) => item !== recipe));
+      toast("Like retiré.");
     } else {
-      const nextLiked = [...likedRecipes, recipe];
-      saveUserLikedRecipes(nextLiked);
-      liveLikes[recipe] = (liveLikes[recipe] || 0) + 1;
-      showToast("Recette likée ❤️");
+      saveUserLikedRecipes([...liked, recipe]);
+      toast("Merci ! Recette likée ❤️");
     }
-
-    updateLikeDisplay(recipe);
-    renderTopRecipe();
+    updateDisplay();
   } catch (error) {
     console.error("Erreur Firebase likes :", error);
-    showToast("Impossible de mettre à jour le like.");
+    toast("Impossible de mettre à jour le like pour le moment.");
+  } finally {
+    pending.delete(recipe);
   }
 }
 
 window.toggleLike = toggleLike;
+window.antoineLikesState = {
+  counts: liveLikes,
+  isLiked: (key) => getUserLikedRecipes().includes(key),
+  refresh: updateDisplay
+};
 
-RECIPE_KEYS.forEach((recipe) => {
-  liveLikes[recipe] = 0;
-  listenLikes(recipe);
-  updateLikeDisplay(recipe);
-});
+RECIPE_KEYS.forEach(listen);
+updateDisplay();
 
-renderTopRecipe();
+// Les boutons créés plus tard (mode cuisine, assistant…) reçoivent leur état.
+const SELECTOR = "[data-like], [data-like-count]";
+new MutationObserver((mutations) => {
+  const hasLikeNode = mutations.some((m) =>
+    [...m.addedNodes].some((n) => n.nodeType === 1 && (n.matches(SELECTOR) || n.querySelector(SELECTOR)))
+  );
+  if (hasLikeNode) applyToDom();
+}).observe(document.body, { childList: true, subtree: true });

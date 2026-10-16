@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coup de feu en cuisine · Le restaurant d'Antoine</title>
+  <meta name="description" content="Les commandes s'enchaînent : assemble chaque plat dans le bon ordre avant que les clients ne perdent patience.">
+  <meta name="theme-color" content="#f6efe4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#15100c" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Le restaurant d'Antoine">
+  <meta property="og:title" content="Coup de feu en cuisine · Le restaurant d'Antoine">
+  <meta property="og:description" content="Les commandes s'enchaînent : assemble chaque plat dans le bon ordre avant que les clients ne perdent patience.">
+  <meta property="og:image" content="img/accueil.webp">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..700,0..100;1,9..144,400..700,0..100&family=Manrope:wght@400..800&display=swap">
+  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="jeux.css">
+  <script>try{var t=localStorage.getItem("antoine-theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
+  <script src="recettes-data.js" defer></script>
+  <script src="site.js" defer></script>
+  <script src="chatbot.js" defer></script>
+  <script src="jeu-commandes.js" defer></script>
+</head>
+<body data-page="games">
+  <main id="main" class="container game-page">
+    <div class="game-head">
+      <div>
+        <p class="eyebrow"><a href="jeux.html" style="text-decoration:none">Mini-jeux</a></p>
+        <h1>Coup de feu <em style="color:var(--accent)">en cuisine</em></h1>
+        <p class="lead" style="margin-top:10px">Les tickets tombent : assemble chaque plat dans le bon ordre avant que le client ne s'impatiente.</p>
+      </div>
+    </div>
+    <div class="game-board" id="kitchenBoard">
+      <div class="hud-bar">
+        <div class="hud-stat"><span>Score</span><strong id="kScore">0</strong></div>
+        <div class="hud-stat"><span>Combo</span><strong id="kCombo">×1</strong></div>
+        <div class="hud-stat"><span>Clients</span><strong id="kLives" class="lives">⭐⭐⭐</strong></div>
+        <div class="hud-stat"><span>Service</span><strong id="kTime">90 s</strong></div>
+        <div class="hud-stat"><span>Record</span><strong id="kBest">–</strong></div>
+      </div>
+      <div class="kitchen">
+        <div id="kTicket" aria-live="polite"></div>
+        <div class="plate-zone" id="kPlate" aria-hidden="true">
+          <div style="display:grid;justify-items:center;width:100%">
+            <div class="plate-stack"></div>
+            <div class="plate-dish"></div>
+          </div>
+        </div>
+      </div>
+      <div class="pantry" id="kPantry" aria-label="Ingrédients"></div>
+      <div class="game-overlay" id="kOverlay">
+        <div class="game-modal">
+          <div class="big" aria-hidden="true">🛎️</div>
+          <h2>C'est le coup de feu !</h2>
+          <ul class="rules">
+            <li><span aria-hidden="true">🧾</span> Chaque ticket indique les ingrédients à poser, dans l'ordre.</li>
+            <li><span aria-hidden="true">👆</span> Clique sur les ingrédients du garde-manger pour monter le plat.</li>
+            <li><span aria-hidden="true">⏳</span> Sers avant la fin de la barre de patience : 3 clients partis et c'est fini.</li>
+            <li><span aria-hidden="true">🔥</span> Enchaîne les plats sans erreur pour multiplier tes points. Chaque plat servi rajoute 3 s au service.</li>
+          </ul>
+          <div class="btn-row"><button class="btn btn-primary" type="button" data-start>Ouvrir le service</button></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
