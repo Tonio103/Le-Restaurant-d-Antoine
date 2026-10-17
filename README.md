@@ -40,7 +40,7 @@ Les quantités sont recalculées automatiquement selon le nombre de portions.
 
 Une recette dont la liste `images` est vide reçoit automatiquement une couverture dessinée
 (champ `cover` : `motif`, `fond`, `encre`, `accent`). Motifs disponibles : `cocotte`, `plat-four`,
-`assiette`, `bol`, `tarte`, `verre`, `tasse`, `poele`, `ramequin`, `biscuit`.
+`assiette`, `bol`, `tarte`, `verre`, `tasse`, `poele`, `ramequin`, `biscuit`, `cloche`, `poisson`, `gateau`, `coquille`, `coupe`.
 Dès que tu ajoutes une photo dans `images`, elle remplace la couverture partout.
 
 Le champ `alias` (facultatif) liste d'autres façons de nommer la recette, pour l'assistant

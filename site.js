@@ -272,7 +272,35 @@
     biscuit: (a) => `
       <path d="M150 52c30 4 54 30 52 62s-30 58-62 56-58-28-56-60 32-62 66-58z" fill="${a}" fill-opacity=".6"/>
       <path d="M96 84c32 2 58 30 56 64s-32 58-64 56-58-30-56-62 30-60 64-58z" fill="${a}"/>
-      <path d="M78 122l12 4-4 11-11-5zM110 104l10 6-6 10-10-6zM118 152l12 2-2 12-12-2zM80 168l10 6-6 9-9-6z" fill="currentColor"/>`
+      <path d="M78 122l12 4-4 11-11-5zM110 104l10 6-6 10-10-6zM118 152l12 2-2 12-12-2zM80 168l10 6-6 9-9-6z" fill="currentColor"/>`,
+    cloche: (a) => `
+      <path d="M30 172a90 90 0 0 1 180 0z" fill="${a}"/>
+      <path d="M12 172h216M40 192h160"/>
+      <circle cx="120" cy="70" r="11"/>
+      <path d="M62 146a62 62 0 0 1 34-50" stroke-width="5"/>`,
+    poisson: (a) => `
+      <ellipse cx="120" cy="124" rx="112" ry="72"/>
+      <path d="M40 120c30-42 100-42 132 0-32 42-102 42-132 0z" fill="${a}"/>
+      <path d="M170 120l38-28v56z" fill="${a}"/>
+      <circle cx="68" cy="112" r="5" fill="currentColor"/>
+      <path d="M90 98q-10 22 0 44" stroke-width="4"/>
+      <path d="M112 170l18-12M128 176l16-6" stroke-width="4"/>`,
+    gateau: (a) => `
+      <path d="M30 150h176v26H30z" fill="${a}" stroke="none"/>
+      <path d="M30 198V124L206 76v122z"/>
+      <path d="M30 150h176M30 176h176" stroke-width="4"/>
+      <circle cx="176" cy="66" r="17" fill="${a}"/>
+      <path d="M166 48l10 9 10-9" stroke-width="4"/>
+      <path d="M12 206h216"/>`,
+    coquille: (a) => `
+      <path d="M120 194L30 106a92 92 0 0 1 180 0z" fill="${a}"/>
+      <path d="M120 194L62 52M120 194L90 32M120 194V28M120 194l30-162M120 194l58-142" stroke-width="4"/>
+      <path d="M94 194h52l-9 16h-34z"/>`,
+    coupe: (a) => `
+      <path d="M40 74h160a80 62 0 0 1-160 0z" fill="${a}"/>
+      <circle cx="120" cy="58" r="22" fill="currentColor" fill-opacity=".9"/>
+      <circle cx="140" cy="30" r="9"/><path d="M144 22q6-12 18-14" stroke-width="4"/>
+      <path d="M120 136v54M80 198h80"/>`
   };
 
   function coverSvg(r) {
@@ -1373,21 +1401,23 @@
       const FILTRES = [
         { id: "tout", label: "Tout", test: () => true },
         ...Object.entries(META.CATEGORIES).map(([key, c]) => ({ id: key, label: c.label, test: (r) => r.categorie === key })),
+        { id: "gastro", label: "Gastronomique", test: (r) => r.tags.includes("gastronomique") },
         { id: "rapide", label: "30 min max", test: (r) => META.tempsTotal(r) <= 30 },
         { id: "sansviande", label: "Sans viande", test: (r) => r.regime?.sansViande }
-      ];
+      ].filter((f) => RECETTES.some(f.test));
       const params = new URLSearchParams(location.search);
       let active = FILTRES.some((f) => f.id === params.get("cat")) ? params.get("cat") : "tout";
       filters.innerHTML = FILTRES.map(
-        (f) => `<button class="chip" type="button" data-filter="${f.id}" aria-pressed="${f.id === active}">${f.label}</button>`
+        (f) =>
+          `<button class="chip" type="button" data-filter="${f.id}" aria-pressed="${f.id === active}">${f.label}<span class="chip-count">${RECETTES.filter(f.test).length}</span></button>`
       ).join("");
 
-      // Sur « Tout » sans recherche, on montre d'abord une sélection, puis « Voir plus ».
-      const PREMIERES = 12;
-      let toutVoir = false;
+      // Sans recherche, on montre les recettes par paquets de 12 avec « Voir plus ».
+      const PAQUET = 12;
+      let limiteVisible = PAQUET;
       const more = document.getElementById("recipeMore");
       more?.addEventListener("click", () => {
-        toutVoir = true;
+        limiteVisible += PAQUET;
         apply();
         observeReveal(grid);
       });
@@ -1395,7 +1425,7 @@
       const apply = () => {
         const f = FILTRES.find((x) => x.id === active);
         const q = normalize(search.value);
-        const limite = active === "tout" && !q && !toutVoir ? PREMIERES : Infinity;
+        const limite = q ? Infinity : limiteVisible;
         let visible = 0;
         let matches = 0;
         grid.querySelectorAll(".recipe-card").forEach((card) => {
@@ -1411,7 +1441,7 @@
         count.textContent = `${matches} recette${matches > 1 ? "s" : ""}`;
         if (more) {
           more.hidden = visible >= matches;
-          more.textContent = `Voir les ${matches} recettes`;
+          more.textContent = `Voir plus de recettes (${matches - visible})`;
         }
       };
 
@@ -1419,6 +1449,7 @@
         const b = e.target.closest("[data-filter]");
         if (!b) return;
         active = b.dataset.filter;
+        limiteVisible = PAQUET;
         filters.querySelectorAll("[data-filter]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
         apply();
       });
@@ -2021,6 +2052,30 @@
           </article>`;
       })
       .join("");
+
+    // Filtre par pays (le premier mot du champ pays, avant une éventuelle parenthèse)
+    const paysDe = (r) => r.origine.pays.split(" (")[0];
+    const avecOrigine = RECETTES.filter((r) => r.origine);
+    const compte = {};
+    avecOrigine.forEach((r) => (compte[paysDe(r)] = (compte[paysDe(r)] || 0) + 1));
+    const listePays = Object.keys(compte).sort((a, b) => compte[b] - compte[a] || a.localeCompare(b, "fr"));
+    if (listePays.length > 1) {
+      grid.insertAdjacentHTML(
+        "beforebegin",
+        `<div class="chip-row origin-filters" id="originFilters" role="group" aria-label="Filtrer par pays">
+          <button class="chip" type="button" data-pays="" aria-pressed="true">Tous<span class="chip-count">${avecOrigine.length}</span></button>
+          ${listePays.map((p) => `<button class="chip" type="button" data-pays="${esc(p)}" aria-pressed="false">${esc(p)}<span class="chip-count">${compte[p]}</span></button>`).join("")}
+        </div>`
+      );
+      document.getElementById("originFilters").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-pays]");
+        if (!b) return;
+        b.parentElement.querySelectorAll("[data-pays]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+        grid.querySelectorAll(".origin-card").forEach((card) => {
+          card.hidden = Boolean(b.dataset.pays) && paysDe(BY_KEY[card.id]) !== b.dataset.pays;
+        });
+      });
+    }
 
     const banner = document.getElementById("travelPins");
     if (banner) {
