@@ -36,6 +36,16 @@ Les quantités sont recalculées automatiquement selon le nombre de portions.
 - `optionnel: true` affiche l'étiquette « option ».
 - `minuteurs: [{ secondes: 600, label: "Cuisson" }]` ajoute un bouton minuteur à une étape.
 
+## Recettes sans photo : couvertures illustrées
+
+Une recette dont la liste `images` est vide reçoit automatiquement une couverture dessinée
+(champ `cover` : `motif`, `fond`, `encre`, `accent`). Motifs disponibles : `cocotte`, `plat-four`,
+`assiette`, `bol`, `tarte`, `verre`, `tasse`, `poele`, `ramequin`, `biscuit`.
+Dès que tu ajoutes une photo dans `images`, elle remplace la couverture partout.
+
+Le champ `alias` (facultatif) liste d'autres façons de nommer la recette, pour l'assistant
+(ex. `["quiche", "quiche lorraine"]`).
+
 ## Ajouter une recette
 
 1. Dans `recettes-data.js`, copie un bloc de recette complet et change la `key`
@@ -53,3 +63,9 @@ Le thème, les minuteurs, la liste de courses, la progression des recettes et le
 des jeux sont enregistrés dans le navigateur du visiteur (`localStorage`) : rien n'est envoyé
 sur un serveur. Seuls les likes et les avis passent par Firebase, et le formulaire de questions
 par Formspree.
+
+## Mises à jour et cache des navigateurs
+
+Les pages chargent les fichiers CSS et JavaScript avec un numéro de version
+(`site.css?v=20261016-2`). Après une modification de ces fichiers, change ce numéro
+dans les pages HTML pour que les visiteurs reçoivent tout de suite la nouvelle version.

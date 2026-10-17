@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Origines des plats · Le restaurant d'Antoine</title>
   <meta name="description" content="D'où viennent les plats du restaurant d'Antoine ? Origines, anecdotes et sources pour chaque recette.">
-  <meta name="theme-color" content="#f6efe4" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#15100c" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f5efe6" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#110c09" media="(prefers-color-scheme: dark)">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Le restaurant d'Antoine">
   <meta property="og:title" content="Origines des plats · Le restaurant d'Antoine">
@@ -16,11 +16,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..700,0..100;1,9..144,400..700,0..100&family=Manrope:wght@400..800&display=swap">
-  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="site.css?v=20261016-2">
   <script>try{var t=localStorage.getItem("antoine-theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
-  <script src="recettes-data.js" defer></script>
-  <script src="site.js" defer></script>
-  <script src="chatbot.js" defer></script>
+  <script src="recettes-data.js?v=20261016-2" defer></script>
+  <script src="site.js?v=20261016-2" defer></script>
+  <script src="chatbot.js?v=20261016-2" defer></script>
 </head>
 <body data-page="infos">
   <main id="main" class="container">
@@ -31,7 +31,7 @@
       <div class="travel-banner" aria-hidden="true">
         <svg viewBox="0 0 1200 120" preserveAspectRatio="none"><path class="route" d="M 10 90 C 200 0, 380 120, 560 50 S 900 0, 1180 60"/></svg>
         <div id="travelPins"></div>
-        <span class="plane">✈️</span>
+        <span class="plane"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 13.5 3 11l1.5-1.5 8 1L17 6a2 2 0 0 1 3 3l-4.5 4.5 1 8L15 23l-2.5-7.5L9 19v3l-1.5 1-1-4-4-1L4 16.5h3l3.5-3.5Z" transform="scale(.92) translate(1 0)"/></svg></span>
       </div>
     </section>
     <div class="origin-grid" id="originGrid"></div>

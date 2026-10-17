@@ -91,7 +91,15 @@
     message: '<path d="M4 5h16v11H9l-5 4V5Z"/>',
     dice: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.1" fill="currentColor"/><circle cx="15" cy="15" r="1.1" fill="currentColor"/><circle cx="15" cy="9" r="1.1" fill="currentColor"/><circle cx="9" cy="15" r="1.1" fill="currentColor"/>',
     list: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>',
-    bell: '<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4l2-2Z"/><path d="M10 21h4"/>'
+    bell: '<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4l2-2Z"/><path d="M10 21h4"/>',
+    alert: '<path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17h.01"/>',
+    pin: '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/>',
+    run: '<circle cx="15" cy="4.5" r="2"/><path d="m6 21 3.5-5.5L13 17l2 4M8 11l3-3 4 1 2 3 3 1M11 8l-2 7"/>',
+    cards: '<rect x="3" y="6" width="11" height="15" rx="2"/><path d="M10 3h9a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-2"/>',
+    question: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+    star: '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>'
   };
 
   function icon(name, extraClass = "") {
@@ -206,8 +214,94 @@
     return `${n} ${n > 1 ? recette.portions.pluriel : recette.portions.unite}`;
   }
 
+  /* Couvertures illustrées pour les recettes qui n'ont pas encore de photo.
+     Dessin vectoriel (pas de texte, donc indépendant des polices), généré
+     depuis recette.cover = { motif, fond, encre, accent }. */
+  const MOTIFS = {
+    cocotte: (a) => `
+      <path d="M58 40c-9-11 9-16 0-28M120 34c-9-11 9-16 0-28M182 40c-9-11 9-16 0-28" stroke-width="5"/>
+      <path d="M40 112h160v52a30 30 0 0 1-30 30H70a30 30 0 0 1-30-30z" fill="${a}"/>
+      <path d="M26 112h188M40 132H20M200 132h20"/>
+      <path d="M50 104a70 36 0 0 1 140 0z" fill="${a}" fill-opacity=".55"/>
+      <circle cx="120" cy="62" r="9"/>`,
+    "plat-four": (a) => `
+      <path d="M78 54c-9-11 9-16 0-28M162 54c-9-11 9-16 0-28" stroke-width="5"/>
+      <path d="M34 112h172l-14 70a14 14 0 0 1-14 11H62a14 14 0 0 1-14-11z" fill="${a}"/>
+      <path d="M22 112h196M22 112q-16 0-16 14M218 112q16 0 16 14"/>
+      <path d="M46 100q15-15 30 0t30 0 30 0 30 0 30 0" stroke-width="6"/>
+      <circle cx="80" cy="140" r="5"/><circle cx="130" cy="152" r="4"/><circle cx="168" cy="136" r="5"/>`,
+    assiette: (a) => `
+      <circle cx="120" cy="120" r="80"/>
+      <circle cx="120" cy="120" r="56" fill="${a}"/>
+      <path d="M16 46v34M26 46v34M36 46v34M16 80q10 12 20 0M26 86v110"/>
+      <path d="M220 46q18 34 0 72v78"/>`,
+    bol: (a) => `
+      <path d="M78 64c-9-11 9-16 0-28M120 58c-9-11 9-16 0-28M162 64c-9-11 9-16 0-28" stroke-width="5"/>
+      <path d="M36 104h168a84 76 0 0 1-168 0z" fill="${a}"/>
+      <path d="M24 104h192M96 186h48"/>
+      <path d="M150 96l46-72" stroke-width="6"/>`,
+    tarte: (a) => `
+      <circle cx="120" cy="120" r="94" stroke-width="12" stroke-dasharray="9 7"/>
+      <circle cx="120" cy="120" r="78" fill="${a}"/>
+      <path d="M120 120V42M120 120l70 36" stroke-width="5"/>
+      <path d="M78 96a50 50 0 0 1 22-26M70 136a52 52 0 0 0 30 40M150 82a48 48 0 0 1 20 22" stroke-width="5"/>`,
+    verre: (a) => `
+      <path d="M74 92h92l-9 104a10 10 0 0 1-10 9H93a10 10 0 0 1-10-9z" fill="${a}"/>
+      <path d="M66 36h108l-15 160a10 10 0 0 1-10 9H91a10 10 0 0 1-10-9z"/>
+      <path d="M148 14l-24 150" stroke-width="6"/>
+      <circle cx="174" cy="42" r="26" fill="${a}"/>
+      <path d="M174 16v52M148 42h52M156 24l36 36M192 24l-36 36" stroke-width="3"/>
+      <rect x="92" y="118" width="22" height="22" rx="5" stroke-width="4"/><rect x="122" y="140" width="20" height="20" rx="5" stroke-width="4"/>`,
+    tasse: (a) => `
+      <path d="M84 56c-9-11 9-16 0-28M116 50c-9-11 9-16 0-28M148 56c-9-11 9-16 0-28" stroke-width="5"/>
+      <path d="M46 78h118v82a32 32 0 0 1-32 32H78a32 32 0 0 1-32-32z" fill="${a}"/>
+      <path d="M164 98h14a24 24 0 0 1 0 48h-14M24 204h170"/>`,
+    poele: (a) => `
+      <circle cx="104" cy="120" r="84"/>
+      <circle cx="104" cy="120" r="68" fill="${a}"/>
+      <path d="M188 120h48" stroke-width="16"/>
+      <path d="M58 104c0-22 40-26 46-6 8 24-30 34-46 6z" fill="currentColor"/>
+      <path d="M110 142c4-22 44-18 44 4 0 22-46 22-44-4z" fill="currentColor"/>
+      <circle cx="80" cy="104" r="11" fill="#f2b23a" stroke="none"/><circle cx="132" cy="146" r="11" fill="#f2b23a" stroke="none"/>`,
+    ramequin: (a) => `
+      <path d="M40 116h160v50a20 20 0 0 1-20 20H60a20 20 0 0 1-20-20z"/>
+      <path d="M62 120v64M84 120v66M106 120v66M128 120v66M150 120v66M172 120v64" stroke-width="4"/>
+      <ellipse cx="120" cy="116" rx="82" ry="20" fill="${a}"/>
+      <path d="M150 98l54-66" stroke-width="6"/>
+      <ellipse cx="210" cy="26" rx="12" ry="18" transform="rotate(40 210 26)"/>`,
+    biscuit: (a) => `
+      <path d="M150 52c30 4 54 30 52 62s-30 58-62 56-58-28-56-60 32-62 66-58z" fill="${a}" fill-opacity=".6"/>
+      <path d="M96 84c32 2 58 30 56 64s-32 58-64 56-58-30-56-62 30-60 64-58z" fill="${a}"/>
+      <path d="M78 122l12 4-4 11-11-5zM110 104l10 6-6 10-10-6zM118 152l12 2-2 12-12-2zM80 168l10 6-6 9-9-6z" fill="currentColor"/>`
+  };
+
+  function coverSvg(r) {
+    const c = r.cover || {};
+    const fond = c.fond || "#3b2a20";
+    const encre = c.encre || "#f6efe4";
+    const accent = c.accent || "#c9a462";
+    const motif = (MOTIFS[c.motif] || MOTIFS.assiette)(accent);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+      <defs><radialGradient id="g" cx="50%" cy="42%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></radialGradient></defs>
+      <rect width="800" height="600" fill="${fond}"/><rect width="800" height="600" fill="url(#g)"/>
+      <g fill="none" stroke="${encre}" stroke-opacity=".07" stroke-width="1.5">${[120, 180, 240, 300, 360, 420].map((rr) => `<circle cx="400" cy="290" r="${rr}"/>`).join("")}</g>
+      <rect x="26" y="26" width="748" height="548" rx="6" fill="none" stroke="${encre}" stroke-opacity=".28" stroke-width="1.5"/>
+      <g fill="${encre}" fill-opacity=".5"><path d="M400 548l6 8-6 8-6-8z"/><path d="M380 556h-60M420 556h60" stroke="${encre}" stroke-opacity=".4"/></g>
+      <g transform="translate(224 114) scale(1.47)" fill="none" stroke="${encre}" color="${encre}" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round">${motif}</g>
+    </svg>`.replace(/\s{2,}/g, " ");
+  }
+
+  const coverCache = {};
+  function coverUri(r) {
+    if (!coverCache[r.key]) coverCache[r.key] = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(coverSvg(r))}`;
+    return coverCache[r.key];
+  }
+
   function imageDe(recette, index = 0) {
-    return recette.images[index] || recette.images[0] || { src: "", thumb: "", alt: recette.titre };
+    const im = recette.images?.[index] || recette.images?.[0];
+    if (im) return im;
+    const uri = coverUri(recette);
+    return { src: uri, thumb: uri, alt: `Illustration : ${recette.titre}`, cover: true };
   }
 
   function debounce(fn, delay = 150) {
@@ -331,7 +425,7 @@
     requestAnimationFrame(frame);
   }
 
-  function burst(target, emojis = ["❤️", "✨", "💛", "🧡"]) {
+  function burst(target, emojis = ["♥", "✦", "♥", "✧"]) {
     if (REDUCED_MOTION || !target) return;
     const rect = target.getBoundingClientRect();
     for (let i = 0; i < 10; i++) {
@@ -369,7 +463,7 @@
     };
     if (document.startViewTransition && !REDUCED_MOTION) document.startViewTransition(apply);
     else apply();
-    toast(next === "dark" ? "Ambiance tamisée activée 🌙" : "Lumière du jour activée ☀️", 1800);
+    toast(next === "dark" ? "Ambiance tamisée activée" : "Lumière du jour activée", 1800);
   }
 
   /* ==========================================================================
@@ -439,10 +533,13 @@
     header.querySelector("[data-theme-toggle]").addEventListener("click", basculerTheme);
 
     // En-tête qui se cache en descendant et réapparaît en remontant.
+    // Sur l'accueil, il reste transparent tant qu'on est sur la grande photo.
+    const hero = document.querySelector(".hero-cine");
     let lastY = scrollY;
     const onScroll = () => {
       const y = scrollY;
       header.classList.toggle("is-scrolled", y > 8);
+      header.classList.toggle("is-solid", !hero || y > hero.offsetHeight - header.offsetHeight - 10);
       const goingDown = y > lastY + 4;
       const goingUp = y < lastY - 4;
       if (goingDown && y > 320 && menu.hidden) header.classList.add("is-hidden");
@@ -460,6 +557,10 @@
     const footer = el(`
       <footer class="site-footer">
         <div class="container">
+          <div class="footer-sign">
+            <p>Bon appétit.</p>
+            <a class="btn btn-gold" href="index.html#recettes">Voir la carte ${icon("arrow")}</a>
+          </div>
           <div class="footer-grid">
             <div>
               <a class="brand" href="index.html" aria-label="Accueil">
@@ -606,7 +707,7 @@
       });
     });
     saveList(list);
-    toast(`🧺 Ingrédients des ${recette.titreCourt.toLowerCase()} ajoutés à ta liste (${portionsLabel(recette, portions)}).`);
+    toast(`Ingrédients « ${recette.titreCourt} » ajoutés à ta liste (${portionsLabel(recette, portions)}).`);
   }
 
   function listAsText() {
@@ -640,7 +741,7 @@
     const list = getList();
     const bodyEl = listDrawer.querySelector(".drawer-body");
     if (!list.length) {
-      bodyEl.innerHTML = `<div class="empty-state"><span class="big">🧺</span><strong>Ta liste est vide</strong>
+      bodyEl.innerHTML = `<div class="empty-state"><span class="big">${icon("basket")}</span><strong>Ta liste est vide</strong>
         <span>Sur une recette, clique sur « Ajouter à ma liste » : les quantités suivent le nombre de portions.</span></div>`;
       return;
     }
@@ -651,7 +752,7 @@
         const r = BY_KEY[key];
         return `<div class="list-group">
           <div class="list-group-head">
-            <h3>${r ? `${r.emoji} ${esc(r.titreCourt)}` : esc(key)}</h3>
+            <h3>${r ? esc(r.titreCourt) : esc(key)}</h3>
             <button class="icon-btn" type="button" data-remove-group="${esc(key)}" aria-label="Retirer cette recette">${icon("trash")}</button>
           </div>
           ${items
@@ -672,7 +773,7 @@
     if (!listDrawer) {
       listDrawer = el(`<aside class="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="list-title">
           <div class="drawer-head">
-            <h2 id="list-title">🧺 Ma liste de courses</h2>
+            <h2 id="list-title">Ma liste de courses</h2>
             <button class="icon-btn" type="button" data-close aria-label="Fermer">${icon("x")}</button>
           </div>
           <div class="drawer-body"></div>
@@ -700,7 +801,7 @@
         if (e.target.closest("[data-copy-list]")) {
           const text = listAsText();
           if (!text) return toast("Ta liste est vide.");
-          copyText(`Ma liste de courses — Le restaurant d'Antoine\n\n${text}`, "Liste copiée : colle-la dans tes notes ou un message 📋");
+          copyText(`Ma liste de courses — Le restaurant d'Antoine\n\n${text}`, "Liste copiée : colle-la dans tes notes ou un message.");
         }
       });
     }
@@ -743,14 +844,14 @@
      ========================================================================== */
   let palette = null;
   const EXTRA_PAGES = [
-    { titre: "Mini-jeux du restaurant", url: "jeux.html", emoji: "🎮", mots: "jeux jeu jouer memory quiz commandes course runner" },
-    { titre: "Memory du chef", url: "memory.html", emoji: "🃏", mots: "memory paires cartes jeu" },
-    { titre: "Quiz du chef", url: "quiz.html", emoji: "🧠", mots: "quiz questions jeu culture" },
-    { titre: "Coup de feu en cuisine", url: "commandes.html", emoji: "🛎️", mots: "commandes service burger assembler jeu" },
-    { titre: "Service infini (course)", url: "index2.html", emoji: "🏃", mots: "course runner chef jeu sauter" },
-    { titre: "Origines des plats", url: "infos.html", emoji: "🌍", mots: "origines histoire culture pays infos" },
-    { titre: "Livre d'or", url: "avis.html", emoji: "⭐", mots: "avis note livre d or commentaires" },
-    { titre: "Poser une question", url: "questions.html", emoji: "✉️", mots: "question contact message chef" }
+    { titre: "Mini-jeux du restaurant", url: "jeux.html", icon: "sparkles", mots: "jeux jeu jouer memory quiz commandes course runner" },
+    { titre: "Memory du chef", url: "memory.html", icon: "cards", mots: "memory paires cartes jeu" },
+    { titre: "Quiz du chef", url: "quiz.html", icon: "question", mots: "quiz questions jeu culture" },
+    { titre: "Coup de feu en cuisine", url: "commandes.html", icon: "bell", mots: "commandes service burger assembler jeu" },
+    { titre: "Service infini (course)", url: "index2.html", icon: "run", mots: "course runner chef jeu sauter" },
+    { titre: "Origines des plats", url: "infos.html", icon: "globe", mots: "origines histoire culture pays infos" },
+    { titre: "Livre d'or", url: "avis.html", icon: "star", mots: "avis note livre d or commentaires" },
+    { titre: "Poser une question", url: "questions.html", icon: "mail", mots: "question contact message chef" }
   ];
 
   function searchIndex(query) {
@@ -831,7 +932,7 @@
           .map((res, i) => {
             if (res.type === "page") {
               return `<li><a href="${res.p.url}" role="option" aria-selected="${i === 0}">
-                  <span class="emoji-tile">${res.p.emoji}</span>
+                  <span class="emoji-tile">${icon(res.p.icon || "search")}</span>
                   <span><strong>${highlight(res.p.titre, input.value)}</strong><small>Page du site</small></span>
                   ${icon("right")}
                 </a></li>`;
@@ -934,7 +1035,7 @@
     timers.push(t);
     saveTimers();
     renderDock();
-    toast(`⏱ Minuteur lancé : ${label} (${dureeSecondes(s)})`, 2200);
+    toast(`Minuteur lancé : ${label} (${dureeSecondes(s)})`, 2200);
     return t;
   }
 
@@ -982,7 +1083,7 @@
         return `<div class="timer${t.paused ? " is-paused" : ""}${t.done ? " is-done" : ""}" data-timer="${t.id}">
           <div class="timer-ring">
             <svg viewBox="0 0 44 44"><circle class="track" cx="22" cy="22" r="18"/><circle class="bar" cx="22" cy="22" r="18" stroke-dasharray="113.1" stroke-dashoffset="0"/></svg>
-            <span>${t.done ? "🔔" : r ? r.emoji : "⏱"}</span>
+            <span>${icon(t.done ? "bell" : "timer")}</span>
           </div>
           <div class="timer-info"><small>${esc(t.label)}${r ? ` · ${esc(r.titreCourt)}` : ""}</small><strong>${t.done ? "C'est prêt !" : clock(remaining(t))}</strong></div>
           <div class="timer-btns">
@@ -1017,7 +1118,7 @@
         } catch {
           /* vibration non disponible */
         }
-        toast(`🔔 ${t.label} : c'est prêt !`, 6000);
+        toast(`${t.label} : c'est prêt !`, 6000);
       }
       if (t.done) ringing = true;
       if (node && !changed) {
@@ -1105,14 +1206,14 @@
     const cat = META.CATEGORIES[r.categorie];
     return `<a class="recipe-card" href="${r.url}" data-reveal style="--i:${index % 6}" data-key="${r.key}">
         <div class="recipe-card-media">
-          <img src="${img.thumb}" alt="${esc(img.alt)}" loading="lazy" width="640" height="480"${transition ? ` style="view-transition-name: photo-${r.key}"` : ""}>
+          <img src="${img.thumb}" alt="${esc(img.alt)}" loading="lazy" width="640" height="512"${transition ? ` style="view-transition-name: photo-${r.key}"` : ""}>
           <div class="card-badges">
-            <span class="pill">${cat ? `${cat.emoji} ${cat.singulier}` : ""}</span>
-            ${r.badge ? `<span class="pill pill-saffron">${esc(r.badge)}</span>` : ""}
+            ${r.badge ? `<span class="pill pill-glass">${esc(r.badge)}</span>` : "<span></span>"}
           </div>
           <span class="card-like" aria-label="Likes">${icon("heart")}<span data-card-likes="${r.key}">${likeCounts[r.key] ?? "–"}</span></span>
         </div>
         <div class="recipe-card-body">
+          <span class="card-cat">${esc(cat?.singulier || "")}</span>
           <h3>${esc(r.titreCourt)}</h3>
           <p>${esc(r.accroche)}</p>
           <div class="recipe-card-meta">
@@ -1143,34 +1244,57 @@
     const n = likeCounts[best.key];
     box.innerHTML = `<a class="top-recipe" href="${best.url}">
         <img src="${imageDe(best).thumb}" alt="">
-        <span><small class="muted">❤️ ${n} like${n > 1 ? "s" : ""}</small><strong>${esc(best.titreCourt)}</strong></span>
+        <span><small class="muted top-likes">${icon("heart")} ${n} like${n > 1 ? "s" : ""}</small><strong>${esc(best.titreCourt)}</strong></span>
       </a>`;
   }
 
   function initHome() {
-    // Assiette tournante du héros
-    const plate = document.getElementById("plateImages");
-    const label = document.getElementById("plateLabel");
-    if (plate && label && RECETTES.length) {
-      plate.innerHTML = RECETTES.map(
-        (r, i) => `<img src="${imageDe(r).thumb}" alt="${esc(imageDe(r).alt)}"${i === 0 ? ' class="is-active"' : ' loading="lazy"'} width="640" height="640">`
-      ).join("");
-      const imgs = [...plate.querySelectorAll("img")];
+    // Héros plein écran : diaporama des photos de la maison (effet Ken Burns)
+    const media = document.getElementById("heroMedia");
+    const nowTitle = document.getElementById("heroNowTitle");
+    const nowLink = document.getElementById("heroNow");
+    const progress = document.getElementById("heroProgress");
+    const avecPhoto = RECETTES.filter((r) => r.images?.length);
+    if (media && avecPhoto.length) {
+      const SLIDE_MS = 6500;
+      const ORIGINES = ["30% 40%", "70% 35%", "50% 60%", "40% 70%", "65% 55%"];
+      media.innerHTML = avecPhoto
+        .map(
+          (r, i) => `<div class="hero-slide${i === 0 ? " is-active" : ""}" style="--ox:${ORIGINES[i % 5].split(" ")[0]};--oy:${ORIGINES[i % 5].split(" ")[1]}">
+            <img src="${r.images[0].src}" alt=""${i === 0 ? ' fetchpriority="high"' : ' loading="lazy"'} width="1600" height="1100">
+          </div>`
+        )
+        .join("");
+      if (progress) {
+        progress.style.setProperty("--slide-ms", `${SLIDE_MS}ms`);
+        progress.innerHTML = avecPhoto.map(() => "<i></i>").join("");
+      }
+      const slides = [...media.querySelectorAll(".hero-slide")];
+      const bars = progress ? [...progress.querySelectorAll("i")] : [];
       let current = 0;
       const show = (i) => {
-        imgs[current].classList.remove("is-active");
-        current = (i + imgs.length) % imgs.length;
-        imgs[current].classList.add("is-active");
-        const r = RECETTES[current];
-        label.href = r.url;
-        label.innerHTML = `<span class="emoji">${r.emoji}</span><span><small>À la carte</small><strong>${esc(r.titreCourt)}</strong></span>`;
+        slides[current].classList.remove("is-active");
+        current = (i + slides.length) % slides.length;
+        const slide = slides[current];
+        // relance l'animation Ken Burns
+        const img = slide.querySelector("img");
+        img.style.animation = "none";
+        void img.offsetWidth;
+        img.style.animation = "";
+        slide.classList.add("is-active");
+        const r = avecPhoto[current];
+        if (nowTitle) nowTitle.textContent = r.titre;
+        if (nowLink) nowLink.href = r.url;
+        bars.forEach((b, idx) => {
+          b.className = idx < current ? "done" : idx === current ? "now" : "";
+        });
       };
       show(0);
-      if (!REDUCED_MOTION) {
-        let timer = setInterval(() => show(current + 1), 3800);
+      if (!REDUCED_MOTION && slides.length > 1) {
+        let timer = setInterval(() => show(current + 1), SLIDE_MS);
         document.addEventListener("visibilitychange", () => {
           clearInterval(timer);
-          if (!document.hidden) timer = setInterval(() => show(current + 1), 3800);
+          if (!document.hidden) timer = setInterval(() => show(current + 1), SLIDE_MS);
         });
       }
     }
@@ -1209,9 +1333,9 @@
       const etapes = RECETTES.reduce((n, r) => n + r.etapes.length, 0);
       const minuteurs = RECETTES.reduce((n, r) => n + r.etapes.reduce((m, e) => m + (e.minuteurs?.length || 0), 0), 0);
       stats.innerHTML = `
-        <div><strong>${RECETTES.length}</strong><span>recettes de famille</span></div>
+        <div><strong>${RECETTES.length}</strong><span>recettes</span></div>
         <div><strong>${etapes}</strong><span>étapes guidées</span></div>
-        <div><strong>${minuteurs}</strong><span>minuteurs intégrés</span></div>
+        <div><strong>${minuteurs}</strong><span>minuteurs</span></div>
         <div><strong>4</strong><span>mini-jeux</span></div>`;
     }
 
@@ -1232,9 +1356,9 @@
       grid.innerHTML = RECETTES.map((r, i) => recipeCard(r, { transition: true, index: i })).join("");
       const FILTRES = [
         { id: "tout", label: "Tout", test: () => true },
-        ...Object.entries(META.CATEGORIES).map(([key, c]) => ({ id: key, label: `${c.emoji} ${c.label}`, test: (r) => r.categorie === key })),
-        { id: "rapide", label: "⚡ 30 min max", test: (r) => META.tempsTotal(r) <= 30 },
-        { id: "sansviande", label: "🌱 Sans viande", test: (r) => r.regime?.sansViande }
+        ...Object.entries(META.CATEGORIES).map(([key, c]) => ({ id: key, label: c.label, test: (r) => r.categorie === key })),
+        { id: "rapide", label: "30 min max", test: (r) => META.tempsTotal(r) <= 30 },
+        { id: "sansviande", label: "Sans viande", test: (r) => r.regime?.sansViande }
       ];
       const params = new URLSearchParams(location.search);
       let active = FILTRES.some((f) => f.id === params.get("cat")) ? params.get("cat") : "tout";
@@ -1242,19 +1366,37 @@
         (f) => `<button class="chip" type="button" data-filter="${f.id}" aria-pressed="${f.id === active}">${f.label}</button>`
       ).join("");
 
+      // Sur « Tout » sans recherche, on montre d'abord une sélection, puis « Voir plus ».
+      const PREMIERES = 12;
+      let toutVoir = false;
+      const more = document.getElementById("recipeMore");
+      more?.addEventListener("click", () => {
+        toutVoir = true;
+        apply();
+        observeReveal(grid);
+      });
+
       const apply = () => {
         const f = FILTRES.find((x) => x.id === active);
         const q = normalize(search.value);
+        const limite = active === "tout" && !q && !toutVoir ? PREMIERES : Infinity;
         let visible = 0;
+        let matches = 0;
         grid.querySelectorAll(".recipe-card").forEach((card) => {
           const r = BY_KEY[card.dataset.key];
           const hay = normalize(`${r.titre} ${r.accroche} ${r.tags.join(" ")} ${tousIngredients(r).map((i) => i.nom).join(" ")}`);
-          const show = f.test(r) && (!q || q.split(" ").every((t) => hay.includes(t)));
+          const match = f.test(r) && (!q || q.split(" ").every((t) => hay.includes(t)));
+          if (match) matches++;
+          const show = match && visible < limite;
           card.classList.toggle("is-hidden", !show);
           if (show) visible++;
         });
-        empty.hidden = visible > 0;
-        count.textContent = `${visible} recette${visible > 1 ? "s" : ""}`;
+        empty.hidden = matches > 0;
+        count.textContent = `${matches} recette${matches > 1 ? "s" : ""}`;
+        if (more) {
+          more.hidden = visible >= matches;
+          more.textContent = `Voir les ${matches} recettes`;
+        }
       };
 
       filters.addEventListener("click", (e) => {
@@ -1300,7 +1442,7 @@
             go.href = r.url;
             go.hidden = false;
             bip(1046, 0.25, 0, "triangle", 0.15);
-            burst(win, ["✨", "🍽️", "⭐"]);
+            burst(win, ["✦", "✧", "✦"]);
           }
         };
         step();
@@ -1356,42 +1498,40 @@
 
     const allergenes = (r.allergenes || []).map((a) => `<span class="pill">${esc(META.ALLERGENES[a] || a)}</span>`).join("");
 
+    const couverture = imageDe(r);
     main.innerHTML = `
+      <section class="r-cover">
+        <img class="r-cover-img" src="${couverture.src}" alt="${esc(couverture.alt)}" width="1600" height="1100" style="view-transition-name: photo-${r.key}" fetchpriority="high">
+        <div class="container">
+          <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a href="index.html">Accueil</a><span>/</span>
+            <a href="index.html?cat=${r.categorie}#recettes">${esc(cat.label)}</a><span>/</span>
+            <span aria-current="page">${esc(r.titreCourt)}</span>
+          </nav>
+          <p class="eyebrow">${esc(r.badge || cat.singulier)}</p>
+          <h1 class="r-title">${esc(r.titre)}</h1>
+          <p class="r-intro">${esc(r.intro)}</p>
+        </div>
+      </section>
       <div class="container">
-        <section class="r-hero">
-          <div data-reveal>
-            <nav class="breadcrumb" aria-label="Fil d'Ariane">
-              <a href="index.html">Accueil</a><span>/</span>
-              <a href="index.html?cat=${r.categorie}#recettes">${esc(cat.label)}</a><span>/</span>
-              <span aria-current="page">${esc(r.titreCourt)}</span>
-            </nav>
-            <p class="eyebrow">${esc(r.badge || cat.singulier)}</p>
-            <h1 class="r-title">${esc(r.titre)} <span class="emoji" aria-hidden="true">${r.emoji}</span></h1>
-            <p class="r-intro">${esc(r.intro)}</p>
-            <div class="r-facts">
-              ${factsTemps.map((f) => `<div class="r-fact"><span>${icon(f.icon)} ${f.label}</span><strong>${esc(f.value)}</strong></div>`).join("")}
-            </div>
-            <div class="r-actions">
-              <button class="btn btn-primary" type="button" data-cook>${icon("book")} Mode cuisine</button>
-              ${likeButton(r.key)}
-              <button class="btn" type="button" data-share>${icon("share")} Partager</button>
-              <button class="btn" type="button" data-print>${icon("printer")} Imprimer</button>
-            </div>
+        <div class="r-bar" data-reveal>
+          <div class="r-facts">
+            ${factsTemps.map((f) => `<div class="r-fact"><span>${icon(f.icon)} ${f.label}</span><strong>${esc(f.value)}</strong></div>`).join("")}
           </div>
-          <div class="gallery" data-reveal="zoom">
-            <div class="gallery-main" data-gallery-main role="button" tabindex="0" aria-label="Agrandir la photo">
-              <img src="${imageDe(r).src}" alt="${esc(imageDe(r).alt)}" width="1600" height="1200" style="view-transition-name: photo-${r.key}" fetchpriority="high">
-              <span class="pill pill-accent">${cat.emoji || ""} ${esc(cat.singulier)}</span>
-            </div>
-            ${
-              r.images.length > 1
-                ? `<div class="gallery-thumbs">${r.images
-                    .map((im, i) => `<button type="button" data-thumb="${i}" aria-current="${i === 0}" aria-label="Voir : ${esc(im.alt)}"><img src="${im.thumb}" alt="" loading="lazy"></button>`)
-                    .join("")}</div>`
-                : ""
-            }
+          <div class="r-actions">
+            <button class="btn btn-primary" type="button" data-cook>${icon("book")} Mode cuisine</button>
+            ${likeButton(r.key)}
+            <button class="btn" type="button" data-share aria-label="Partager">${icon("share")} Partager</button>
+            <button class="btn" type="button" data-print aria-label="Imprimer">${icon("printer")}</button>
           </div>
-        </section>
+        </div>
+        ${
+          r.images?.length
+            ? `<div class="r-strip" aria-label="Photos de la recette">${r.images
+                .map((im, i) => `<button type="button" data-photo="${i}" aria-label="Agrandir : ${esc(im.alt)}"><img src="${im.thumb}" alt="" loading="lazy"></button>`)
+                .join("")}</div>`
+            : ""
+        }
 
         <section class="r-layout" id="recette">
           <aside class="card ingredients-card" data-reveal="left" aria-labelledby="ing-title">
@@ -1437,7 +1577,7 @@
             ${
               r.securite
                 ? `<div class="notice" style="margin-top:20px" data-reveal>
-                    <span class="notice-icon" aria-hidden="true">⚠️</span>
+                    <span class="notice-icon" aria-hidden="true">${icon("alert")}</span>
                     <div><strong>Bon à savoir</strong><p>${esc(r.securite)}</p>
                     ${r.sourcesSecurite?.length ? `<p class="sources">Sources : ${r.sourcesSecurite.map((s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.titre)}</a>`).join(" · ")}</p>` : ""}
                     </div>
@@ -1459,7 +1599,7 @@
                 <div class="accords">${r.accords.map((a) => `<div class="accord"><strong>${esc(a.titre)}</strong><span>${esc(a.texte)}</span></div>`).join("")}</div>
               </section>
               <section class="card" data-reveal style="--i:2">
-                <div class="card-title"><h3>🧊 Conservation</h3></div>
+                <div class="card-title"><h3>Conservation</h3></div>
                 <p class="muted">${esc(r.conservation)}</p>
                 <div class="card-title" style="margin:22px 0 10px"><h3>Allergènes</h3></div>
                 ${allergenes ? `<div class="allergens">${allergenes}</div>` : `<p class="muted">Aucun des 14 allergènes majeurs dans les ingrédients listés.</p>`}
@@ -1546,7 +1686,7 @@
       persist();
       const total = tousIngredients(r).length;
       ingCount.textContent = `${state.ings.size}/${total} prêts`;
-      if (state.ings.size === total) toast("🧺 Tous les ingrédients sont prêts. En cuisine !");
+      if (state.ings.size === total) toast("Tous les ingrédients sont prêts. En cuisine !");
     });
     main.querySelector("[data-add-list]").addEventListener("click", () => addRecipeToList(r, state.portions));
     renderIngredients();
@@ -1566,10 +1706,10 @@
       const tot = r.etapes.length;
       progress.style.setProperty("--p", String(n / tot));
       progressLabel.textContent =
-        n === 0 ? `${tot} étapes · clique sur un numéro quand l'étape est faite` : n === tot ? "Tout est prêt : bon appétit ! 🎉" : `${n} étape${n > 1 ? "s" : ""} sur ${tot} terminée${n > 1 ? "s" : ""}`;
+        n === 0 ? `${tot} étapes · clique sur un numéro quand l'étape est faite` : n === tot ? "Tout est prêt : bon appétit !" : `${n} étape${n > 1 ? "s" : ""} sur ${tot} terminée${n > 1 ? "s" : ""}`;
       if (celebrate && n === tot) {
         confetti();
-        toast("🎉 Bravo chef ! Il ne reste plus qu'à déguster.");
+        toast("Bravo chef ! Il ne reste plus qu'à déguster.");
       }
     }
 
@@ -1616,27 +1756,12 @@
     });
     renderChoices();
 
-    // --- Galerie ---
-    const mainImg = main.querySelector("[data-gallery-main] img");
-    let galleryIndex = 0;
-    main.querySelectorAll("[data-thumb]").forEach((t) =>
-      t.addEventListener("click", () => {
-        galleryIndex = Number(t.dataset.thumb);
-        const im = r.images[galleryIndex];
-        mainImg.style.viewTransitionName = "none";
-        mainImg.src = im.src;
-        mainImg.alt = im.alt;
-        main.querySelectorAll("[data-thumb]").forEach((x) => x.setAttribute("aria-current", String(x === t)));
-      })
+    // --- Photos ---
+    const photos = r.images?.length ? r.images : [couverture];
+    main.querySelectorAll("[data-photo]").forEach((t) =>
+      t.addEventListener("click", () => openLightbox(photos, Number(t.dataset.photo)))
     );
-    const galleryMain = main.querySelector("[data-gallery-main]");
-    galleryMain.addEventListener("click", () => openLightbox(r.images, galleryIndex));
-    galleryMain.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        openLightbox(r.images, galleryIndex);
-      }
-    });
+    main.querySelector(".r-cover-img").addEventListener("click", () => openLightbox(photos, 0));
 
     // --- Actions ---
     main.querySelector("[data-print]").addEventListener("click", () => window.print());
@@ -1649,7 +1774,7 @@
           /* partage annulé */
         }
       } else {
-        copyText(location.href, "Lien de la recette copié 🔗");
+        copyText(location.href, "Lien de la recette copié.");
       }
     });
     main.querySelector("[data-cook]").addEventListener("click", () => openCookMode(r, state, persist, renderSteps));
@@ -1688,7 +1813,7 @@
     const cook = el(`<div class="cook" role="dialog" aria-modal="true" aria-label="Mode cuisine : ${esc(r.titre)}">
         <div>
           <div class="cook-top">
-            <span class="avatar" aria-hidden="true">${r.emoji}</span>
+            <span class="avatar avatar-chef" aria-hidden="true">${LOGO}</span>
             <div class="cook-title"><small>Mode cuisine</small><strong>${esc(r.titre)}</strong></div>
             <button class="btn btn-sm" type="button" data-show-ings>${icon("list")} <span>Ingrédients</span></button>
             <button class="icon-btn bordered" type="button" data-close-cook aria-label="Quitter le mode cuisine">${icon("x")}</button>
@@ -1748,7 +1873,7 @@
         d.classList.add("is-done");
       });
       stage.innerHTML = `<div class="cook-step cook-finish anim-next">
-          <div class="big" aria-hidden="true">🍽️</div>
+          <div class="big cook-logo" aria-hidden="true">${LOGO}</div>
           <h2>Bon appétit !</h2>
           <p>Toutes les étapes sont faites. Tu peux être fier·e de toi, chef.</p>
           <div class="step-timers">${likeButton(r.key)}<button class="btn" type="button" data-close-cook>Retour à la recette</button></div>
@@ -1834,7 +1959,7 @@
         .request("screen")
         .then((lock) => {
           wakeLock = lock;
-          toast("💡 L'écran restera allumé pendant que tu cuisines.", 2400);
+          toast("L'écran restera allumé pendant que tu cuisines.", 2400);
         })
         .catch(() => {});
     }
@@ -1856,10 +1981,9 @@
         return `<article class="origin-card" id="${r.key}" data-reveal style="--i:${i % 3}">
             <div class="media">
               <img src="${img.thumb}" alt="${esc(img.alt)}" loading="lazy" width="640" height="360">
-              <span class="flag" aria-hidden="true">${o.drapeau}</span>
             </div>
             <div class="body">
-              <p class="where">📍 ${esc(o.pays)}</p>
+              <p class="where">${icon("pin")} ${esc(o.pays)}</p>
               <h2>${esc(r.titreCourt)}</h2>
               <p class="muted">${esc(o.resume)}</p>
               <ul>${o.faits.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>
@@ -1875,9 +1999,9 @@
 
     const banner = document.getElementById("travelPins");
     if (banner) {
-      const pins = ["🇫🇷", "🇩🇪", "🇲🇽", "🇺🇸", "🌺", "🇯🇵", "🇦🇺"];
-      banner.innerHTML = pins
-        .map((p, i) => `<span class="pin" style="left:${6 + i * 14.5}%;top:${i % 2 ? 58 : 18}%;animation-delay:${0.3 + i * 0.12}s">${p}</span>`)
+      const pays = [...new Set(RECETTES.filter((r) => r.origine).map((r) => r.origine.pays.split(" (")[0]))].slice(0, 8);
+      banner.innerHTML = pays
+        .map((p, i) => `<span class="pin" style="left:${4 + i * (88 / Math.max(1, pays.length - 1))}%;top:${i % 2 ? 60 : 14}%;animation-delay:${0.3 + i * 0.12}s"><i></i>${esc(p)}</span>`)
         .join("");
     }
   }
@@ -1910,7 +2034,7 @@
       try {
         const res = await fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } });
         if (!res.ok) throw new Error(String(res.status));
-        form.innerHTML = `<div class="empty-state" style="border-style:solid"><span class="big">📨</span><strong>Message bien reçu, merci !</strong>
+        form.innerHTML = `<div class="empty-state" style="border-style:solid"><span class="big">${icon("mail")}</span><strong>Message bien reçu, merci !</strong>
           <span>Le restaurant te répondra par e-mail dès que possible.</span></div>`;
         confetti(80);
       } catch {
@@ -1925,6 +2049,7 @@
      API PUBLIQUE (utilisée par l'assistant et les jeux)
      ========================================================================== */
   window.Antoine = {
+    logo: LOGO,
     recettes: RECETTES,
     parCle: BY_KEY,
     meta: META,
@@ -1939,6 +2064,8 @@
     tousIngredients,
     portionsLabel,
     imageDe,
+    coverUri,
+    motifs: Object.keys(MOTIFS),
     toast,
     confetti,
     burst,
@@ -1963,7 +2090,7 @@
   // Meilleurs scores des jeux (accueil et page des jeux)
   document.querySelectorAll("[data-best]").forEach((node) => {
     const value = store.get(node.dataset.best);
-    if (value && value !== "0") node.textContent = `🏆 Record : ${value}${node.dataset.suffix || ""}`;
+    if (value && value !== "0") node.textContent = `Record : ${value}${node.dataset.suffix || ""}`;
   });
   updateListBadge();
   if (timers.length) renderDock();
@@ -1977,7 +2104,7 @@
     setTimeout(() => {
       const list = document.getElementById("reviewsList");
       if (window.__reviewsModuleLoaded || !list) return;
-      list.innerHTML = `<div class="empty-state"><span class="big">📡</span><strong>Le livre d'or ne répond pas</strong>
+      list.innerHTML = `<div class="empty-state"><span class="big">${icon("alert")}</span><strong>Le livre d'or ne répond pas</strong>
         <span>Impossible de joindre le serveur des avis pour le moment. Réessaie un peu plus tard.</span></div>`;
       const summary = document.getElementById("ratingSummary");
       if (summary) summary.innerHTML = `<p class="muted">Note indisponible pour le moment.</p>`;

@@ -67,7 +67,10 @@
 
   function start() {
     const cfg = LEVELS[level];
-    const dishes = shuffle(A.recettes).slice(0, cfg.pairs);
+    // Les cartes utilisent les vraies photos ; les recettes illustrées complètent si besoin.
+    const avecPhoto = A.recettes.filter((r) => r.images?.length);
+    const pool = avecPhoto.length >= cfg.pairs ? avecPhoto : A.recettes;
+    const dishes = shuffle(pool).slice(0, cfg.pairs);
     const deck = shuffle(dishes.flatMap((r) => [r, r]));
     clearInterval(state?.clock);
     state = { first: null, lock: false, moves: 0, found: 0, seconds: 0, clock: null, started: false, total: cfg.pairs };
