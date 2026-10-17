@@ -66,30 +66,33 @@
         });
       });
 
-    // Ingrédient distinctif → recette
+    // Ingrédient distinctif → recette (les mauvaises réponses ne contiennent jamais l'ingrédient)
     const DISTINCTIFS = [
-      ["Edamame", "pokebowl"],
-      ["Câpres", "saladecesar"],
-      ["Gingembre frais", "ramen"],
-      ["Petits oignons grelots", "cailles"],
-      ["Cheddar", "burgers"],
-      ["Levure chimique", "marbre"],
-      ["Feta", "avocadotoast"],
-      ["Miso", "ramen"],
-      ["Filets d'anchois", "saladecesar"],
-      ["Mangue", "pokebowl"],
-      ["Rhum ambré ou fleur d'oranger", "crepes"],
-      ["Bouquet garni", "cailles"]
+      ["Edamame", "pokebowl", "edamame"],
+      ["Câpres", "saladecesar", "capre"],
+      ["Gingembre frais", "ramen", "gingembre"],
+      ["Petits oignons grelots", "cailles", "grelot"],
+      ["Cheddar", "burgers", "cheddar"],
+      ["Levure chimique", "marbre", "levure chimique"],
+      ["Feta", "avocadotoast", "feta"],
+      ["Miso", "ramen", "miso"],
+      ["Filets d'anchois", "saladecesar", "anchois"],
+      ["Mangue", "pokebowl", "mangue"],
+      ["Rhum ambré ou fleur d'oranger", "crepes", "rhum"],
+      ["Bouquet garni", "cailles", "bouquet garni"]
     ];
+    const contient = (r, mot) => A.tousIngredients(r).some((i) => A.normalize(i.nom).includes(mot));
     shuffle(DISTINCTIFS)
       .slice(0, 3)
-      .forEach(([ing, key]) => {
+      .forEach(([ing, key, mot]) => {
         const r = BY[key];
+        const autres = R.filter((x) => x.key !== key && !contient(x, mot));
+        if (!r || autres.length < 3) return;
         qs.push({
           cat: "Recettes de la maison",
-          q: `Dans quelle recette de la maison trouve-t-on : ${ing.toLowerCase()} ?`,
-          answers: [r.titreCourt, ...shuffle(R.filter((x) => x.key !== key)).slice(0, 3).map((x) => x.titreCourt)],
-          explain: `On en trouve dans la recette « ${r.titre} ».`,
+          q: `Laquelle de ces recettes de la maison contient : ${ing.toLowerCase()} ?`,
+          answers: [r.titreCourt, ...shuffle(autres).slice(0, 3).map((x) => x.titreCourt)],
+          explain: `Parmi ces choix, seule la recette « ${r.titre} » en contient.`,
           link: r.url
         });
       });

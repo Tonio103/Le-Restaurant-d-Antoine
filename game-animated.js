@@ -4,6 +4,8 @@
   const STORAGE_KEY = "service-infini-premium-best";
   const VIEW_W = 640;
   const VIEW_H = 360;
+  // Même requête que dans styles.css : le jeu y est pivoté de 90° pour s'afficher en grand.
+  const ROTATED = window.matchMedia("(orientation: portrait) and (max-width: 600px) and (pointer: coarse)");
   const GROUND_Y = 302;
   const MAX_LIVES = 3;
 
@@ -651,7 +653,8 @@
         if (!this.pointer || event.pointerId !== this.pointer.id) {
           return;
         }
-        const dy = event.clientY - this.pointer.y;
+        // Jeu pivoté d'un quart de tour (téléphone en portrait) : « vers le bas » devient « vers la gauche » à l'écran.
+        const dy = ROTATED.matches ? this.pointer.x - event.clientX : event.clientY - this.pointer.y;
         if (dy > 22) {
           this.pointer.swiped = true;
           this.slideHeld = true;

@@ -494,7 +494,7 @@
       .join("");
     return {
       html: `<p>Pour <strong>${esc(r.titreCourt.toLowerCase())}</strong> (${esc(A.portionsLabel(r, n))}) :</p><ul>${lignes}</ul>`,
-      actions: [{ label: "🧺 Ajouter à ma liste", type: "list", key: r.key, portions: n }],
+      actions: [{ label: "Ajouter à ma liste", icon: "basket", type: "list", key: r.key, portions: n }],
       quick: [`Pour ${n + 2} ${r.portions.pluriel}`, "Combien de temps ?", "Les étapes"]
     };
   }
@@ -513,7 +513,7 @@
   function answerSteps(r) {
     return {
       html: `<p>Les ${r.etapes.length} étapes de ${recipeLink(r)} :</p><ol>${r.etapes.map((e) => `<li>${esc(e.titre)}</li>`).join("")}</ol><p>Le mode cuisine te guide étape par étape en grand, avec les minuteurs.</p>`,
-      actions: [{ label: "👩‍🍳 Lancer le mode cuisine", type: "link", href: `${r.url}#cuisine` }],
+      actions: [{ label: "Lancer le mode cuisine", icon: "book", type: "link", href: `${r.url}#cuisine` }],
       quick: ["Une astuce", "Les ingrédients"]
     };
   }
@@ -554,7 +554,7 @@
     if (!o) return { html: `<p>Je n'ai pas d'informations fiables sur l'origine de ce plat.</p>` };
     return {
       html: `<p>${o.drapeau} <strong>${esc(o.pays)}</strong> — ${esc(o.resume)}</p><ul>${o.faits.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>`,
-      actions: [{ label: "🌍 Voir les sources", type: "link", href: `infos.html#${r.key}` }]
+      actions: [{ label: "Voir les sources", icon: "globe", type: "link", href: `infos.html#${r.key}` }]
     };
   }
 
@@ -827,7 +827,7 @@
       return { html: `<p>🎮 Il y a 4 mini-jeux au restaurant : la course du chef, le memory, le quiz et le coup de feu en cuisine.</p>`, actions: [{ label: "Voir les jeux", type: "link", href: "jeux.html" }] };
     }
     if (has(text, ["liste de courses", "ma liste", "courses"])) {
-      return { html: `<p>🧺 Ta liste de courses s'ouvre sur le côté. Sur chaque recette, le bouton « Ajouter à ma liste » y met les ingrédients avec les bonnes quantités.</p>`, actions: [{ label: "Ouvrir ma liste", type: "openlist" }] };
+      return { html: `<p>Ta liste de courses s'ouvre sur le côté. Sur chaque recette, le bouton « Ajouter à ma liste » y met les ingrédients avec les bonnes quantités.</p>`, actions: [{ label: "Ouvrir ma liste", icon: "basket", type: "openlist" }] };
     }
     if (has(text, ["livre d or", "laisser un avis", "donner mon avis", "noter"])) {
       return { html: `<p>⭐ Le livre d'or t'attend : tu peux y laisser une note et un petit mot.</p>`, actions: [{ label: "Aller au livre d'or", type: "link", href: "avis.html" }] };
@@ -975,9 +975,10 @@
   function renderActions(actions) {
     return `<div class="quick-replies" style="padding:0 0 0 38px">${actions
       .map((a, i) => {
-        if (a.type === "link") return `<button type="button" style="--i:${i}" data-chat-href="${esc(a.href)}">${esc(a.label)}</button>`;
-        if (a.type === "list") return `<button type="button" style="--i:${i}" data-chat-list="${esc(a.key)}" data-portions="${a.portions}">${esc(a.label)}</button>`;
-        if (a.type === "openlist") return `<button type="button" style="--i:${i}" data-open-list>${esc(a.label)}</button>`;
+        const label = `${a.icon ? icon(a.icon) : ""}${esc(a.label)}`;
+        if (a.type === "link") return `<button type="button" style="--i:${i}" data-chat-href="${esc(a.href)}">${label}</button>`;
+        if (a.type === "list") return `<button type="button" style="--i:${i}" data-chat-list="${esc(a.key)}" data-portions="${a.portions}">${label}</button>`;
+        if (a.type === "openlist") return `<button type="button" style="--i:${i}" data-open-list>${label}</button>`;
         return "";
       })
       .join("")}</div>`;
@@ -1130,16 +1131,24 @@
     // On cale le panneau sur la zone réellement visible.
     const vv = window.visualViewport;
     if (vv) {
+      let lastHeight = vv.height;
       const fit = () => {
         if (panel.hidden || window.innerWidth > 560) {
           panel.style.removeProperty("top");
           panel.style.removeProperty("height");
+          lastHeight = vv.height;
           return;
         }
         panel.style.top = `${vv.offsetTop}px`;
         panel.style.height = `${vv.height}px`;
-        const bodyEl = panel.querySelector(".chat-body");
-        bodyEl.scrollTop = bodyEl.scrollHeight;
+        // Seulement quand le clavier s'ouvre : le dernier message reste visible au-dessus du champ.
+        // (Sinon on ne touche pas au défilement, pour pouvoir lire le début d'une longue réponse.)
+        const typing = document.activeElement?.closest?.(".chat-form");
+        if (typing && vv.height < lastHeight - 80) {
+          const bodyEl = panel.querySelector(".chat-body");
+          bodyEl.scrollTop = bodyEl.scrollHeight;
+        }
+        lastHeight = vv.height;
       };
       vv.addEventListener("resize", fit);
       vv.addEventListener("scroll", fit);

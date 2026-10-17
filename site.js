@@ -281,13 +281,26 @@
     const encre = c.encre || "#f6efe4";
     const accent = c.accent || "#c9a462";
     const motif = (MOTIFS[c.motif] || MOTIFS.assiette)(accent);
+    // Coins du cadre : petites équerres dorées
+    const coin = (x, y, sx, sy) => `<path d="M${x} ${y + 34 * sy}V${y}H${x + 34 * sx}" />`;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
-      <defs><radialGradient id="g" cx="50%" cy="42%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></radialGradient></defs>
-      <rect width="800" height="600" fill="${fond}"/><rect width="800" height="600" fill="url(#g)"/>
-      <g fill="none" stroke="${encre}" stroke-opacity=".07" stroke-width="1.5">${[120, 180, 240, 300, 360, 420].map((rr) => `<circle cx="400" cy="290" r="${rr}"/>`).join("")}</g>
-      <rect x="26" y="26" width="748" height="548" rx="6" fill="none" stroke="${encre}" stroke-opacity=".28" stroke-width="1.5"/>
-      <g fill="${encre}" fill-opacity=".5"><path d="M400 548l6 8-6 8-6-8z"/><path d="M380 556h-60M420 556h60" stroke="${encre}" stroke-opacity=".4"/></g>
-      <g transform="translate(224 114) scale(1.47)" fill="none" stroke="${encre}" color="${encre}" stroke-width="5.4" stroke-linecap="round" stroke-linejoin="round">${motif}</g>
+      <defs>
+        <linearGradient id="l" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".1"/><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".38"/></linearGradient>
+        <radialGradient id="g" cx="50%" cy="48%" r="34%"><stop offset="0" stop-color="${accent}" stop-opacity=".28"/><stop offset="1" stop-color="${accent}" stop-opacity="0"/></radialGradient>
+        <pattern id="p" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M14 9l5 5-5 5-5-5z" fill="${encre}" fill-opacity=".05"/></pattern>
+        <filter id="f" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter>
+      </defs>
+      <rect width="800" height="600" fill="${fond}"/><rect width="800" height="600" fill="url(#p)"/><rect width="800" height="600" fill="url(#l)"/>
+      <circle cx="400" cy="290" r="290" fill="url(#g)"/>
+      <circle cx="400" cy="290" r="232" fill="${fond}" fill-opacity=".5"/>
+      <circle cx="400" cy="290" r="232" fill="none" stroke="${accent}" stroke-opacity=".5" stroke-width="2"/>
+      <circle cx="400" cy="290" r="246" fill="none" stroke="${encre}" stroke-opacity=".16" stroke-width="1.2" stroke-dasharray="2 9"/>
+      <ellipse cx="400" cy="452" rx="150" ry="16" fill="#000" fill-opacity=".35" filter="url(#f)"/>
+      <rect x="24" y="24" width="752" height="552" rx="4" fill="none" stroke="${encre}" stroke-opacity=".22" stroke-width="1.2"/>
+      <rect x="36" y="36" width="728" height="528" rx="2" fill="none" stroke="${accent}" stroke-opacity=".3" stroke-width="1"/>
+      <g fill="none" stroke="${accent}" stroke-opacity=".85" stroke-width="2.4" stroke-linecap="round">${coin(48, 48, 1, 1)}${coin(752, 48, -1, 1)}${coin(48, 552, 1, -1)}${coin(752, 552, -1, -1)}</g>
+      <g fill="${accent}" fill-opacity=".8"><path d="M400 542l7 9-7 9-7-9z"/></g><path d="M374 551h-64M426 551h64" stroke="${accent}" stroke-opacity=".5" stroke-width="1.2"/>
+      <g transform="translate(212 102) scale(1.57)" fill="none" stroke="${encre}" color="${encre}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">${motif}</g>
     </svg>`.replace(/\s{2,}/g, " ");
   }
 
@@ -533,11 +546,12 @@
     header.querySelector("[data-theme-toggle]").addEventListener("click", basculerTheme);
 
     // En-tête qui se cache en descendant et réapparaît en remontant.
-    // Sur l'accueil, il reste transparent tant qu'on est sur la grande photo.
-    const hero = document.querySelector(".hero-cine");
+    // Sur l'accueil et les recettes, il reste transparent tant qu'on est sur la grande photo
+    // (la couverture d'une recette est créée plus tard par initRecipe, d'où la recherche à chaque fois).
     let lastY = scrollY;
     const onScroll = () => {
       const y = scrollY;
+      const hero = document.querySelector(".hero-cine, .r-cover");
       header.classList.toggle("is-scrolled", y > 8);
       header.classList.toggle("is-solid", !hero || y > hero.offsetHeight - header.offsetHeight - 10);
       const goingDown = y > lastY + 4;
@@ -660,6 +674,8 @@
     document.querySelectorAll("[data-card-likes]").forEach((node) => {
       const n = likeCounts[node.dataset.cardLikes];
       node.textContent = n ?? "–";
+      // Pas de « ♥ 0 » sur les cartes : le compteur n'apparaît qu'à partir du premier like.
+      node.parentElement.hidden = !(n > 0);
     });
   });
 
@@ -713,7 +729,7 @@
   function listAsText() {
     const list = getList();
     const groups = {};
-    list.forEach((i) => (groups[i.recette] ||= []).push(i));
+    list.forEach((i) => (groups[i.recette] = groups[i.recette] || []).push(i));
     return Object.entries(groups)
       .map(([key, items]) => {
         const titre = BY_KEY[key]?.titreCourt || key;
@@ -746,7 +762,7 @@
       return;
     }
     const groups = {};
-    list.forEach((i) => (groups[i.recette] ||= []).push(i));
+    list.forEach((i) => (groups[i.recette] = groups[i.recette] || []).push(i));
     bodyEl.innerHTML = Object.entries(groups)
       .map(([key, items]) => {
         const r = BY_KEY[key];
@@ -875,7 +891,7 @@
         if (tags.includes(t)) s += 2;
         if (ings.includes(t)) {
           s += 1.5;
-          matchedIng ||= tousIngredients(r).find((i) => normalize(i.nom).includes(t))?.nom || "";
+          matchedIng = matchedIng || tousIngredients(r).find((i) => normalize(i.nom).includes(t))?.nom || "";
         }
         score += s;
         return s > 0;
@@ -1210,7 +1226,7 @@
           <div class="card-badges">
             ${r.badge ? `<span class="pill pill-glass">${esc(r.badge)}</span>` : "<span></span>"}
           </div>
-          <span class="card-like" aria-label="Likes">${icon("heart")}<span data-card-likes="${r.key}">${likeCounts[r.key] ?? "–"}</span></span>
+          <span class="card-like" aria-label="Likes"${likeCounts[r.key] > 0 ? "" : " hidden"}>${icon("heart")}<span data-card-likes="${r.key}">${likeCounts[r.key] ?? "–"}</span></span>
         </div>
         <div class="recipe-card-body">
           <span class="card-cat">${esc(cat?.singulier || "")}</span>
@@ -1757,11 +1773,20 @@
     renderChoices();
 
     // --- Photos ---
-    const photos = r.images?.length ? r.images : [couverture];
+    // En-tête transparent au-dessus de la couverture
+    body.classList.add("has-cover");
+    window.dispatchEvent(new Event("scroll"));
+
+    // Une couverture illustrée n'est pas une photo : pas de visionneuse dans ce cas.
+    const photos = r.images || [];
     main.querySelectorAll("[data-photo]").forEach((t) =>
       t.addEventListener("click", () => openLightbox(photos, Number(t.dataset.photo)))
     );
-    main.querySelector(".r-cover-img").addEventListener("click", () => openLightbox(photos, 0));
+    if (photos.length) {
+      const coverImg = main.querySelector(".r-cover-img");
+      coverImg.style.cursor = "zoom-in";
+      coverImg.addEventListener("click", () => openLightbox(photos, 0));
+    }
 
     // --- Actions ---
     main.querySelector("[data-print]").addEventListener("click", () => window.print());
@@ -2001,7 +2026,12 @@
     if (banner) {
       const pays = [...new Set(RECETTES.filter((r) => r.origine).map((r) => r.origine.pays.split(" (")[0]))].slice(0, 8);
       banner.innerHTML = pays
-        .map((p, i) => `<span class="pin" style="left:${4 + i * (88 / Math.max(1, pays.length - 1))}%;top:${i % 2 ? 60 : 14}%;animation-delay:${0.3 + i * 0.12}s"><i></i>${esc(p)}</span>`)
+        .map((p, i) => {
+          // Les étiquettes de la moitié droite partent vers la gauche pour ne pas déborder de l'écran.
+          const pos = 4 + i * (88 / Math.max(1, pays.length - 1));
+          const x = pos > 50 ? `right:${100 - pos}%;flex-direction:row-reverse` : `left:${pos}%`;
+          return `<span class="pin" style="${x};top:${i % 2 ? 60 : 14}%;animation-delay:${0.3 + i * 0.12}s"><i></i>${esc(p)}</span>`;
+        })
         .join("");
     }
   }

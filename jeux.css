@@ -688,6 +688,16 @@
   color: rgba(255, 247, 239, 0.75);
 }
 
+/* Sur téléphone, le texte passe sur un fondu sombre pour rester lisible au-dessus du décor. */
+@media (max-width: 640px) {
+  .game-card.featured {
+    min-height: 420px;
+    background:
+      linear-gradient(0deg, rgba(10, 6, 3, 0.96) 0%, rgba(10, 6, 3, 0.86) 48%, rgba(10, 6, 3, 0.2) 100%),
+      url("assets/restaurant.png") center top / cover;
+  }
+}
+
 
 
 @keyframes shake {

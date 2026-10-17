@@ -1282,7 +1282,7 @@ body.has-hero {
 }
 
 /* En-tête transparent au-dessus du héros */
-.has-hero .site-header:not(.is-solid) {
+:is(.has-hero, .has-cover) .site-header:not(.is-solid) {
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -1290,32 +1290,32 @@ body.has-hero {
   color: var(--cream);
 }
 
-.has-hero .site-header:not(.is-solid) .main-nav a,
-.has-hero .site-header:not(.is-solid) .icon-btn,
-.has-hero .site-header:not(.is-solid) .brand-text strong {
+:is(.has-hero, .has-cover) .site-header:not(.is-solid) .main-nav a,
+:is(.has-hero, .has-cover) .site-header:not(.is-solid) .icon-btn,
+:is(.has-hero, .has-cover) .site-header:not(.is-solid) .brand-text strong {
   color: var(--cream);
 }
 
-.has-hero .site-header:not(.is-solid) .brand-text em {
+:is(.has-hero, .has-cover) .site-header:not(.is-solid) .brand-text em {
   color: var(--gold-2);
 }
 
-.has-hero .site-header:not(.is-solid) .main-nav a:hover,
-.has-hero .site-header:not(.is-solid) .icon-btn:hover {
+:is(.has-hero, .has-cover) .site-header:not(.is-solid) .main-nav a:hover,
+:is(.has-hero, .has-cover) .site-header:not(.is-solid) .icon-btn:hover {
   background: rgba(244, 236, 223, 0.12);
 }
 
-.has-hero .site-header:not(.is-solid) .search-trigger {
+:is(.has-hero, .has-cover) .site-header:not(.is-solid) .search-trigger {
   border-color: rgba(244, 236, 223, 0.3);
   background: rgba(244, 236, 223, 0.08);
   color: rgba(244, 236, 223, 0.85);
 }
 
-.has-hero .site-header:not(.is-solid) .search-trigger .kbd {
+:is(.has-hero, .has-cover) .site-header:not(.is-solid) .search-trigger .kbd {
   border-color: rgba(244, 236, 223, 0.3);
 }
 
-.has-hero .site-header:not(.is-solid) .brand-mark {
+:is(.has-hero, .has-cover) .site-header:not(.is-solid) .brand-mark {
   background: rgba(244, 236, 223, 0.1);
   box-shadow: inset 0 0 0 1px rgba(217, 181, 116, 0.5);
   color: var(--gold-2);
@@ -3478,6 +3478,13 @@ body[data-page="games"] .chat-fab .fab-label {
   animation-delay: calc(var(--i, 0) * 45ms);
 }
 
+.quick-replies button svg {
+  width: 15px;
+  height: 15px;
+  margin: -2px 6px 0 0;
+  vertical-align: middle;
+}
+
 .quick-replies button:hover {
   border-color: var(--accent);
   background: var(--accent-soft);
@@ -4388,7 +4395,8 @@ h3 {
   align-items: end;
   min-height: min(78vh, 760px);
   margin-top: calc(var(--header-h) * -1);
-  padding: calc(var(--header-h) + 40px) 0 clamp(32px, 5vw, 64px);
+  /* le bas laisse la place à la barre .r-bar qui chevauche la couverture (margin-top: -36px) */
+  padding: calc(var(--header-h) + 40px) 0 clamp(64px, 7vw, 88px);
   overflow: hidden;
   isolation: isolate;
   background: var(--night);
@@ -4410,6 +4418,7 @@ h3 {
   position: absolute;
   inset: 0;
   z-index: -1;
+  pointer-events: none;
   background:
     linear-gradient(0deg, rgba(14, 9, 6, 0.92) 0%, rgba(14, 9, 6, 0.55) 45%, rgba(14, 9, 6, 0.15) 75%, rgba(14, 9, 6, 0.45) 100%);
 }
@@ -4502,6 +4511,11 @@ h3 {
   .r-bar .r-fact:nth-child(odd) {
     padding-left: 2px;
     border-left: 0;
+  }
+
+  /* place pour le bouton flottant de l'assistant */
+  .r-bar .r-actions {
+    padding-right: 60px;
   }
 }
 
@@ -4852,6 +4866,12 @@ h3 {
   white-space: nowrap;
 }
 
+@media (max-width: 640px) {
+  .travel-banner .pin:nth-child(even) {
+    display: none;
+  }
+}
+
 .travel-banner .pin i {
   width: 10px;
   height: 10px;
@@ -4873,11 +4893,13 @@ h3 {
 }
 
 @media (max-width: 560px) {
+  /* 2 × 2, avec une marge à droite pour le bouton de l'assistant */
   .hero-stats {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, auto));
-    gap: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 18px;
     width: 100%;
+    padding-right: 72px;
   }
 
   .hero-stats strong {

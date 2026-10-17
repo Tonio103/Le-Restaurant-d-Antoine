@@ -67,5 +67,5 @@ par Formspree.
 ## Mises à jour et cache des navigateurs
 
 Les pages chargent les fichiers CSS et JavaScript avec un numéro de version
-(`site.css?v=20261016-2`). Après une modification de ces fichiers, change ce numéro
+(`site.css?v=20261017-1`). Après une modification de ces fichiers, change ce numéro
 dans les pages HTML pour que les visiteurs reçoivent tout de suite la nouvelle version.

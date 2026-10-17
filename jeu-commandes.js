@@ -48,7 +48,10 @@
     { nom: "Jus d'orange frais", key: "jusorange", suite: ["orange", "orange", "glacon", "menthe"], niveau: 0 },
     { nom: "Salade César", key: "saladecesar", suite: ["salade", "bacon", "fromage", "pain"], niveau: 1 },
     { nom: "Poké végétarien", key: "pokebowl", suite: ["riz", "avocat", "concombre", "mangue", "oeuf"], niveau: 2 },
-    { nom: "Ramen gourmand", key: "ramen", suite: ["nouilles", "poulet", "champignon", "oeuf", "oignon"], niveau: 2 }
+    { nom: "Ramen gourmand", key: "ramen", suite: ["nouilles", "poulet", "champignon", "oeuf", "oignon"], niveau: 2 },
+    { nom: "Shakshuka", key: "shakshuka", suite: ["oignon", "tomate", "oeuf", "oeuf", "fromage"], niveau: 1 },
+    { nom: "Risotto aux champignons", key: "risottochampignons", suite: ["riz", "champignon", "fromage"], niveau: 1 },
+    { nom: "Citronnade", key: "citronnade", suite: ["citron", "citron", "glacon", "menthe"], niveau: 0 }
   ];
 
   const SERVICE = 90; // secondes
@@ -103,7 +106,7 @@
 
   function pickOrder() {
     const stage = g.served < 3 ? 0 : g.served < 8 ? 1 : 2;
-    const pool = COMMANDES.filter((c) => c.niveau <= stage && c.nom !== g.order?.nom);
+    const pool = COMMANDES.filter((c) => c.niveau <= stage && c.nom !== g.order?.nom && A.parCle[c.key]);
     return pool[Math.floor(Math.random() * pool.length)];
   }
 

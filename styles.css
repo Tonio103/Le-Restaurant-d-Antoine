@@ -477,8 +477,8 @@ kbd {
   50% { opacity: 0.55; }
 }
 
-/* Téléphone en paysage : HUD plus discret pour laisser voir la scène. */
-@media (max-height: 500px) {
+/* Téléphone en paysage (ou jeu pivoté) : HUD plus discret pour laisser voir la scène. */
+@media (max-height: 500px), (orientation: portrait) and (max-width: 600px) and (pointer: coarse) {
   .hud {
     padding: 6px 10px;
   }
@@ -533,4 +533,53 @@ kbd {
 
 .panel {
   background: linear-gradient(180deg, rgba(15, 17, 20, 0.96), rgba(8, 9, 12, 0.92));
+}
+
+/* Téléphone tenu en portrait : le jeu pivote d'un quart de tour et occupe tout l'écran.
+   Il suffit de tourner le téléphone vers la gauche, même si la rotation automatique est verrouillée.
+   (Cette requête est reprise dans game-animated.js pour le geste « balayer vers le bas ».) */
+@media (orientation: portrait) and (max-width: 600px) and (pointer: coarse) {
+  .page {
+    position: fixed;
+    inset: 0;
+    display: block;
+    padding: 0;
+  }
+
+  .game-shell {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 100vh;
+    width: 100dvh;
+    height: 100vw;
+    border: 0;
+    box-shadow: none;
+    transform-origin: 0 0;
+    transform: rotate(90deg);
+  }
+
+  .hud {
+    padding: 6px 10px;
+  }
+
+  .mobile-zones {
+    bottom: 10px;
+  }
+
+  /* Le conseil s'affiche avec les panneaux (accueil, pause, fin), pas pendant la partie. */
+  .rotate-hint {
+    top: auto;
+    bottom: 8px;
+    z-index: 5;
+    animation: none;
+  }
+
+  .game-shell:has(.overlay:not(.overlay--hidden)) .rotate-hint {
+    opacity: 1;
+  }
+
+  .game-shell:has(.overlay.overlay--hidden) .rotate-hint {
+    opacity: 0;
+  }
 }
