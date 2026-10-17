@@ -245,8 +245,8 @@
   };
   const PANTRY = ["sel", "poivre", "huile", "eau", "fleur de sel", "piment", "herbes"];
 
-  // « pommes de terre » ne veut pas dire « pommes », « lait de coco » pas « lait »…
-  const MASQUES = { pommesdeterre: ["pommes"], laitdecoco: ["lait"], pain2: ["pain"] };
+  // « pommes de terre » ne veut pas dire « pommes », « lait de coco » pas « lait », « tomates cerises » pas « cerises »…
+  const MASQUES = { pommesdeterre: ["pommes"], laitdecoco: ["lait"], pain2: ["pain"], tomates: ["cerises"] };
   function cleanKeys(keys) {
     const hidden = new Set(keys.flatMap((k) => MASQUES[k] || []));
     return keys.filter((k) => !hidden.has(k));

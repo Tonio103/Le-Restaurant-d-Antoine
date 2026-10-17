@@ -242,6 +242,33 @@
     }
   ];
 
+  // Questions sur les recettes ajoutées ensuite (seulement si la recette est présente)
+  [
+    {
+      key: "tartetatin",
+      cat: "Culture",
+      q: "La tarte Tatin porte le nom de deux sœurs. Où tenaient-elles leur hôtel ?",
+      answers: ["À Lamotte-Beuvron, en Sologne", "À Lyon", "À Bayonne", "À Dijon"],
+      explain: "Stéphanie et Caroline Tatin tenaient un hôtel à Lamotte-Beuvron. Le récit de la tarte ratée puis retournée relève en grande partie de la légende."
+    },
+    {
+      key: "tiramisu",
+      cat: "Culture",
+      q: "Que signifie littéralement « tiramisù » ?",
+      answers: ["« Tire-moi vers le haut »", "« Petit café »", "« Gâteau de Venise »", "« Crème du soir »"],
+      explain: "De « tira mi sù » (« tireme sù » en dialecte vénitien) : « tire-moi vers le haut », autrement dit « remonte-moi »."
+    },
+    {
+      key: "cookies",
+      cat: "Culture",
+      q: "Le cookie aux pépites de chocolat est le biscuit officiel de quel État américain ?",
+      answers: ["Le Massachusetts", "La Californie", "Le Texas", "L'État de New York"],
+      explain: "Il est attribué à Ruth Graves Wakefield, de la Toll House Inn à Whitman (Massachusetts), et il est le biscuit officiel de cet État depuis 1997."
+    }
+  ]
+    .filter((x) => BY[x.key]?.origine)
+    .forEach(({ key, ...question }) => CULTURE.push({ ...question, sources: sourcesOf(key), link: `infos.html#${key}` }));
+
   const TECHNIQUE = [
     {
       cat: "Technique",
