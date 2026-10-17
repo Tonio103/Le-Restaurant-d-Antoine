@@ -3262,7 +3262,9 @@ body[data-page="games"] .chat-fab .fab-label {
   bottom: 20px;
   z-index: 701;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  /* minmax(0, 1fr) : la zone des messages ne grandit jamais au-delà du panneau,
+     sinon Safari (iPhone) la laisse déborder et elle ne défile plus. */
+  grid-template-rows: auto minmax(0, 1fr) auto;
   width: min(410px, calc(100vw - 24px));
   height: min(640px, calc(100vh - 110px));
   height: min(640px, calc(100dvh - 110px));
@@ -3348,10 +3350,18 @@ body[data-page="games"] .chat-fab .fab-label {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
   padding: 18px 16px;
   overflow-y: auto;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scroll-behavior: smooth;
+}
+
+/* Les messages gardent leur hauteur : c'est la zone qui défile, pas eux qui rétrécissent. */
+.chat-body > * {
+  flex-shrink: 0;
 }
 
 .msg {
