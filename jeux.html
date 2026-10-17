@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Les mini-jeux · Le restaurant d'Antoine</title>
   <meta name="description" content="Quatre mini-jeux gourmands : la course du chef, le memory des plats, le quiz du chef et le coup de feu en cuisine.">
-  <meta name="theme-color" content="#f6efe4" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#15100c" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f5efe6" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#110c09" media="(prefers-color-scheme: dark)">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Le restaurant d'Antoine">
   <meta property="og:title" content="Les mini-jeux · Le restaurant d'Antoine">
@@ -16,12 +16,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..700,0..100;1,9..144,400..700,0..100&family=Manrope:wght@400..800&display=swap">
-  <link rel="stylesheet" href="site.css">
-  <link rel="stylesheet" href="jeux.css">
+  <link rel="stylesheet" href="site.css?v=20261017-2">
+  <link rel="stylesheet" href="jeux.css?v=20261017-2">
   <script>try{var t=localStorage.getItem("antoine-theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
-  <script src="recettes-data.js" defer></script>
-  <script src="site.js" defer></script>
-  <script src="chatbot.js" defer></script>
+  <script src="recettes-data.js?v=20261017-2" defer></script>
+  <script src="site.js?v=20261017-2" defer></script>
+  <script src="chatbot.js?v=20261017-2" defer></script>
 </head>
 <body data-page="games">
   <main id="main" class="container">
@@ -32,28 +32,28 @@
     </section>
     <div class="games-grid games-hub">
       <a class="game-card featured" href="index2.html" data-reveal>
-        <span class="game-icon" aria-hidden="true">🏃</span>
+        <span class="game-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15" cy="4.5" r="2"/><path d="m6 21 3.5-5.5L13 17l2 4M8 11l3-3 4 1 2 3 3 1M11 8l-2 7"/></svg></span>
         <h3>Service infini</h3>
         <p>Le chef traverse le restaurant, la terrasse, la cuisine, la cave et l'usine. Saute par-dessus les tables, glisse sous les lustres, ramasse les pièces… et trouve la table secrète !</p>
         <div class="game-tags"><span class="pill">Réflexes</span><span class="pill">Clavier ou tactile</span></div>
         <span class="game-best" data-best="service-infini-premium-best" data-suffix=" pts">Pas encore de record</span>
       </a>
       <a class="game-card" href="memory.html" data-reveal style="--i:1; --tint:var(--saffron-soft)">
-          <span class="game-icon" aria-hidden="true">🃏</span>
+          <span class="game-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="11" height="15" rx="2"/><path d="M10 3h9a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-2"/></svg></span>
           <h3>Memory du chef</h3>
           <p>Retrouve les paires de plats de la maison en un minimum de coups.</p>
           <div class="game-tags"><span class="pill">Mémoire</span><span class="pill">3 niveaux</span></div>
           <span class="game-best" data-best="antoine-memory-record">Pas encore de record</span>
         </a>
       <a class="game-card" href="quiz.html" data-reveal style="--i:2; --tint:var(--sage-soft)">
-          <span class="game-icon" aria-hidden="true">🧠</span>
+          <span class="game-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01"/></svg></span>
           <h3>Quiz du chef</h3>
           <p>10 questions sur les recettes, les techniques et l'histoire des plats.</p>
           <div class="game-tags"><span class="pill">Culture</span><span class="pill">10 questions</span></div>
           <span class="game-best" data-best="antoine-quiz-record">Pas encore de record</span>
         </a>
       <a class="game-card" href="commandes.html" data-reveal style="--i:3; --tint:rgba(161,54,82,.14)">
-          <span class="game-icon" aria-hidden="true">🛎️</span>
+          <span class="game-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4l2-2Z"/><path d="M10 21h4"/></svg></span>
           <h3>Coup de feu</h3>
           <p>Les commandes s'enchaînent : assemble chaque plat dans le bon ordre, vite !</p>
           <div class="game-tags"><span class="pill">Rapidité</span><span class="pill">90 secondes</span></div>

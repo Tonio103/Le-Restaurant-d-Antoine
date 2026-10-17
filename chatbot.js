@@ -86,7 +86,7 @@
      ========================================================================== */
   const ALIASES = {
     cailles: ["caille", "cailles", "petits pois", "petit pois", "cailles aux petits pois"],
-    crepes: ["crepe", "crepes", "pancake", "pancakes", "chandeleur", "pate a crepes"],
+    crepes: ["crepe", "crepes", "chandeleur", "pate a crepes"],
     burgers: ["burger", "burgers", "hamburger", "hamburgers", "cheeseburger"],
     fondants: ["fondant", "fondants", "coulant", "coulants", "fondant au chocolat", "moelleux au chocolat", "lava cake"],
     marbre: ["marbre", "gateau marbre", "cake marbre", "marbres"],
@@ -96,6 +96,12 @@
     ramen: ["ramen", "ramens", "soupe japonaise", "soupe de nouilles"],
     jusorange: ["jus d orange", "jus orange", "jus", "orange pressee", "oranges pressees", "jus presse"]
   };
+
+  // Les autres recettes (et les nouvelles) : titre court + champ « alias » des données.
+  RECETTES.forEach((r) => {
+    const extra = [r.titreCourt, ...(r.alias || [])].map((a) => norm(a).trim()).filter(Boolean);
+    ALIASES[r.key] = [...new Set([...(ALIASES[r.key] || []), ...extra])];
+  });
 
   // Mots « simples » pour la correction des fautes de frappe.
   const FUZZY_WORDS = Object.entries(ALIASES).flatMap(([key, list]) =>
@@ -213,15 +219,46 @@
     ketchup: ["ketchup"],
     moutarde: ["moutarde"],
     ciboule: ["ciboule", "oignon vert", "cebette"],
-    miso: ["miso"]
+    miso: ["miso"],
+    boeuf: ["boeuf", "paleron", "joue de boeuf", "bourguignon"],
+    veau: ["veau", "tendron", "epaule de veau"],
+    pommesdeterre: ["pomme de terre", "pommes de terre", "patate", "patates"],
+    creme: ["creme", "creme fraiche", "creme liquide", "creme epaisse"],
+    vin: ["vin", "vin rouge", "vin blanc"],
+    pates: ["pates", "spaghetti", "spaghettis", "lasagne", "lasagnes", "tagliatelles", "penne"],
+    poischiches: ["pois chiche", "pois chiches"],
+    laitdecoco: ["lait de coco", "creme de coco"],
+    courgette: ["courgette", "courgettes"],
+    aubergine: ["aubergine", "aubergines"],
+    poivron: ["poivron", "poivrons"],
+    fromagerape: ["gruyere", "comte", "emmental", "fromage rape", "pecorino"],
+    mascarpone: ["mascarpone"],
+    cafe: ["cafe", "expresso"],
+    cerises: ["cerise", "cerises"],
+    pommes: ["pomme", "pommes"],
+    cannelle: ["cannelle"],
+    curry: ["curry", "garam masala", "curcuma"],
+    epinards: ["epinard", "epinards"],
+    guanciale: ["guanciale", "pancetta"],
+    biscuits: ["biscuits cuillere", "boudoirs", "biscuit"],
+    pain2: ["pate brisee", "pate feuilletee", "pate sablee"]
   };
   const PANTRY = ["sel", "poivre", "huile", "eau", "fleur de sel", "piment", "herbes"];
 
+  // « pommes de terre » ne veut pas dire « pommes », « lait de coco » pas « lait »…
+  const MASQUES = { pommesdeterre: ["pommes"], laitdecoco: ["lait"], pain2: ["pain"] };
+  function cleanKeys(keys) {
+    const hidden = new Set(keys.flatMap((k) => MASQUES[k] || []));
+    return keys.filter((k) => !hidden.has(k));
+  }
+
   function ingredientKeysOf(name) {
     const n = norm(name);
-    return Object.entries(INGREDIENTS)
-      .filter(([, syn]) => has(n, syn))
-      .map(([k]) => k);
+    return cleanKeys(
+      Object.entries(INGREDIENTS)
+        .filter(([, syn]) => has(n, syn))
+        .map(([k]) => k)
+    );
   }
 
   const RECIPE_INGS = Object.fromEntries(
@@ -287,7 +324,22 @@
     },
     feta: { label: "la feta", texte: "Du fromage de chèvre frais, de la ricotta salée ou quelques copeaux de parmesan." },
     caille: { label: "les cailles", texte: "Des cuisses de poulet ou des pilons, en allongeant un peu la cuisson jusqu'à ce que la viande soit bien cuite à cœur." },
-    steak: { label: "le steak haché", texte: "Un steak végétal pour une version sans viande, ou un filet de poulet aplati et grillé." }
+    steak: { label: "le steak haché", texte: "Un steak végétal pour une version sans viande, ou un filet de poulet aplati et grillé." },
+    creme: {
+      label: "la crème",
+      texte: "Pour une sauce, une crème végétale (avoine, soja) se remplace à volume égal. En cuisine salée, du yaourt grec ou du fromage blanc peuvent dépanner, mais ajoute-les hors du feu : ils peuvent trancher s'ils bouillent."
+    },
+    vin: {
+      label: "le vin",
+      texte: "Remplace-le par du bouillon (de bœuf pour une sauce au vin rouge, de volaille pour le vin blanc). Le goût sera différent, moins acide et moins profond."
+    },
+    mascarpone: { label: "le mascarpone", texte: "De la ricotta bien égouttée ou un fromage frais épais : la crème sera moins riche et un peu plus acidulée." },
+    poischiches: { label: "les pois chiches", texte: "Des haricots blancs ou des lentilles cuites gardent l'esprit du plat." },
+    laitdecoco: { label: "le lait de coco", texte: "De la crème liquide ou un yaourt nature (ajouté hors du feu) : le plat sera moins parfumé mais tout aussi onctueux." },
+    cerises: {
+      label: "les cerises",
+      texte: "D'autres fruits fonctionnent très bien : abricots, prunes, poires ou pommes. Avec d'autres fruits que les cerises, on parle souvent de « flognarde »."
+    }
   };
 
   const BLAGUES = [
@@ -442,7 +494,7 @@
       .join("");
     return {
       html: `<p>Pour <strong>${esc(r.titreCourt.toLowerCase())}</strong> (${esc(A.portionsLabel(r, n))}) :</p><ul>${lignes}</ul>`,
-      actions: [{ label: "🧺 Ajouter à ma liste", type: "list", key: r.key, portions: n }],
+      actions: [{ label: "Ajouter à ma liste", icon: "basket", type: "list", key: r.key, portions: n }],
       quick: [`Pour ${n + 2} ${r.portions.pluriel}`, "Combien de temps ?", "Les étapes"]
     };
   }
@@ -461,7 +513,7 @@
   function answerSteps(r) {
     return {
       html: `<p>Les ${r.etapes.length} étapes de ${recipeLink(r)} :</p><ol>${r.etapes.map((e) => `<li>${esc(e.titre)}</li>`).join("")}</ol><p>Le mode cuisine te guide étape par étape en grand, avec les minuteurs.</p>`,
-      actions: [{ label: "👩‍🍳 Lancer le mode cuisine", type: "link", href: `${r.url}#cuisine` }],
+      actions: [{ label: "Lancer le mode cuisine", icon: "book", type: "link", href: `${r.url}#cuisine` }],
       quick: ["Une astuce", "Les ingrédients"]
     };
   }
@@ -502,7 +554,7 @@
     if (!o) return { html: `<p>Je n'ai pas d'informations fiables sur l'origine de ce plat.</p>` };
     return {
       html: `<p>${o.drapeau} <strong>${esc(o.pays)}</strong> — ${esc(o.resume)}</p><ul>${o.faits.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>`,
-      actions: [{ label: "🌍 Voir les sources", type: "link", href: `infos.html#${r.key}` }]
+      actions: [{ label: "Voir les sources", icon: "globe", type: "link", href: `infos.html#${r.key}` }]
     };
   }
 
@@ -583,9 +635,11 @@
   }
 
   function fromFridge(text) {
-    const have = Object.entries(INGREDIENTS)
-      .filter(([, syn]) => has(text, syn))
-      .map(([k]) => k);
+    const have = cleanKeys(
+      Object.entries(INGREDIENTS)
+        .filter(([, syn]) => has(text, syn))
+        .map(([k]) => k)
+    );
     if (!have.length) return null;
     const results = RECETTES.map((r) => {
       const ings = RECIPE_INGS[r.key];
@@ -773,7 +827,7 @@
       return { html: `<p>🎮 Il y a 4 mini-jeux au restaurant : la course du chef, le memory, le quiz et le coup de feu en cuisine.</p>`, actions: [{ label: "Voir les jeux", type: "link", href: "jeux.html" }] };
     }
     if (has(text, ["liste de courses", "ma liste", "courses"])) {
-      return { html: `<p>🧺 Ta liste de courses s'ouvre sur le côté. Sur chaque recette, le bouton « Ajouter à ma liste » y met les ingrédients avec les bonnes quantités.</p>`, actions: [{ label: "Ouvrir ma liste", type: "openlist" }] };
+      return { html: `<p>Ta liste de courses s'ouvre sur le côté. Sur chaque recette, le bouton « Ajouter à ma liste » y met les ingrédients avec les bonnes quantités.</p>`, actions: [{ label: "Ouvrir ma liste", icon: "basket", type: "openlist" }] };
     }
     if (has(text, ["livre d or", "laisser un avis", "donner mon avis", "noter"])) {
       return { html: `<p>⭐ Le livre d'or t'attend : tu peux y laisser une note et un petit mot.</p>`, actions: [{ label: "Aller au livre d'or", type: "link", href: "avis.html" }] };
@@ -921,28 +975,36 @@
   function renderActions(actions) {
     return `<div class="quick-replies" style="padding:0 0 0 38px">${actions
       .map((a, i) => {
-        if (a.type === "link") return `<button type="button" style="--i:${i}" data-chat-href="${esc(a.href)}">${esc(a.label)}</button>`;
-        if (a.type === "list") return `<button type="button" style="--i:${i}" data-chat-list="${esc(a.key)}" data-portions="${a.portions}">${esc(a.label)}</button>`;
-        if (a.type === "openlist") return `<button type="button" style="--i:${i}" data-open-list>${esc(a.label)}</button>`;
+        const label = `${a.icon ? icon(a.icon) : ""}${esc(a.label)}`;
+        if (a.type === "link") return `<button type="button" style="--i:${i}" data-chat-href="${esc(a.href)}">${label}</button>`;
+        if (a.type === "list") return `<button type="button" style="--i:${i}" data-chat-list="${esc(a.key)}" data-portions="${a.portions}">${label}</button>`;
+        if (a.type === "openlist") return `<button type="button" style="--i:${i}" data-open-list>${label}</button>`;
         return "";
       })
       .join("")}</div>`;
   }
 
+  const AVATAR = `<span class="avatar avatar-chef" aria-hidden="true">${A.logo || "👨‍🍳"}</span>`;
+  const TOUCH = window.matchMedia("(pointer: coarse)").matches;
+
   function appendMessage(msg, animate = true) {
     const bodyEl = panel.querySelector(".chat-body");
     const wrap = document.createElement("div");
-    wrap.style.display = "contents";
+    wrap.className = "msg-group";
     if (msg.from === "user") {
       wrap.innerHTML = `<div class="msg user"><div class="msg-bubble">${esc(msg.text)}</div></div>`;
     } else {
-      wrap.innerHTML = `<div class="msg bot"><span class="avatar" aria-hidden="true">👨‍🍳</span><div class="msg-bubble">${msg.html}</div></div>${
+      wrap.innerHTML = `<div class="msg bot">${AVATAR}<div class="msg-bubble">${msg.html}</div></div>${
         msg.cards?.length ? renderCards(msg.cards) : ""
       }${msg.actions?.length ? renderActions(msg.actions) : ""}`;
     }
     if (!animate) wrap.querySelectorAll(".msg, .msg-cards, .quick-replies button").forEach((n) => (n.style.animation = "none"));
     bodyEl.appendChild(wrap);
-    bodyEl.scrollTop = bodyEl.scrollHeight;
+    // Une réponse longue doit se lire depuis son début : on cale le début du
+    // message en haut de la zone visible plutôt que d'aller tout en bas.
+    const top = wrap.offsetTop - 12;
+    const bottom = bodyEl.scrollHeight - bodyEl.clientHeight;
+    bodyEl.scrollTop = msg.from === "bot" && wrap.offsetHeight > bodyEl.clientHeight * 0.6 ? Math.min(top, bottom) : bottom;
   }
 
   function setQuick(list) {
@@ -964,7 +1026,7 @@
     const bodyEl = panel.querySelector(".chat-body");
     const typing = document.createElement("div");
     typing.className = "msg bot";
-    typing.innerHTML = `<span class="avatar" aria-hidden="true">👨‍🍳</span><div class="msg-bubble typing" aria-label="L'assistant écrit"><i></i><i></i><i></i></div>`;
+    typing.innerHTML = `${AVATAR}<div class="msg-bubble typing" aria-label="L'assistant écrit"><i></i><i></i><i></i></div>`;
     bodyEl.appendChild(typing);
     bodyEl.scrollTop = bodyEl.scrollHeight;
 
@@ -977,13 +1039,16 @@
     }
     const delay = Math.min(1100, 380 + reply.html.length * 0.8);
     setTimeout(() => {
-      typing.remove();
-      const botMsg = { from: "bot", html: reply.html, cards: reply.cards || [], actions: reply.actions || [], quick: reply.quick || [] };
-      history.push(botMsg);
-      appendMessage(botMsg);
-      setQuick(reply.quick?.length ? reply.quick : defaultQuick());
-      saveHistory();
-      busy = false;
+      try {
+        typing.remove();
+        const botMsg = { from: "bot", html: reply.html, cards: reply.cards || [], actions: reply.actions || [], quick: reply.quick || [] };
+        history.push(botMsg);
+        appendMessage(botMsg);
+        setQuick(reply.quick?.length ? reply.quick : defaultQuick());
+        saveHistory();
+      } finally {
+        busy = false;
+      }
     }, delay);
   }
 
@@ -1004,7 +1069,7 @@
     fab.className = "chat-fab";
     fab.type = "button";
     fab.setAttribute("aria-label", "Ouvrir l'assistant du chef");
-    fab.innerHTML = `<span class="avatar" aria-hidden="true">👨‍🍳</span><span class="fab-label">Demande au chef</span>${
+    fab.innerHTML = `${AVATAR}<span class="fab-label">Demande au chef</span>${
       A.store.get("antoine-chat-vu") ? "" : '<span class="ping" aria-hidden="true"></span>'
     }`;
     document.body.appendChild(fab);
@@ -1016,7 +1081,7 @@
     panel.setAttribute("aria-label", "Assistant du chef");
     panel.innerHTML = `
       <div class="chat-head">
-        <span class="avatar" aria-hidden="true">👨‍🍳</span>
+        ${AVATAR}
         <div class="who"><strong>L'assistant du chef</strong><small>Répond instantanément</small></div>
         <button class="icon-btn" type="button" data-chat-clear aria-label="Effacer la conversation" title="Nouvelle conversation">${icon("trash")}</button>
         <button class="icon-btn chat-expand" type="button" data-chat-expand aria-label="Agrandir">${icon("expand")}</button>
@@ -1060,7 +1125,35 @@
       const input = e.currentTarget.q;
       send(input.value);
       input.value = "";
+      if (TOUCH) input.blur();
     });
+    // iPhone/Android : le clavier réduit la zone visible sans réduire 100vh.
+    // On cale le panneau sur la zone réellement visible.
+    const vv = window.visualViewport;
+    if (vv) {
+      let lastHeight = vv.height;
+      const fit = () => {
+        if (panel.hidden || window.innerWidth > 560) {
+          panel.style.removeProperty("top");
+          panel.style.removeProperty("height");
+          lastHeight = vv.height;
+          return;
+        }
+        panel.style.top = `${vv.offsetTop}px`;
+        panel.style.height = `${vv.height}px`;
+        // Seulement quand le clavier s'ouvre : le dernier message reste visible au-dessus du champ.
+        // (Sinon on ne touche pas au défilement, pour pouvoir lire le début d'une longue réponse.)
+        const typing = document.activeElement?.closest?.(".chat-form");
+        if (typing && vv.height < lastHeight - 80) {
+          const bodyEl = panel.querySelector(".chat-body");
+          bodyEl.scrollTop = bodyEl.scrollHeight;
+        }
+        lastHeight = vv.height;
+      };
+      vv.addEventListener("resize", fit);
+      vv.addEventListener("scroll", fit);
+      panel.fit = fit;
+    }
     panel.addEventListener("click", (e) => {
       const q = e.target.closest("[data-quick]");
       if (q) send(q.dataset.quick);
@@ -1080,17 +1173,21 @@
   function open(prompt) {
     if (!panel) build();
     panel.hidden = false;
+    document.body.classList.add("chat-open");
+    panel.fit?.();
     fab.classList.add("is-hidden");
     fab.querySelector(".ping")?.remove();
     A.store.set("antoine-chat-vu", "1");
     const bodyEl = panel.querySelector(".chat-body");
     bodyEl.scrollTop = bodyEl.scrollHeight;
     if (prompt) send(prompt);
-    else setTimeout(() => panel.querySelector(".chat-form input").focus(), 50);
+    // Pas de focus automatique sur mobile : le clavier cacherait la conversation.
+    else if (!TOUCH) setTimeout(() => panel.querySelector(".chat-form input").focus(), 50);
   }
 
   function close() {
     panel.hidden = true;
+    document.body.classList.remove("chat-open");
     fab.classList.remove("is-hidden");
     fab.focus();
   }
