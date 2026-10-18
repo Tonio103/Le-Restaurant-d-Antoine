@@ -127,9 +127,10 @@
     familial: { mots: ["famille", "familial", "convivial", "partager", "entre amis", "amis", "copains", "soiree"], label: "convivial" },
     healthy: { mots: ["healthy", "sain", "saine", "equilibre", "equilibree", "dietetique", "vitamine", "vitamines", "detox"], label: "équilibré" },
     chocolat: { mots: ["chocolat", "choco", "cacao", "chocolate"], label: "chocolat" },
-    poisson: { mots: ["poisson", "saumon", "poissons"], label: "poisson" },
-    viande: { mots: ["viande", "boeuf", "poulet", "volaille", "bacon", "lardons", "carnivore", "steak"], label: "viande" },
-    asiatique: { mots: ["japonais", "japonaise", "asiatique", "asie", "japon", "hawai", "hawaien", "exotique"], label: "voyage" },
+    gastro: { mots: ["gastronomique", "gastro", "gourmet", "gourmette", "gourmettes", "chic", "raffine", "raffinee", "etoile", "haut de gamme", "comme au restaurant", "elegant", "elegante", "grand chef"], label: "gastronomique" },
+    poisson: { mots: ["poisson", "saumon", "poissons", "sole", "cabillaud", "fruits de mer", "crevettes", "saint-jacques", "saint jacques"], label: "poisson" },
+    viande: { mots: ["viande", "boeuf", "poulet", "volaille", "bacon", "lardons", "carnivore", "steak", "agneau", "canard", "veau", "magret"], label: "viande" },
+    asiatique: { mots: ["japonais", "japonaise", "asiatique", "asie", "japon", "hawai", "hawaien", "exotique", "thai", "thailandais", "indien", "indienne", "inde", "oriental", "orientale"], label: "voyage" },
     francais: { mots: ["francais", "francaise", "traditionnel", "terroir", "classique", "grand-mere", "grand mere", "mamie", "mamoune", "bistrot"], label: "tradition" },
     americain: { mots: ["americain", "americaine", "usa", "fast food", "street food"], label: "américain" },
     fatigue: { mots: ["fatigue", "fatiguee", "creve", "crevee", "epuise", "epuisee", "flemme", "la flemme", "pas envie de cuisiner"], label: "sans effort" },
@@ -145,13 +146,14 @@
     ete: ["ete", "frais"],
     fete: ["fete", "invite", "raffine", "dimanche"],
     romantique: ["romantique", "raffine"],
+    gastro: ["gastronomique", "raffine"],
     enfant: ["enfant"],
     familial: ["familial", "convivial"],
     healthy: ["healthy", "equilibre", "leger", "sain"],
     chocolat: ["chocolat"],
     poisson: ["poisson"],
     viande: ["viande"],
-    asiatique: ["japonais", "asiatique", "hawaien"],
+    asiatique: ["japonais", "asiatique", "hawaien", "thai", "indien", "oriental"],
     francais: ["francais", "traditionnel"],
     americain: ["americain"],
     faim: ["plat", "copieux", "gourmand"]
@@ -241,6 +243,17 @@
     epinards: ["epinard", "epinards"],
     guanciale: ["guanciale", "pancetta"],
     biscuits: ["biscuits cuillere", "boudoirs", "biscuit"],
+    poires: ["poire", "poires"],
+    fraises: ["fraise", "fraises"],
+    fruitsrouges: ["fruits rouges", "framboise", "framboises", "myrtilles"],
+    canard: ["canard", "magret", "cuisses de canard"],
+    agneau: ["agneau", "gigot", "souris d agneau"],
+    crevettes: ["crevette", "crevettes"],
+    reblochon: ["reblochon"],
+    morilles: ["morille", "morilles"],
+    peches: ["peche", "peches"],
+    amandes: ["amande", "amandes", "poudre d amande"],
+    rhum: ["rhum"],
     pain2: ["pate brisee", "pate feuilletee", "pate sablee"]
   };
   const PANTRY = ["sel", "poivre", "huile", "eau", "fleur de sel", "piment", "herbes"];
@@ -645,10 +658,12 @@
       const ings = RECIPE_INGS[r.key];
       const matched = ings.filter((i) => i.keys.some((k) => have.includes(k)));
       const missing = ings.filter((i) => !i.keys.some((k) => have.includes(k)));
-      return { r, matched, missing, ratio: ings.length ? matched.length / ings.length : 0 };
+      // couverts : combien des ingrédients cités par la personne la recette utilise
+      const couverts = have.filter((k) => ings.some((i) => i.keys.includes(k))).length;
+      return { r, matched, missing, couverts, ratio: ings.length ? matched.length / ings.length : 0 };
     })
       .filter((o) => o.matched.length)
-      .sort((a, b) => a.missing.length - b.missing.length || b.matched.length - a.matched.length)
+      .sort((a, b) => b.couverts - a.couverts || a.missing.length - b.missing.length)
       .slice(0, 3);
     if (!results.length) {
       return {
